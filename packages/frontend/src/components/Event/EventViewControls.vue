@@ -45,229 +45,224 @@ const { t } = useI18n();
 
 <template>
     <div class="EventViewControls">
-        <q-btn
-            flat
-            dense
-            color="grey-7"
-            icon="fa fa-ellipsis-v"
-            class="EventViewControls__menu-btn"
-            aria-label="Event controls menu"
-        >
-            <q-badge
-                v-if="totalNotifications > 0"
-                color="red"
-                floating
-                class="EventViewControls__badge"
-                :aria-label="`${totalNotifications} notifications`"
-            >
-                {{ totalNotifications }}
-            </q-badge>
+        <v-menu location="bottom end" origin="top end" class="EventViewControls__menu">
+            <template v-slot:activator="{ props: menuProps }">
+                <v-badge
+                    v-if="totalNotifications > 0"
+                    :content="totalNotifications"
+                    color="error"
+                    :aria-label="`${totalNotifications} notifications`"
+                >
+                    <v-btn
+                        v-bind="menuProps"
+                        variant="text"
+                        density="comfortable"
+                        color="grey-darken-1"
+                        icon="fas fa-ellipsis-v"
+                        class="EventViewControls__menu-btn"
+                        aria-label="Event controls menu"
+                    />
+                </v-badge>
+                <v-btn
+                    v-else
+                    v-bind="menuProps"
+                    variant="text"
+                    density="comfortable"
+                    color="grey-darken-1"
+                    icon="fas fa-ellipsis-v"
+                    class="EventViewControls__menu-btn"
+                    aria-label="Event controls menu"
+                />
+            </template>
 
-            <q-menu class="EventViewControls__menu" anchor="bottom right" self="top right">
-                <q-list>
-                    <!-- Floor Selection (if multiple floors) -->
-                    <template v-if="hasMultipleFloors">
-                        <q-item-label header class="EventViewControls__section-header">
-                            <q-icon name="fa fa-layer-group" class="q-mr-xs" />
-                            {{ t("EventViewControls.sections.floors") }}
-                        </q-item-label>
+            <v-list class="EventViewControls__menu-list">
+                <!-- Floor Selection (if multiple floors) -->
+                <template v-if="hasMultipleFloors">
+                    <v-list-subheader class="EventViewControls__section-header">
+                        <v-icon size="small" class="me-1">fas fa-layer-group</v-icon>
+                        {{ t("EventViewControls.sections.floors") }}
+                    </v-list-subheader>
 
-                        <!-- Radio group for floors -->
-                        <div role="radiogroup" aria-label="Select floor">
-                            <q-item
-                                v-for="floor in floors"
-                                :key="floor.id"
-                                clickable
-                                v-close-popup
-                                @click="setActiveFloor(floor)"
-                                class="EventViewControls__menu-item"
-                                :class="{
-                                    'EventViewControls__menu-item--active': isActiveFloor(floor.id),
-                                }"
-                                role="radio"
-                                :aria-checked="isActiveFloor(floor.id)"
-                                :aria-label="`${floor.name}${isActiveFloor(floor.id) ? ' (current floor)' : ''}`"
-                                tabindex="0"
-                            >
-                                <q-item-section avatar>
-                                    <q-icon
-                                        :name="
-                                            isActiveFloor(floor.id)
-                                                ? 'fa fa-check-circle'
-                                                : 'fa fa-circle'
-                                        "
-                                        class="EventViewControls__menu-icon"
-                                        :class="{
-                                            'EventViewControls__menu-icon--active': isActiveFloor(
-                                                floor.id,
-                                            ),
-                                        }"
-                                        aria-hidden="true"
-                                    />
-                                </q-item-section>
-                                <q-item-section>
-                                    <q-item-label class="EventViewControls__menu-label">
-                                        {{ floor.name }}
-                                    </q-item-label>
-                                </q-item-section>
-                            </q-item>
-                        </div>
+                    <!-- Radio group for floors -->
+                    <div role="radiogroup" aria-label="Select floor">
+                        <v-list-item
+                            v-for="floor in floors"
+                            :key="floor.id"
+                            @click="setActiveFloor(floor)"
+                            class="EventViewControls__menu-item"
+                            :class="{
+                                'EventViewControls__menu-item--active': isActiveFloor(floor.id),
+                            }"
+                            role="radio"
+                            :aria-checked="isActiveFloor(floor.id)"
+                            :aria-label="`${floor.name}${isActiveFloor(floor.id) ? ' (current floor)' : ''}`"
+                            tabindex="0"
+                        >
+                            <template v-slot:prepend>
+                                <v-icon
+                                    :icon="
+                                        isActiveFloor(floor.id)
+                                            ? 'fas fa-check-circle'
+                                            : 'fas fa-circle'
+                                    "
+                                    class="EventViewControls__menu-icon"
+                                    :class="{
+                                        'EventViewControls__menu-icon--active': isActiveFloor(
+                                            floor.id,
+                                        ),
+                                    }"
+                                    aria-hidden="true"
+                                />
+                            </template>
 
-                        <q-separator class="EventViewControls__separator" />
+                            <v-list-item-title class="EventViewControls__menu-label">
+                                {{ floor.name }}
+                            </v-list-item-title>
+                        </v-list-item>
+                    </div>
+
+                    <v-divider class="EventViewControls__separator" />
+                </template>
+
+                <!-- Actions Section -->
+                <v-list-subheader class="EventViewControls__section-header">
+                    <v-icon size="small" class="me-1">fas fa-cog</v-icon>
+                    {{ t("EventViewControls.sections.actions") }}
+                </v-list-subheader>
+
+                <!-- Queued Reservations -->
+                <v-list-item
+                    @click="emit('toggle-queued-reservations-drawer-visibility')"
+                    class="EventViewControls__menu-item"
+                    aria-label="Toggle queued reservations drawer"
+                    role="menuitem"
+                >
+                    <template v-slot:prepend>
+                        <v-icon
+                            icon="fas fa-bars"
+                            class="EventViewControls__menu-icon"
+                            aria-hidden="true"
+                        />
                     </template>
 
-                    <!-- Actions Section -->
-                    <q-item-label header class="EventViewControls__section-header">
-                        <q-icon name="fa fa-cog" class="q-mr-xs" />
-                        {{ t("EventViewControls.sections.actions") }}
-                    </q-item-label>
+                    <v-list-item-title class="EventViewControls__menu-label">
+                        {{ t("EventViewControls.menuItems.queuedReservations") }}
+                    </v-list-item-title>
 
-                    <!-- Queued Reservations -->
-                    <q-item
-                        clickable
-                        v-close-popup
-                        @click="emit('toggle-queued-reservations-drawer-visibility')"
-                        class="EventViewControls__menu-item"
-                        aria-label="Toggle queued reservations drawer"
-                        role="menuitem"
-                    >
-                        <q-item-section avatar>
-                            <q-icon
-                                name="fa fa-bars"
-                                class="EventViewControls__menu-icon"
-                                aria-hidden="true"
-                            />
-                        </q-item-section>
-                        <q-item-section>
-                            <q-item-label class="EventViewControls__menu-label">
-                                {{ t("EventViewControls.menuItems.queuedReservations") }}
-                            </q-item-label>
-                        </q-item-section>
-                        <q-item-section side v-if="queuedReservationsCount > 0">
-                            <q-badge
-                                color="red"
-                                :label="queuedReservationsCount"
-                                :aria-label="`${queuedReservationsCount} queued reservations`"
-                            />
-                        </q-item-section>
-                    </q-item>
+                    <template v-slot:append v-if="queuedReservationsCount > 0">
+                        <v-badge
+                            :content="queuedReservationsCount"
+                            color="error"
+                            :aria-label="`${queuedReservationsCount} queued reservations`"
+                        />
+                    </template>
+                </v-list-item>
 
-                    <!-- Guest List -->
-                    <q-item
-                        clickable
-                        v-close-popup
-                        @click="emit('toggle-event-guest-list-drawer-visibility')"
-                        class="EventViewControls__menu-item"
-                        aria-label="Toggle guest list drawer"
-                        role="menuitem"
-                    >
-                        <q-item-section avatar>
-                            <q-icon
-                                name="fa fa-users"
-                                class="EventViewControls__menu-icon"
-                                aria-hidden="true"
-                            />
-                        </q-item-section>
-                        <q-item-section>
-                            <q-item-label class="EventViewControls__menu-label">
-                                {{ t("EventViewControls.menuItems.guestList") }}
-                            </q-item-label>
-                        </q-item-section>
-                        <q-item-section side v-if="guestListCount > 0">
-                            <q-badge
-                                color="blue"
-                                :label="guestListCount"
-                                :aria-label="`${guestListCount} guests`"
-                            />
-                        </q-item-section>
-                    </q-item>
+                <!-- Guest List -->
+                <v-list-item
+                    @click="emit('toggle-event-guest-list-drawer-visibility')"
+                    class="EventViewControls__menu-item"
+                    aria-label="Toggle guest list drawer"
+                    role="menuitem"
+                >
+                    <template v-slot:prepend>
+                        <v-icon
+                            icon="fas fa-users"
+                            class="EventViewControls__menu-icon"
+                            aria-hidden="true"
+                        />
+                    </template>
 
-                    <q-separator class="EventViewControls__separator" />
+                    <v-list-item-title class="EventViewControls__menu-label">
+                        {{ t("EventViewControls.menuItems.guestList") }}
+                    </v-list-item-title>
 
-                    <!-- Event Info -->
-                    <q-item
-                        clickable
-                        v-close-popup
-                        @click="emit('show-event-info')"
-                        class="EventViewControls__menu-item"
-                        aria-label="Show event info"
-                        role="menuitem"
-                    >
-                        <q-item-section avatar>
-                            <q-icon
-                                name="fa fa-info-circle"
-                                class="EventViewControls__menu-icon"
-                                aria-hidden="true"
-                            />
-                        </q-item-section>
-                        <q-item-section>
-                            <q-item-label class="EventViewControls__menu-label">
-                                {{ t("EventViewControls.menuItems.eventInfo") }}
-                            </q-item-label>
-                        </q-item-section>
-                    </q-item>
+                    <template v-slot:append v-if="guestListCount > 0">
+                        <v-badge
+                            :content="guestListCount"
+                            color="info"
+                            :aria-label="`${guestListCount} guests`"
+                        />
+                    </template>
+                </v-list-item>
 
-                    <!-- Admin View -->
-                    <q-item
-                        v-if="canSeeAdminEvent"
-                        clickable
-                        v-close-popup
-                        @click="emit('navigate-to-admin-event')"
-                        class="EventViewControls__menu-item"
-                        aria-label="Navigate to admin view"
-                        role="menuitem"
-                    >
-                        <q-item-section avatar>
-                            <q-icon
-                                name="fa fa-eye"
-                                class="EventViewControls__menu-icon"
-                                aria-hidden="true"
-                            />
-                        </q-item-section>
-                        <q-item-section>
-                            <q-item-label class="EventViewControls__menu-label">
-                                {{ t("EventViewControls.menuItems.adminView") }}
-                            </q-item-label>
-                        </q-item-section>
-                    </q-item>
+                <v-divider class="EventViewControls__separator" />
 
-                    <!-- Export Reservations -->
-                    <q-item
-                        v-if="canExportReservations"
-                        clickable
-                        v-close-popup
-                        @click="emit('export-reservations')"
-                        class="EventViewControls__menu-item"
-                        aria-label="Export reservations"
-                        role="menuitem"
-                    >
-                        <q-item-section avatar>
-                            <q-icon
-                                name="fa fa-file-export"
-                                class="EventViewControls__menu-icon"
-                                aria-hidden="true"
-                            />
-                        </q-item-section>
-                        <q-item-section>
-                            <q-item-label class="EventViewControls__menu-label">
-                                {{ t("EventViewControls.menuItems.exportReservations") }}
-                            </q-item-label>
-                        </q-item-section>
-                    </q-item>
-                </q-list>
-            </q-menu>
-        </q-btn>
+                <!-- Event Info -->
+                <v-list-item
+                    @click="emit('show-event-info')"
+                    class="EventViewControls__menu-item"
+                    aria-label="Show event info"
+                    role="menuitem"
+                >
+                    <template v-slot:prepend>
+                        <v-icon
+                            icon="fas fa-info-circle"
+                            class="EventViewControls__menu-icon"
+                            aria-hidden="true"
+                        />
+                    </template>
+
+                    <v-list-item-title class="EventViewControls__menu-label">
+                        {{ t("EventViewControls.menuItems.eventInfo") }}
+                    </v-list-item-title>
+                </v-list-item>
+
+                <!-- Admin View -->
+                <v-list-item
+                    v-if="canSeeAdminEvent"
+                    @click="emit('navigate-to-admin-event')"
+                    class="EventViewControls__menu-item"
+                    aria-label="Navigate to admin view"
+                    role="menuitem"
+                >
+                    <template v-slot:prepend>
+                        <v-icon
+                            icon="fas fa-eye"
+                            class="EventViewControls__menu-icon"
+                            aria-hidden="true"
+                        />
+                    </template>
+
+                    <v-list-item-title class="EventViewControls__menu-label">
+                        {{ t("EventViewControls.menuItems.adminView") }}
+                    </v-list-item-title>
+                </v-list-item>
+
+                <!-- Export Reservations -->
+                <v-list-item
+                    v-if="canExportReservations"
+                    @click="emit('export-reservations')"
+                    class="EventViewControls__menu-item"
+                    aria-label="Export reservations"
+                    role="menuitem"
+                >
+                    <template v-slot:prepend>
+                        <v-icon
+                            icon="fas fa-file-export"
+                            class="EventViewControls__menu-icon"
+                            aria-hidden="true"
+                        />
+                    </template>
+
+                    <v-list-item-title class="EventViewControls__menu-label">
+                        {{ t("EventViewControls.menuItems.exportReservations") }}
+                    </v-list-item-title>
+                </v-list-item>
+            </v-list>
+        </v-menu>
     </div>
 </template>
 
 <style lang="scss" scoped>
+@use "src/css/variables.scss" as *;
+
 .EventViewControls {
     display: flex;
     align-items: center;
     justify-content: flex-end;
 
     &__menu-btn {
-        position: relative;
         min-width: 36px;
         min-height: 36px;
         border-radius: $button-border-radius;
@@ -279,18 +274,7 @@ const { t } = useI18n();
         }
     }
 
-    &__badge {
-        position: absolute;
-        top: -6px;
-        right: -6px;
-        z-index: 1;
-        font-size: 10px;
-        min-width: 16px;
-        height: 16px;
-        animation: pulse 2s infinite;
-    }
-
-    &__menu {
+    &__menu-list {
         min-width: 240px;
         max-height: 400px;
         border-radius: $button-border-radius;
@@ -300,7 +284,7 @@ const { t } = useI18n();
     }
 
     &__section-header {
-        padding: 12px 16px 8px 16px;
+        padding: 12px 16px 8px 16px !important;
         font-weight: 600;
         color: $text-secondary;
         font-size: 12px;
@@ -311,8 +295,9 @@ const { t } = useI18n();
     }
 
     &__menu-item {
-        padding: 10px 16px;
-        transition: all 0.2s ease;
+        :deep(.v-list-item__prepend) {
+            min-width: 36px;
+        }
 
         &:hover {
             background: rgba($primary, 0.05);
@@ -320,10 +305,6 @@ const { t } = useI18n();
 
         &--active {
             background: rgba($primary, 0.1);
-        }
-
-        .q-item__section--avatar {
-            min-width: 36px;
         }
     }
 
@@ -363,14 +344,14 @@ const { t } = useI18n();
     }
 }
 
-.body--dark .EventViewControls {
+.v-theme--dark .EventViewControls {
     &__menu-btn {
         &:hover {
             background: rgba($primary, 0.15);
         }
     }
 
-    &__menu {
+    &__menu-list {
         background: $surface-elevated-dark;
         border-color: $border-light-dark;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -414,19 +395,17 @@ const { t } = useI18n();
             min-height: 32px;
         }
 
-        &__menu {
+        &__menu-list {
             min-width: 220px;
         }
 
         &__section-header {
-            padding: 10px 12px 6px 12px;
+            padding: 10px 12px 6px 12px !important;
             font-size: 11px;
         }
 
         &__menu-item {
-            padding: 8px 12px;
-
-            .q-item__section--avatar {
+            :deep(.v-list-item__prepend) {
                 min-width: 32px;
             }
         }

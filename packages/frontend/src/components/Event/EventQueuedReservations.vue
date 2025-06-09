@@ -12,11 +12,10 @@ import { storeToRefs } from "pinia";
 import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
 import EventShowQueuedReservation from "src/components/Event/reservation/EventShowQueuedReservation.vue";
 import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
-import FTBtn from "src/components/FTBtn.vue";
+// FTBtn will be replaced by v-btn
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalDialog } from "src/composables/useDialog";
 import { plannedToQueuedReservation } from "src/helpers/reservation/planned-to-queued-reservation";
 import { useAuthStore } from "src/stores/auth-store";
 import { useEventsStore } from "src/stores/events-store";
@@ -42,7 +41,6 @@ const { data, error, eventData, eventOwner, users } = defineProps<EventQueuedRes
 
 const { nonNullableUser } = storeToRefs(useAuthStore());
 const { t } = useI18n();
-const { createDialog } = useDialog();
 const eventsStore = useEventsStore();
 const propertiesStore = usePropertiesStore();
 
@@ -51,103 +49,91 @@ const propertiesSettings = computed(function () {
 });
 
 function addNewQueuedReservation(): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: EventCreateReservation,
-            componentPropsObject: {
-                currentUser: nonNullableUser.value,
-                eventDurationInHours: propertiesSettings.value.event.eventDurationInHours,
-                eventStartTimestamp: eventData.date,
-                mode: "create",
-                onlyPlanned: true,
-                timezone: propertiesSettings.value.timezone,
-                users,
+    const dialog = globalDialog.openDialog(
+        EventCreateReservation,
+        {
+            currentUser: nonNullableUser.value,
+            eventDurationInHours: propertiesSettings.value.event.eventDurationInHours,
+            eventStartTimestamp: eventData.date,
+            mode: "create",
+            onCreate(reservationData: PlannedReservation) {
+                emit("create", plannedToQueuedReservation(reservationData));
+                dialog.hide();
             },
-            listeners: {
-                create(reservationData: PlannedReservation) {
-                    emit("create", plannedToQueuedReservation(reservationData));
-                    dialog.hide();
-                },
-            },
-            maximized: false,
+            onlyPlanned: true,
+            timezone: propertiesSettings.value.timezone,
+            users,
+        },
+        {
             title: `${t("EventQueuedReservations.addNewReservation")}`,
         },
-    });
+    );
 }
 
 function showReservation(reservation: QueuedReservationDoc): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: EventShowQueuedReservation,
-            componentPropsObject: {
-                reservation,
-                timezone: propertiesSettings.value.timezone,
-            },
-            listeners: {
-                delete() {
-                    emit("delete", reservation);
-                    dialog.hide();
-                },
-                unqueue() {
-                    emit("unqueue", reservation);
-                    dialog.hide();
-                    eventsStore.toggleQueuedReservationsDrawerVisibility();
-                },
-            },
-            maximized: false,
-            title: "",
+    const dialog = globalDialog.openDialog(EventShowQueuedReservation, {
+        onDelete() {
+            emit("delete", reservation);
+            dialog.hide();
         },
+        onUnqueue() {
+            emit("unqueue", reservation);
+            dialog.hide();
+            eventsStore.toggleQueuedReservationsDrawerVisibility();
+        },
+        reservation,
+        timezone: propertiesSettings.value.timezone,
     });
 }
 </script>
 
 <template>
-    <q-drawer
-        no-swipe-open
+    <v-navigation-drawer
+        temporary
         v-model="eventsStore.showQueuedReservationsDrawer"
-        overlay
-        behavior="mobile"
-        side="left"
+        location="left"
     >
-        <div class="EventQueuedReservations">
+        <div class="EventQueuedReservations pa-2">
             <FTTitle :title="t('EventQueuedReservations.title')">
                 <template #right>
-                    <FTBtn
+                    <v-btn
                         aria-label="Add new reservation"
-                        rounded
-                        icon="fa fa-plus"
+                        icon="fa:fas fa-plus"
                         class="button-gradient"
+                        variant="elevated"
+                        density="comfortable"
                         @click="addNewQueuedReservation"
                     />
                 </template>
             </FTTitle>
         </div>
 
-        <div v-if="data.length === 0">
-            <div class="row justify-center items-center q-mt-md">
+        <div v-if="data.length === 0" class="pa-2">
+            <div class="d-flex flex-column justify-center align-center mt-4">
                 <FTCenteredText>{{ t("EventQueuedReservations.emptyMessage") }}</FTCenteredText>
-                <q-img src="/people-confirmation.svg" alt="Empty reservations image" />
+                <v-img
+                    src="/people-confirmation.svg"
+                    alt="Empty reservations image"
+                    max-width="200"
+                    class="mt-4"
+                />
             </div>
         </div>
 
-        <div v-if="data.length === 0 && error">
+        <div v-if="data.length === 0 && error" class="pa-2">
             <FTCenteredText> {{ t("EventQueuedReservations.errorMessage") }}</FTCenteredText>
         </div>
 
         <div v-if="data.length > 0">
-            <q-list>
-                <q-item clickable v-for="res in data" @click="showReservation(res)">
-                    <q-item-section>
-                        <q-item-label>{{ res.guestName }}</q-item-label>
-                        <q-item-label caption>{{ res.guestContact }}</q-item-label>
-                    </q-item-section>
-                    <q-item-section side v-if="res.isVIP">
-                        <ReservationVIPChip />
-                    </q-item-section>
-                </q-item>
-            </q-list>
+            <v-list lines="two">
+                <v-list-item v-for="res in data" :key="res.id" @click="showReservation(res)" link>
+                    <v-list-item-title>{{ res.guestName }}</v-list-item-title>
+                    <v-list-item-subtitle>{{ res.guestContact }}</v-list-item-subtitle>
+                    <template v-slot:append>
+                        <ReservationVIPChip v-if="res.isVIP" />
+                    </template>
+                </v-list-item>
+            </v-list>
         </div>
-    </q-drawer>
+    </v-navigation-drawer>
 </template>

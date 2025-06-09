@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { DrinkBundle, DrinkCardItem, DrinkCardSection } from "@firetable/types";
 
-import FTDialog from "src/components/FTDialog.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalDialog } from "src/composables/useDialog";
 import { useI18n } from "vue-i18n";
 
 import DrinkBundleDialog from "./DrinkBundleDialog.vue";
@@ -21,79 +20,84 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 const { t } = useI18n();
-const { createDialog } = useDialog();
 
 function showBundleDialog(bundleToEdit?: DrinkBundle): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: DrinkBundleDialog,
-            componentPropsObject: {
-                availableItems: props.availableItems,
-                bundleToEdit,
+    const dialog = globalDialog.openDialog(
+        DrinkBundleDialog,
+        {
+            availableItems: props.availableItems,
+            bundleToEdit,
+            onSubmit(bundle: DrinkBundle) {
+                emit("add-bundle", bundle);
+                dialog.hide();
             },
-            listeners: {
-                submit(bundle: DrinkBundle) {
-                    emit("add-bundle", bundle);
-                    dialog.hide();
-                },
-                update(updatedBundle: DrinkBundle) {
-                    emit("update-bundle", updatedBundle);
-                    dialog.hide();
-                },
+            onUpdate(updatedBundle: DrinkBundle) {
+                emit("update-bundle", updatedBundle);
+                dialog.hide();
             },
+        },
+        {
             title: bundleToEdit
                 ? t("DrinkCardBuilderAddDragElementsDropdown.editBundleDialogTitle")
                 : t("DrinkCardBuilderAddDragElementsDropdown.createBundleDialogTitle"),
         },
-    });
+    );
 }
 
 function showCustomSectionDialog(): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: DrinkCardBuilderCustomSectionDialog,
-            listeners: {
-                add(section: DrinkCardSection) {
-                    emit("add-section", section);
-                    dialog.hide();
-                },
+    const dialog = globalDialog.openDialog(
+        DrinkCardBuilderCustomSectionDialog,
+        {
+            onAdd(section: DrinkCardSection) {
+                emit("add-section", section);
+                dialog.hide();
             },
+        },
+        {
             title: t("PageAdminPropertyDrinkCards.addSection"),
         },
-    });
+    );
 }
 
 defineExpose({ showBundleDialog });
 </script>
 
 <template>
-    <q-btn-dropdown flat rounded color="primary" icon="fa fa-plus" class="button-gradient">
-        <q-list>
-            <q-item clickable v-close-popup @click="$emit('add-header')">
-                <q-item-section>{{
+    <v-menu location="bottom end">
+        <template #activator="{ props }">
+            <v-btn
+                v-bind="props"
+                rounded="lg"
+                color="primary"
+                icon="fas fa-plus"
+                class="button-gradient"
+            ></v-btn>
+        </template>
+
+        <v-list>
+            <v-list-item @click="$emit('add-header')">
+                <v-list-item-title>{{
                     t("DrinkCardBuilderAddDragElementsDropdown.addHeaderLabel")
-                }}</q-item-section>
-            </q-item>
+                }}</v-list-item-title>
+            </v-list-item>
 
-            <q-item clickable v-close-popup @click="$emit('add-header-end')">
-                <q-item-section>{{
+            <v-list-item @click="$emit('add-header-end')">
+                <v-list-item-title>{{
                     t("DrinkCardBuilderAddDragElementsDropdown.addHeaderEndLabel")
-                }}</q-item-section>
-            </q-item>
+                }}</v-list-item-title>
+            </v-list-item>
 
-            <q-item clickable v-close-popup @click="showBundleDialog()">
-                <q-item-section>{{
+            <v-list-item @click="showBundleDialog()">
+                <v-list-item-title>{{
                     t("DrinkCardBuilderAddDragElementsDropdown.addBundleLabel")
-                }}</q-item-section>
-            </q-item>
+                }}</v-list-item-title>
+            </v-list-item>
 
-            <q-item clickable v-close-popup @click="showCustomSectionDialog">
-                <q-item-section>
+            <v-list-item @click="showCustomSectionDialog">
+                <v-list-item-title>
                     {{ t("PageAdminPropertyDrinkCards.addSection") }}
-                </q-item-section>
-            </q-item>
-        </q-list>
-    </q-btn-dropdown>
+                </v-list-item-title>
+            </v-list-item>
+        </v-list>
+    </v-menu>
 </template>

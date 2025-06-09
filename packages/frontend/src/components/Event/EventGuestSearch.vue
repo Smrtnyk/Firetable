@@ -1,21 +1,20 @@
 <script setup lang="ts">
-import type { AnyFunction, FloorDoc, PlannedReservation } from "@firetable/types";
+import type { FloorDoc, PlannedReservation, PlannedReservationDoc } from "@firetable/types";
 
-import { isString } from "es-toolkit";
-import { isObject, matchesProperty } from "es-toolkit/compat";
-import { QSelect } from "quasar";
+import { matchesProperty, uniqBy } from "es-toolkit/compat";
 import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
-import { nextTick, ref, useTemplateRef, watch } from "vue";
+import { computed, nextTick, ref, useTemplateRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 export interface EventGuestSearchProps {
-    allReservedTables: PlannedReservation[];
+    allReservedTables: PlannedReservationDoc[];
     floors: FloorDoc[];
     showFloorNameInOption: boolean;
 }
 
 interface Option {
     arrived: boolean;
+    id: string;
     isVip: boolean;
     label: string;
     value: PlannedReservation;
@@ -25,10 +24,49 @@ const props = defineProps<EventGuestSearchProps>();
 const emit = defineEmits(["found", "clear"]);
 const { t } = useI18n();
 
-const selectEl = useTemplateRef<QSelect | undefined>("selectEl");
-const options = ref(getNamesFromReservations(props.allReservedTables));
-const searchTerm = ref("");
+const selectEl = useTemplateRef<any>("selectEl");
+const selectedItem = ref<null | Option>(null);
+const searchInput = ref("");
 const hideArrived = ref(false);
+
+const SEARCH_RESULT_LIMIT = 50;
+
+const displayOptions = computed(() => {
+    let baseReservations = props.allReservedTables;
+
+    if (hideArrived.value) {
+        baseReservations = baseReservations.filter(function (reservation) {
+            return !reservation.arrived;
+        });
+    }
+
+    if (searchInput.value) {
+        const normalizedVal = searchInput.value.toLowerCase().trim();
+        const tokens = normalizedVal.split(/\s+/);
+
+        baseReservations = baseReservations.filter(function (reservation) {
+            const guestName = reservation.guestName.toLowerCase();
+            const guestNameTokens = guestName.split(/\s+/);
+
+            return tokens.some(function (token) {
+                return guestNameTokens.some(function (nameToken) {
+                    return nameToken.includes(token);
+                });
+            });
+        });
+    }
+
+    const limitedReservations = searchInput.value
+        ? baseReservations
+        : baseReservations.slice(0, SEARCH_RESULT_LIMIT);
+
+    const options = limitedReservations.map(mapReservationToOption);
+
+    // Ensure uniqueness by the composite ID
+    return uniqBy(options, function (option) {
+        return option.id;
+    });
+});
 
 function createTableLabel(reservation: PlannedReservation): string {
     const label = `${reservation.guestName} (${reservation.tableLabel})`;
@@ -39,82 +77,44 @@ function createTableLabel(reservation: PlannedReservation): string {
     return label;
 }
 
-function filterFn(val: string, update: any): void {
-    update(function () {
-        const loweredVal = val.toLowerCase();
-        const filteredTables = findSearchedTable(val).filter(function (reservation) {
-            // Exclude arrived reservations if hideArrived is true
-            return !(hideArrived.value && reservation.arrived);
-        });
-
-        const mappedOptions = filteredTables.map(mapReservationToOption).filter(function (option) {
-            return option.value.guestName.toLowerCase().includes(loweredVal);
-        });
-
-        // NOTE: a quasar workaround to keep the before-options slot rendered
-        // If no options after filtering but hideArrived is true, add a dummy option to keep dropdown open
-        if (mappedOptions.length === 0 && hideArrived.value) {
-            options.value = [
-                {
-                    // @ts-expect-error -- a workaround to keep the before-options slot rendered
-                    isDummy: true,
-                    label: "",
-                    value: null as any,
-                },
-            ];
-        } else {
-            options.value = mappedOptions;
-        }
-    });
-}
-
-function findSearchedTable(inputVal: string | { value: PlannedReservation }): PlannedReservation[] {
-    const val = isString(inputVal) ? inputVal : inputVal.value.guestName;
-    const normalizedVal = val.toLowerCase().trim();
-
-    // If inputVal is an object, we assume a specific item was selected
-    if (isObject(inputVal)) {
-        // Remove focus when item is selected to not keep virtual keyboard which is annoying on mobile
-        if (normalizedVal.length > 0) {
-            removeFocus();
-        }
-        // Return only the table that matches the guestName exactly
-        return props.allReservedTables.filter(function (reservation) {
-            return (
-                reservation.guestName.toLowerCase() === normalizedVal &&
-                reservation.floorId === inputVal.value.floorId
-            );
-        });
-    }
-
-    // If inputVal is a string, perform the original filtering logic
-    const tokens = normalizedVal.split(/\s+/);
-    return props.allReservedTables.filter(function (reservation) {
-        const { guestName } = reservation;
-        const normalizedGuestName = guestName.toLowerCase();
-        const guestNameTokens = normalizedGuestName.split(/\s+/);
-
-        return tokens.some(function (token) {
-            return guestNameTokens.some(function (nameToken) {
-                return nameToken.includes(token);
-            });
-        });
-    });
-}
-
-function getNamesFromReservations(
-    reservations: PlannedReservation[],
-): { label: string; value: PlannedReservation }[] {
-    return reservations.map(mapReservationToOption);
-}
-
-function mapReservationToOption(reservation: PlannedReservation): Option {
+function mapReservationToOption(reservation: PlannedReservationDoc): Option {
     return {
         arrived: reservation.arrived,
+        id: `${reservation.id}-${reservation.floorId}`,
         isVip: reservation.isVIP,
         label: createTableLabel(reservation),
         value: reservation,
     };
+}
+
+function onClear(): void {
+    selectedItem.value = null;
+    searchInput.value = "";
+    emit("clear");
+}
+
+function onSearchUpdate(value: string): void {
+    searchInput.value = value;
+
+    if (!value) {
+        emit("clear");
+        return;
+    }
+
+    const currentResults = displayOptions.value.map(function (option) {
+        return option.value;
+    });
+    emit("found", currentResults);
+}
+
+function onSelect(item: null | Option): void {
+    if (!item) {
+        emit("clear");
+        return;
+    }
+
+    emit("found", [item.value]);
+    removeFocus();
 }
 
 function removeFocus(): void {
@@ -124,90 +124,114 @@ function removeFocus(): void {
 }
 
 watch(hideArrived, function () {
-    filterFn(searchTerm.value, (fn: AnyFunction) => fn());
-});
-
-watch(searchTerm, function (newTerm) {
-    if (newTerm) {
-        const found = findSearchedTable(newTerm);
-        emit("found", found);
-    } else {
-        emit("clear");
+    if (searchInput.value) {
+        const currentResults = displayOptions.value.map(function (option) {
+            return option.value;
+        });
+        emit("found", currentResults);
     }
 });
-
-function setModel(val: string): void {
-    searchTerm.value = val;
-}
 </script>
 
 <template>
     <div class="EventGuestSearch">
-        <q-select
+        <v-autocomplete
             ref="selectEl"
-            fill-input
-            hide-selected
-            use-input
-            v-model="searchTerm"
-            :label="t(`EventGuestSearch.label`)"
+            v-model="selectedItem"
+            v-model:search="searchInput"
+            :items="displayOptions"
+            :label="t('EventGuestSearch.label')"
+            item-title="label"
+            item-value="id"
+            :custom-filter="() => true"
+            return-object
+            density="compact"
+            variant="outlined"
             clearable
-            clear-icon="fa fa-close"
-            dense
-            hide-dropdown-icon
-            outlined
-            :debounce="300"
-            @input-value="setModel"
-            @filter="filterFn"
-            @clear="() => emit('clear')"
-            :options="options"
+            hide-details
+            no-filter
+            @update:model-value="onSelect"
+            @update:search="onSearchUpdate"
+            @click:clear="onClear"
+            class="EventGuestSearch__select"
         >
-            <template #prepend>
-                <q-icon name="fa fa-search" size="xs" />
+            <template v-slot:prepend-inner>
+                <v-icon size="small" color="grey-darken-1">fas fa-search</v-icon>
             </template>
 
-            <template #before-options>
-                <q-item>
-                    <q-item-section>
-                        <q-checkbox
-                            v-model="hideArrived"
-                            :label="t('EventGuestSearch.hideArrivedLabel')"
-                            dense
-                            @click.stop
-                        />
-                    </q-item-section>
-                </q-item>
-                <q-separator />
+            <template v-slot:prepend-item>
+                <div class="EventGuestSearch__filter-header">
+                    <v-checkbox
+                        v-model="hideArrived"
+                        :label="t('EventGuestSearch.hideArrivedLabel')"
+                        density="comfortable"
+                        hide-details
+                        @click.stop
+                        class="EventGuestSearch__checkbox"
+                    />
+                </div>
+                <v-divider />
             </template>
 
-            <template #option="scope">
-                <!-- Don't render dummy option that is a workaround -->
-                <q-item v-if="!scope.opt.isDummy" v-bind="scope.itemProps">
-                    <q-item-section>
-                        <q-item-label>
-                            {{ scope.opt.label }}
-                        </q-item-label>
-                    </q-item-section>
+            <template v-slot:item="{ item, props }">
+                <v-list-item v-bind="props" density="compact">
+                    <template v-slot:title>
+                        {{ item.raw.label }}
+                    </template>
 
-                    <q-item-section v-if="scope.opt.arrived" side>
-                        <q-icon
-                            name="fa fa-check"
-                            color="green"
-                            :aria-label="t('EventGuestSearch.guestArrivedIconAriaLabel')"
-                        />
-                    </q-item-section>
-                    <q-item-section v-if="scope.opt.isVip" side>
-                        <ReservationVIPChip />
-                    </q-item-section>
-                </q-item>
+                    <template v-slot:append>
+                        <div class="EventGuestSearch__badges">
+                            <v-icon
+                                size="small"
+                                v-if="item.raw.arrived"
+                                color="success"
+                                :aria-label="t('EventGuestSearch.guestArrivedIconAriaLabel')"
+                            >
+                                fas fa-check
+                            </v-icon>
+                            <ReservationVIPChip v-if="item.raw.isVip" />
+                        </div>
+                    </template>
+                </v-list-item>
             </template>
 
-            <template #no-option>
-                <q-item>
-                    <q-item-section class="text-grey">
+            <template v-slot:no-data>
+                <v-list-item class="EventGuestSearch__no-results">
+                    <v-list-item-title class="text-grey">
                         {{ t("EventGuestSearch.noResultsText") }}
-                    </q-item-section>
-                </q-item>
+                    </v-list-item-title>
+                </v-list-item>
             </template>
-        </q-select>
+        </v-autocomplete>
     </div>
 </template>
+
+<style lang="scss" scoped>
+.EventGuestSearch {
+    &__select {
+        width: 100%;
+    }
+
+    &__option {
+        :deep(.v-list-item__content) {
+            overflow: visible;
+        }
+    }
+
+    &__badges {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    &__no-results {
+        pointer-events: none;
+    }
+}
+
+.v-theme--dark .EventGuestSearch {
+    &__arrived-icon {
+        background: rgba(var(--v-theme-success), 0.2);
+    }
+}
+</style>

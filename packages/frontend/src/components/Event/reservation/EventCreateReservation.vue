@@ -13,11 +13,11 @@ export interface EventCreateReservationProps {
     eventStartTimestamp: number;
     mode: "create" | "update";
     /**
-     *  If true, only the Planned Reservation Form is shown
+     * If true, only the Planned Reservation Form is shown
      */
     onlyPlanned?: boolean;
     /**
-     *  Optional data for editing
+     * Optional data for editing
      */
     reservationData?: ReservationDoc | undefined;
     timezone: string;
@@ -85,7 +85,9 @@ if (!props.onlyPlanned) {
 }
 
 async function onOKClick(): Promise<void> {
-    if (!(await currentlyActiveRef.value?.reservationForm.validate())) {
+    if (!currentlyActiveRef.value?.reservationForm) return;
+
+    if (!(await currentlyActiveRef.value.reservationForm.validate()).valid) {
         return;
     }
 
@@ -121,19 +123,20 @@ const hasChanges = computed(function () {
 </script>
 
 <template>
-    <q-card-section>
-        <q-btn-toggle
+    <v-card-text class="pa-2">
+        <v-btn-toggle
             v-if="!props.onlyPlanned && props.mode === 'create'"
             v-model="reservationType"
-            no-caps
-            rounded
-            spread
-            unelevated
-            :options="[
-                { label: 'Planned', value: ReservationType.PLANNED },
-                { label: 'Walk-In', value: ReservationType.WALK_IN },
-            ]"
-        />
+            rounded="xl"
+            variant="outlined"
+            color="primary"
+            divided
+            class="d-flex mb-4"
+        >
+            <v-btn :value="ReservationType.PLANNED" class="flex-grow-1">Planned</v-btn>
+            <v-btn :value="ReservationType.WALK_IN" class="flex-grow-1">Walk-In</v-btn>
+        </v-btn-toggle>
+
         <PlannedReservationForm
             ref="plannedRef"
             v-if="showPlannedReservationForm"
@@ -154,22 +157,20 @@ const hasChanges = computed(function () {
             :event-start-timestamp="props.eventStartTimestamp"
             :event-duration-in-hours="props.eventDurationInHours"
         />
-
-        <q-btn
-            rounded
-            size="md"
-            class="button-gradient q-mt-md q-mr-md"
-            @click="onOKClick"
-            :label="t(`Global.submit`)"
-        />
-        <q-btn
-            v-if="props.mode === 'update'"
-            rounded
-            size="md"
-            class="q-mt-md"
-            @click="resetForm"
-            :disable="!hasChanges"
-            :label="t(`Global.reset`)"
-        />
-    </q-card-section>
+        <div class="mt-4">
+            <v-btn rounded="lg" size="large" class="button-gradient mr-4" @click="onOKClick">
+                {{ t(`Global.submit`) }}
+            </v-btn>
+            <v-btn
+                v-if="props.mode === 'update'"
+                rounded="lg"
+                size="large"
+                variant="tonal"
+                @click="resetForm"
+                :disable="!hasChanges"
+            >
+                {{ t(`Global.reset`) }}
+            </v-btn>
+        </div>
+    </v-card-text>
 </template>

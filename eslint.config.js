@@ -46,6 +46,8 @@ export default config(
             ecmaVersion: "latest",
             globals: {
                 ...globals.browser,
+                __BUILD_NUMBER__: "readonly",
+                __GIT_COMMIT_HASH__: "readonly",
             },
             parser: vueParser,
             parserOptions: {

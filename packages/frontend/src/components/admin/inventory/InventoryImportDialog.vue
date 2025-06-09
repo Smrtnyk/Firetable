@@ -1,17 +1,17 @@
 <template>
     <div class="InventoryImportDialog">
-        <q-card-section>
-            <FTTabs v-model="activeTab" dense :disable="loading">
-                <q-tab name="file" :label="t('InventoryImportDialog.tabs.importFile')" />
-                <q-tab name="paste" :label="t('InventoryImportDialog.tabs.pasteCsvAsText')" />
-            </FTTabs>
+        <v-card-text>
+            <v-tabs v-model="activeTab" :disabled="loading" density="compact">
+                <v-tab value="file">{{ t("InventoryImportDialog.tabs.importFile") }}</v-tab>
+                <v-tab value="paste">{{ t("InventoryImportDialog.tabs.pasteCsvAsText") }}</v-tab>
+            </v-tabs>
 
-            <q-separator />
+            <v-divider class="my-4" />
 
-            <FTTabPanels v-model="activeTab" animated class="q-mt-md">
-                <q-tab-panel name="file">
+            <v-tabs-window v-model="activeTab" class="mt-4">
+                <v-tabs-window-item value="file">
                     <div
-                        class="upload-area q-pa-sm text-center cursor-pointer"
+                        class="upload-area pa-4 text-center cursor-pointer"
                         :class="{ 'upload-area--dragging': isDragging }"
                         @dragenter.prevent="isDragging = true"
                         @dragleave.prevent="isDragging = false"
@@ -19,11 +19,11 @@
                         @drop.prevent="handleFileDrop"
                         @click="fileInput?.click()"
                     >
-                        <q-icon name="fa fa-file-import" size="48px" color="primary" />
-                        <div class="text-h6 q-mt-md">
+                        <v-icon icon="fas fa-file-import" size="48" color="primary" />
+                        <div class="text-h6 mt-4">
                             {{ t("InventoryImportDialog.fileUpload.dropCsvMessage") }}
                         </div>
-                        <div class="text-caption q-mt-sm">
+                        <div class="text-caption mt-2">
                             {{ t("InventoryImportDialog.fileUpload.clickToUploadMessage") }}
                         </div>
                         <input
@@ -34,39 +34,37 @@
                             @change="handleFileSelect"
                         />
                     </div>
-                </q-tab-panel>
+                </v-tabs-window-item>
 
                 <!-- Paste Content Panel -->
-                <q-tab-panel name="paste" class="q-pa-none">
-                    <q-input
+                <v-tabs-window-item value="paste">
+                    <v-textarea
                         v-model="pastedContent"
-                        type="textarea"
-                        outlined
-                        class="w-full"
+                        variant="outlined"
+                        class="w-100"
                         :placeholder="t('InventoryImportDialog.pasteCsv.placeholder')"
-                        :disable="loading"
-                        :rows="10"
+                        :disabled="loading"
+                        rows="10"
                     />
-                </q-tab-panel>
-            </FTTabPanels>
-        </q-card-section>
+                </v-tabs-window-item>
+            </v-tabs-window>
+        </v-card-text>
 
-        <q-card-actions align="right">
-            <q-btn
-                :label="t('Global.submit')"
+        <v-card-actions class="justify-end">
+            <v-btn
                 rounded
                 class="button-gradient"
                 :loading="loading"
-                :disable="!canImport || loading"
+                :disabled="!canImport || loading"
                 @click="handleImport"
-            />
-        </q-card-actions>
+            >
+                {{ t("Global.submit") }}
+            </v-btn>
+        </v-card-actions>
     </div>
 </template>
 
 <script setup lang="ts">
-import FTTabPanels from "src/components/FTTabPanels.vue";
-import FTTabs from "src/components/FTTabs.vue";
 import { computed, ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -127,17 +125,21 @@ async function handleImport(): Promise<void> {
 
 <style lang="scss" scoped>
 .upload-area {
-    border: 2px dashed var(--q-primary);
+    border: 2px dashed rgb(var(--v-theme-primary));
     border-radius: 8px;
     transition: all 0.3s ease;
 
     &:hover {
-        background: rgba(var(--q-primary), 0.1);
+        background: rgba(var(--v-theme-primary), 0.1);
     }
 
     &--dragging {
-        background: rgba(var(--q-primary), 0.1);
+        background: rgba(var(--v-theme-primary), 0.1);
         border-style: solid;
     }
+}
+
+.cursor-pointer {
+    cursor: pointer;
 }
 </style>

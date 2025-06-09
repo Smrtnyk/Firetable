@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import AppDrawer from "src/components/AppDrawer.vue";
 import AppTopMenu from "src/components/AppTopMenu.vue";
-import RouteLoadingBar from "src/components/RouteLoadingBar.vue";
 import { ref } from "vue";
 import { useRoute } from "vue-router";
 
@@ -10,18 +9,25 @@ const isDrawerVisible = ref(false);
 </script>
 
 <template>
-    <q-layout view="hHh lpR fFf">
-        <RouteLoadingBar />
+    <v-app>
         <AppDrawer v-model="isDrawerVisible" />
         <AppTopMenu @toggle-drawer="isDrawerVisible = !isDrawerVisible" />
-        <q-page-container>
-            <q-page class="row">
+        <v-main>
+            <v-container class="FloorEditorLayout__container fill-height pa-0" fluid>
                 <router-view :key="route.fullPath" v-slot="{ Component }">
                     <transition name="fade" mode="out-in">
                         <component :is="Component" />
                     </transition>
                 </router-view>
-            </q-page>
-        </q-page-container>
-    </q-layout>
+            </v-container>
+        </v-main>
+    </v-app>
 </template>
+
+<style lang="scss" scoped>
+.FloorEditorLayout {
+    &__container {
+        display: block;
+    }
+}
+</style>

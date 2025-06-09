@@ -10,8 +10,14 @@ const props = defineProps<{
 </script>
 
 <template>
-    <div class="row justify-end">
-        <q-chip v-if="isAWalkInReservation(props.reservation)" color="quaternary" label="Walk-In" />
+    <div>
+        <v-chip
+            v-if="isAWalkInReservation(props.reservation)"
+            color="grey"
+            class="mr-2"
+            size="small"
+            >Walk-In</v-chip
+        >
         <ReservationVIPChip v-if="props.reservation.isVIP" />
     </div>
 </template>

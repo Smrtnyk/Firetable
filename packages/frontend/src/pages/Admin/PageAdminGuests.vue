@@ -6,22 +6,30 @@ import { useLocalStorage } from "@vueuse/core";
 import { lowerCase, uniq } from "es-toolkit";
 import { property } from "es-toolkit/compat";
 import { storeToRefs } from "pinia";
-import { Loading, QVirtualScroll } from "quasar";
 import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import GuestSortOptions from "src/components/admin/guest/GuestSortOptions.vue";
-import FTBottomDialog from "src/components/FTBottomDialog.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
 import GuestSummaryChips from "src/components/guest/GuestSummaryChips.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalBottomSheet } from "src/composables/useBottomSheet";
+import { globalDialog } from "src/composables/useDialog";
 import { batchDeleteGuests, createGuest } from "src/db";
-import { isMobile } from "src/global-reactives/screen-detection";
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useScreenDetection } from "src/global-reactives/screen-detection";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
+import { useGlobalStore } from "src/stores/global-store";
 import { useGuestsStore } from "src/stores/guests-store";
-import { computed, onUnmounted, ref, useTemplateRef, watch } from "vue";
+import {
+    computed,
+    nextTick,
+    onBeforeUnmount,
+    onMounted,
+    onUnmounted,
+    ref,
+    useTemplateRef,
+    watch,
+} from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 
@@ -29,12 +37,17 @@ export interface PageAdminGuestsProps {
     organisationId: string;
 }
 
+const LONG_PRESS_DURATION = 2000;
+const SCROLL_VISIBILITY_THRESHOLD_MIN = 0.1;
+const SCROLL_VISIBILITY_THRESHOLD_MAX = 0.9;
+
+const { isMobile } = useScreenDetection();
 const sortOption = useLocalStorage<SortOption>("guest-list-sort-option", "bookings");
 const sortDirection = useLocalStorage<SortDirection>("guest-list-sort-direction", "desc");
 
-const { createDialog } = useDialog();
 const { t } = useI18n();
 const props = defineProps<PageAdminGuestsProps>();
+const globalStore = useGlobalStore();
 const guestsStore = useGuestsStore();
 const guestsRef = guestsStore.getGuests(props.organisationId);
 const guests = computed(() => guestsRef.value.data);
@@ -46,16 +59,16 @@ watch(
     () => isLoading.value,
     function () {
         if (isLoading.value) {
-            Loading.show();
+            globalStore.setLoading(true);
         } else {
-            Loading.hide();
+            globalStore.setLoading(false);
         }
     },
     { immediate: true },
 );
 
 onUnmounted(() => {
-    Loading.hide();
+    globalStore.setLoading(false);
 });
 
 const searchQuery = ref<string>("");
@@ -93,11 +106,9 @@ const guestsWithSummaries = computed(function () {
             };
         })
         .filter(function (guest) {
-            // Admin sees all guests
             if (isAdmin.value) {
                 return true;
             }
-            // Non-admins: only include guests with summaries (i.e., visits to accessible properties)
             return guest.summary && guest.summary.length > 0;
         });
 });
@@ -113,7 +124,6 @@ const sortedGuests = computed(function () {
 
             case "lastModified":
                 {
-                    // Use 0 as default if lastModified is not set
                     const aTime = a.lastModified ?? 0;
                     const bTime = b.lastModified ?? 0;
                     comparison = bTime - aTime;
@@ -201,50 +211,42 @@ function setSortOption(option: SortOption): void {
 }
 
 function showCreateGuestDialog(): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: AddNewGuestForm,
-            listeners: {
-                create(payload: CreateGuestPayload) {
-                    dialog.hide();
+    const dialog = globalDialog.openDialog(
+        AddNewGuestForm,
+        {
+            onCreate(payload: CreateGuestPayload) {
+                dialog.hide();
 
-                    tryCatchLoadingWrapper({
-                        hook() {
-                            return createGuest(props.organisationId, payload);
-                        },
-                    });
-                },
+                tryCatchLoadingWrapper({
+                    hook() {
+                        return createGuest(props.organisationId, payload);
+                    },
+                });
             },
-            maximized: false,
+        },
+        {
             title: t("PageAdminGuests.createNewGuestDialogTitle"),
         },
-    });
+    );
 }
 
 function showSortDialog(): void {
-    createDialog({
-        component: FTBottomDialog,
-        componentProps: {
-            component: GuestSortOptions,
-            componentPropsObject: {
-                availableTags,
-                currentSortDirection: sortDirection,
-                currentSortOption: sortOption,
-                selectedTags,
-            },
-            listeners: {
-                toggleDirection() {
-                    toggleSortDirection();
-                },
-                "update:selectedTags"(payload) {
-                    selectedTags.value = payload;
-                },
-                "update:sortOption"(payload) {
-                    setSortOption(payload);
-                },
-            },
+    globalBottomSheet.openBottomSheet(GuestSortOptions, {
+        availableTags,
+        currentSortDirection: sortDirection,
+        currentSortOption: sortOption,
+        onToggleDirection() {
+            toggleSortDirection();
         },
+        // @ts-expect-error -- FIXME: use proper types for payload
+        "onUpdate:selectedTags"(payload) {
+            selectedTags.value = payload;
+        },
+        // @ts-expect-error -- FIXME: use proper types for payload
+        "onUpdate:sortOption"(payload) {
+            setSortOption(payload);
+        },
+        selectedTags,
     });
 }
 
@@ -252,31 +254,69 @@ function toggleSortDirection(): void {
     sortDirection.value = sortDirection.value === "desc" ? "asc" : "desc";
 }
 
-const virtualListRef = useTemplateRef<QVirtualScroll>("virtualListRef");
+const virtualListRef = useTemplateRef("virtualListRef");
 const showScrollButton = ref(false);
-const lastGuestIndex = computed(() => filteredGuests.value.length - 1);
-
 const scrollDirection = ref<"down" | "up">("down");
-const lastScrollIndex = ref(0);
+const lastScrollTop = ref(0);
 
 function handleScroll(): void {
+    const container = virtualListRef.value?.$el;
+    if (!container) return;
+
     if (scrollDirection.value === "down") {
-        virtualListRef.value?.scrollTo(lastGuestIndex.value, "end");
+        container.scrollTop = container.scrollHeight;
     } else {
-        virtualListRef.value?.scrollTo(0, "start");
+        container.scrollTop = 0;
     }
 }
 
-function onVirtualScroll({
-    index,
-}: Parameters<NonNullable<QVirtualScroll["onVirtualScroll"]>>[0]): void {
-    const scrollPercentage = index / filteredGuests.value.length;
+function handleVirtualScroll(event: Event): void {
+    const container = event.target as HTMLElement;
+    const scrollTop = container.scrollTop;
+    const scrollHeight = container.scrollHeight;
+    const clientHeight = container.clientHeight;
 
-    scrollDirection.value = index > lastScrollIndex.value ? "down" : "up";
-    lastScrollIndex.value = index;
+    // Calculate scroll percentage
+    const scrollPercentage = scrollTop / (scrollHeight - clientHeight);
 
-    showScrollButton.value = scrollPercentage > 0.1 && scrollPercentage < 0.9;
+    // Determine scroll direction
+    scrollDirection.value = scrollTop > lastScrollTop.value ? "down" : "up";
+    lastScrollTop.value = scrollTop;
+
+    // Show button only when scrolled between 10% and 90%
+    showScrollButton.value =
+        scrollPercentage > SCROLL_VISIBILITY_THRESHOLD_MIN &&
+        scrollPercentage < SCROLL_VISIBILITY_THRESHOLD_MAX;
 }
+
+function setupScrollListener(): void {
+    nextTick(() => {
+        const container = virtualListRef.value?.$el;
+        if (!container) return;
+
+        container.addEventListener("scroll", handleVirtualScroll);
+    });
+}
+
+// Setup scroll listener when component is mounted
+onMounted(() => {
+    setupScrollListener();
+});
+
+// Cleanup scroll listener
+onBeforeUnmount(() => {
+    const container = virtualListRef.value?.$el;
+    if (container) {
+        container.removeEventListener("scroll", handleVirtualScroll);
+    }
+});
+
+// Re-setup listener when filtered guests change
+watch(filteredGuests, () => {
+    nextTick(() => {
+        setupScrollListener();
+    });
+});
 
 const selectedGuests = ref<string[]>([]);
 const selectionMode = ref(false);
@@ -293,9 +333,10 @@ async function bulkDeleteSelected(): Promise<void> {
     if (selectedGuests.value.length === 0) {
         return;
     }
-    const shouldDelete = await showConfirm(
-        `Are you sure you want to delete ${selectedGuests.value.length} guests?`,
-    );
+    const shouldDelete = await globalDialog.confirm({
+        message: "",
+        title: `Are you sure you want to delete ${selectedGuests.value.length} guests?`,
+    });
     if (!shouldDelete) {
         return;
     }
@@ -324,6 +365,22 @@ function onItemClick(item: any): void {
                 organisationId: props.organisationId,
             },
         });
+    }
+}
+
+let longPressTimer: null | ReturnType<typeof setTimeout> = null;
+
+// FIXME: does vueuse providee helper for this? also fix this any
+function handleMouseDown(item: any): void {
+    longPressTimer = setTimeout(() => {
+        onItemHold(item);
+    }, LONG_PRESS_DURATION);
+}
+
+function handleMouseUp(): void {
+    if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
     }
 }
 
@@ -370,100 +427,109 @@ function toggleSelectAll(): void {
         </FTTitle>
 
         <!-- Search Input and Sort Options Container -->
-        <q-input
+        <v-text-field
             v-if="guestsWithSummaries.length > 0 && !isLoading"
-            :dense="isMobile"
-            outlined
+            :density="isMobile ? 'compact' : 'default'"
+            variant="outlined"
             v-model="searchQuery"
-            debounce="300"
             clearable
             clear-icon="fa fa-close"
             label="Search by name or contact"
-            class="q-mb-sm"
+            class="mb-2"
+            hide-details
         >
-            <template #prepend>
-                <q-icon name="fa fa-search" />
+            <template #prepend-inner>
+                <v-icon icon="fa fa-search" />
             </template>
-            <template #append>
+            <template #append-inner>
                 <!-- Sort Controls -->
-                <q-btn
-                    dense
-                    flat
+                <v-btn
+                    density="compact"
+                    variant="text"
                     icon="fa fa-sort"
                     aria-label="filter guests"
                     @click="showSortDialog"
                 />
             </template>
-        </q-input>
+        </v-text-field>
 
-        <q-slide-transition>
-            <div v-show="selectionMode" class="row items-center q-pa-sm full-width">
-                <q-checkbox
+        <v-expand-transition>
+            <div v-show="selectionMode" class="d-flex align-center pa-2 w-100">
+                <v-checkbox
                     v-model="allSelected"
                     @update:model-value="toggleSelectAll"
-                    toggle-indeterminate
-                    dense
-                    class="q-mr-sm"
+                    density="compact"
+                    hide-details
+                    class="flex-grow-0 mr-2"
                 />
                 <span>{{ `Selected items ${selectedGuests.length}` }}</span>
-                <q-space />
-                <q-btn
+                <v-spacer />
+                <v-btn
                     icon="fa fa-trash"
-                    color="negative"
-                    flat
-                    class="q-ml-sm"
+                    color="error"
+                    variant="text"
+                    class="ml-2"
                     @click="bulkDeleteSelected"
                     aria-label="Bulk delete"
                 />
-                <q-btn
+                <v-btn
                     icon="fa fa-close"
-                    flat
-                    class="q-ml-sm"
+                    variant="text"
+                    class="ml-2"
                     @click="cancelSelectionMode"
                     aria-label="Cancel bulk action"
                 />
             </div>
-        </q-slide-transition>
+        </v-expand-transition>
 
         <!-- Guest List -->
-        <q-virtual-scroll
-            style="max-height: 75vh"
+        <v-virtual-scroll
+            :height="isMobile ? 'calc(75vh)' : '75vh'"
             :items="filteredGuests"
             v-if="filteredGuests.length > 0 && !isLoading"
-            v-slot="{ item }"
             ref="virtualListRef"
-            @virtual-scroll="onVirtualScroll"
+            item-height="80"
         >
-            <q-item
-                v-touch-hold:2000.mouse="() => onItemHold(item)"
-                :key="item.id"
-                clickable
-                @click="onItemClick(item)"
-            >
-                <q-item-section>
-                    <q-item-label>
-                        <div class="row items-center">
-                            <q-checkbox
-                                size="xs"
-                                v-if="selectionMode"
-                                class="q-mr-sm"
-                                :model-value="selectedGuests.includes(item.id)"
-                                @update:model-value="() => toggleGuestSelection(item.id)"
-                                @click.stop
-                            />
+            <template #default="{ item, index }">
+                <v-list-item
+                    :key="item.id"
+                    @click="onItemClick(item)"
+                    @mousedown="handleMouseDown(item)"
+                    @mouseup="handleMouseUp"
+                    @mouseleave="handleMouseUp"
+                    @touchstart="handleMouseDown(item)"
+                    @touchend="handleMouseUp"
+                    @touchcancel="handleMouseUp"
+                    lines="two"
+                    :ripple="!selectionMode"
+                >
+                    <template #prepend v-if="selectionMode">
+                        <v-checkbox
+                            size="small"
+                            :model-value="selectedGuests.includes(item.id)"
+                            @update:model-value="() => toggleGuestSelection(item.id)"
+                            @click.stop
+                            hide-details
+                            class="mr-4"
+                        />
+                    </template>
+
+                    <v-list-item-title>
+                        <div class="d-flex align-center">
                             <span>{{ item.name }}</span>
-                            <q-space />
-                            <span class="text-grey-6" v-if="item.maskedContact">{{
-                                item.maskedContact
-                            }}</span>
+                            <v-spacer />
+                            <span class="text-grey" v-if="item.maskedContact">
+                                {{ item.maskedContact }}
+                            </span>
                         </div>
-                    </q-item-label>
-                    <q-item-label caption>
+                    </v-list-item-title>
+
+                    <v-list-item-subtitle>
                         <template v-if="item.summary">
                             <div
                                 v-for="summary in item.summary"
                                 :key="summary.propertyName"
-                                class="full-width"
+                                class="w-100"
                             >
                                 <span>{{ summary.propertyName }}</span
                                 >:
@@ -471,33 +537,35 @@ function toggleSelectAll(): void {
                             </div>
                         </template>
                         <span v-else>No bookings</span>
-                    </q-item-label>
-                </q-item-section>
-            </q-item>
-        </q-virtual-scroll>
+                    </v-list-item-subtitle>
+                </v-list-item>
+                <v-divider v-if="index < filteredGuests.length - 1" />
+            </template>
+        </v-virtual-scroll>
 
-        <FTCenteredText v-if="!isLoading && filteredGuests.length === 0">{{
-            t("PageAdminGuests.noGuestsData")
-        }}</FTCenteredText>
+        <FTCenteredText v-if="!isLoading && filteredGuests.length === 0">
+            {{ t("PageAdminGuests.noGuestsData") }}
+        </FTCenteredText>
 
-        <q-page-sticky
+        <v-fab
             v-if="showScrollButton"
-            position="bottom"
-            :offset="[18, 18]"
+            @click="handleScroll"
+            :icon="scrollDirection === 'down' ? 'fa fa-chevron-down' : 'fa fa-chevron-up'"
+            color="secondary"
+            location="bottom end"
+            size="default"
             class="scroll-to-bottom"
-        >
-            <q-btn
-                @click="handleScroll"
-                fab
-                :icon="scrollDirection === 'down' ? 'fa fa-chevron-down' : 'fa fa-chevron-up'"
-                color="secondary"
-            />
-        </q-page-sticky>
+            app
+        />
     </div>
 </template>
 
 <style lang="scss">
 .scroll-to-bottom {
     z-index: 999999;
+}
+
+.v-list-item {
+    cursor: pointer;
 }
 </style>

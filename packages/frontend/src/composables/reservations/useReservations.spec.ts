@@ -15,13 +15,11 @@ import { createTestingPinia } from "@pinia/testing";
 import { page, userEvent } from "@vitest/browser/context";
 import { flushPromises } from "@vue/test-utils";
 import { noop } from "es-toolkit";
-import { BottomSheet, Dialog, Loading, Notify, Quasar } from "quasar";
 import EventCreateReservation from "src/components/Event/reservation/EventCreateReservation.vue";
 import EventShowReservation from "src/components/Event/reservation/EventShowReservation.vue";
 import messages from "src/i18n";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createApp, nextTick, ref, shallowRef } from "vue";
-import "quasar/dist/quasar.css";
 import "src/css/app.scss";
 import { createI18n } from "vue-i18n";
 
@@ -1875,8 +1873,6 @@ function withSetup(
             return noop;
         },
     });
-    app.use(Quasar);
-    Quasar.install(app, { plugins: { BottomSheet, Dialog, Loading, Notify } });
     app.use(i18n);
     app.use(testingPinia);
 

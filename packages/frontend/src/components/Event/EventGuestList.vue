@@ -1,17 +1,108 @@
+<template>
+    <v-navigation-drawer
+        temporary
+        :model-value="eventsStore.showEventGuestListDrawer"
+        @update:model-value="
+            eventsStore.toggleEventGuestListDrawerVisibility(!eventsStore.showEventGuestListDrawer)
+        "
+        location="right"
+        class="PageEvent__guest-list-drawer"
+    >
+        <div class="EventGuestList">
+            <div class="EventGuestList__header pa-2">
+                <FTTitle :title="t('EventGuestList.title')">
+                    <template #right>
+                        <v-btn
+                            v-if="canInteract"
+                            rounded="pill"
+                            icon="fa:fas fa-plus"
+                            class="button-gradient"
+                            variant="elevated"
+                            density="comfortable"
+                            @click="showAddNewGuestForm"
+                            :disabled="isGuestListFull"
+                            aria-label="Add new guest"
+                        />
+                    </template>
+                </FTTitle>
+
+                <v-progress-linear
+                    striped
+                    :model-value="reachedCapacityPercentage"
+                    height="25"
+                    class="mb-2"
+                >
+                    <div
+                        class="d-flex justify-center align-center"
+                        style="position: absolute; width: 100%; height: 100%"
+                    >
+                        <span class="text-white font-weight-bold">
+                            {{ guestList.length }} / {{ guestListLimit }}
+                        </span>
+                    </div>
+                </v-progress-linear>
+            </div>
+
+            <div class="EventGuestList__content pa-2 pt-0">
+                <div v-if="guestList.length === 0" class="text-center mt-4">
+                    <FTCenteredText>{{ t("EventGuestList.guestListEmptyMessage") }}</FTCenteredText>
+                    <v-img src="/people-confirmation.svg" class="mx-auto mt-4" />
+                </div>
+
+                <v-list v-else lines="one" class="EventGuestList__list">
+                    <v-list-item
+                        v-for="guest in guestList"
+                        :key="guest.id"
+                        :class="{ 'bg-green-lighten-3': guest.confirmed }"
+                    >
+                        <v-list-item-title>{{ guest.name }}</v-list-item-title>
+                        <template v-if="canInteract" #append>
+                            <v-btn
+                                icon
+                                size="small"
+                                variant="text"
+                                @click="toggleGuestConfirmation(guest)"
+                                :aria-label="guest.confirmed ? 'Unconfirm guest' : 'Confirm guest'"
+                            >
+                                <v-icon
+                                    :color="guest.confirmed ? 'red' : 'green'"
+                                    :icon="
+                                        guest.confirmed
+                                            ? 'far fa-times-circle'
+                                            : 'far fa-check-circle'
+                                    "
+                                />
+                            </v-btn>
+                            <v-btn
+                                icon
+                                size="small"
+                                variant="text"
+                                color="warning"
+                                @click="deleteGuest(guest.id)"
+                                aria-label="Delete guest"
+                            >
+                                <v-icon>fa:fas fa-trash</v-icon>
+                            </v-btn>
+                        </template>
+                    </v-list-item>
+                </v-list>
+            </div>
+        </div>
+    </v-navigation-drawer>
+</template>
+
 <script setup lang="ts">
-import type { GuestInGuestListData, VoidFunction } from "@firetable/types";
+import type { GuestInGuestListData } from "@firetable/types";
 import type { EventOwner } from "src/db";
 
 import { AdminRole, Role } from "@firetable/types";
 import { storeToRefs } from "pinia";
 import EventGuestListCreateGuestForm from "src/components/Event/EventGuestListCreateGuestForm.vue";
-import FTBtn from "src/components/FTBtn.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalDialog } from "src/composables/useDialog";
 import { addGuestToGuestList, confirmGuestFromGuestList, deleteGuestFromGuestList } from "src/db";
-import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
 import { useEventsStore } from "src/stores/events-store";
 import { computed } from "vue";
@@ -24,13 +115,15 @@ interface Props {
 }
 
 const { eventOwner, guestList = [], guestListLimit } = defineProps<Props>();
-const { createDialog } = useDialog();
 const eventsStore = useEventsStore();
 const { nonNullableUser } = storeToRefs(useAuthStore());
 const { t } = useI18n();
-const reachedCapacity = computed(function () {
-    return guestList.length / guestListLimit;
+
+const reachedCapacityPercentage = computed(function () {
+    if (guestListLimit === 0) return 0;
+    return (guestList.length / guestListLimit) * 100;
 });
+
 const isGuestListFull = computed(function () {
     return guestList.length >= guestListLimit;
 });
@@ -40,6 +133,18 @@ const canInteract = computed(function () {
         nonNullableUser.value.role,
     );
 });
+
+async function deleteGuest(id: string): Promise<void> {
+    if (!(await globalDialog.confirm({ title: t("EventGuestList.deleteGuestTitle") }))) {
+        return;
+    }
+
+    await tryCatchLoadingWrapper({
+        hook() {
+            return deleteGuestFromGuestList(eventOwner, id);
+        },
+    });
+}
 
 function onCreate(newGuestData: GuestInGuestListData): Promise<void> | void {
     if (guestList.length >= guestListLimit) {
@@ -54,120 +159,35 @@ function onCreate(newGuestData: GuestInGuestListData): Promise<void> | void {
     });
 }
 
-async function onSwipeLeftConfirmGuest(
-    { reset }: { reset: VoidFunction },
-    guest: GuestInGuestListData,
-): Promise<void> {
+function showAddNewGuestForm(): void {
+    const dialog = globalDialog.openDialog(
+        EventGuestListCreateGuestForm,
+        {
+            onCreate(newGuestData: GuestInGuestListData) {
+                onCreate(newGuestData);
+                dialog.hide();
+            },
+        },
+        {
+            title: t("EventGuestList.addGuestLabel"),
+        },
+    );
+}
+
+async function toggleGuestConfirmation(guest: GuestInGuestListData): Promise<void> {
     await tryCatchLoadingWrapper({
         hook() {
             return confirmGuestFromGuestList(eventOwner, guest.id, !guest.confirmed);
-        },
-    }).finally(reset);
-}
-
-async function onSwipeRightDeleteGuest(
-    { reset }: { reset: VoidFunction },
-    id: string,
-): Promise<void> {
-    if (!(await showConfirm(t("EventGuestList.deleteGuestTitle")))) {
-        return reset();
-    }
-
-    await tryCatchLoadingWrapper({
-        // Reset only on error hook, since deleting the guest causes the rerender of the list anyway
-        errorHook: reset,
-        hook() {
-            return deleteGuestFromGuestList(eventOwner, id);
-        },
-    });
-}
-
-function showAddNewGuestForm(): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: EventGuestListCreateGuestForm,
-            componentPropsObject: {},
-            listeners: {
-                create(newGuestData: GuestInGuestListData) {
-                    onCreate(newGuestData);
-                    dialog.hide();
-                },
-            },
-            maximized: false,
-            title: t("EventGuestList.addGuestLabel"),
         },
     });
 }
 </script>
 
-<template>
-    <q-drawer
-        no-swipe-open
-        :model-value="eventsStore.showEventGuestListDrawer"
-        @update:model-value="eventsStore.toggleEventGuestListDrawerVisibility"
-        class-name="PageEvent__guest-list-drawer"
-        side="right"
-        content-class="PageEvent__guest-list-container"
-        overlay
-        behavior="mobile"
-    >
-        <div class="EventGuestList">
-            <FTTitle :title="t('EventGuestList.title')">
-                <template #right>
-                    <FTBtn
-                        v-if="canInteract"
-                        rounded
-                        icon="fa fa-plus"
-                        class="button-gradient"
-                        @click="showAddNewGuestForm"
-                        :disabled="isGuestListFull"
-                    />
-                </template>
-            </FTTitle>
-
-            <q-linear-progress stripe :value="reachedCapacity" size="25px">
-                <div class="absolute-full flex flex-center">
-                    <q-badge
-                        color="white"
-                        text-color="accent"
-                        :label="`${guestList.length} / ${guestListLimit}`"
-                    />
-                </div>
-            </q-linear-progress>
-
-            <div class="EventGuestList" v-if="guestList.length === 0">
-                <FTCenteredText>{{ t("EventGuestList.guestListEmptyMessage") }}</FTCenteredText>
-                <q-img src="/people-confirmation.svg" />
-            </div>
-
-            <q-list v-else bordered separator>
-                <q-slide-item
-                    v-for="guest in guestList"
-                    :key="guest.id"
-                    right-color="warning"
-                    :left-color="guest.confirmed ? 'red-5' : 'green-5'"
-                    @right="onSwipeRightDeleteGuest($event, guest.id)"
-                    @left="onSwipeLeftConfirmGuest($event, guest)"
-                >
-                    <template v-if="canInteract" #right>
-                        <q-icon name="fa fa-trash" />
-                    </template>
-                    <template v-if="canInteract" #left>
-                        <q-icon color="white" :name="guest.confirmed ? 'close' : 'check'" />
-                    </template>
-                    <q-item
-                        clickable
-                        :class="{
-                            'bg-green-4': guest.confirmed,
-                        }"
-                    >
-                        <q-item-section>
-                            <q-item-label>{{ guest.name }}</q-item-label>
-                        </q-item-section>
-                    </q-item>
-                </q-slide-item>
-            </q-list>
-        </div>
-    </q-drawer>
-</template>
+<style lang="scss" scoped>
+.EventGuestList {
+    &__content {
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+    }
+}
+</style>

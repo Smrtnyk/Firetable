@@ -2,56 +2,47 @@
 import type { CreateOrganisationPayload } from "src/db";
 
 import { storeToRefs } from "pinia";
-import { useQuasar } from "quasar";
 import AddNewOrganisationForm from "src/components/admin/organisation/AddNewOrganisationForm.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalDialog } from "src/composables/useDialog";
 import { createNewOrganisation } from "src/db";
 import {
     formatOrganisationStatus,
     getOrganisationStatusColor,
 } from "src/helpers/organisation/organisation";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useGlobalStore } from "src/stores/global-store";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 
+const globalStore = useGlobalStore();
 const propertiesStore = usePropertiesStore();
 const { organisations } = storeToRefs(usePropertiesStore());
-const quasar = useQuasar();
-
-const { createDialog } = useDialog();
 
 function createOrganisation(): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: AddNewOrganisationForm,
-            componentPropsObject: {},
-            listeners: {
-                create(organisationPayload: CreateOrganisationPayload) {
-                    onOrganisationCreate(organisationPayload);
-                    dialog.hide();
-                },
+    const dialog = globalDialog.openDialog(
+        AddNewOrganisationForm,
+        {
+            onCreate(organisationPayload: CreateOrganisationPayload) {
+                onOrganisationCreate(organisationPayload);
+                dialog.hide();
             },
-            maximized: false,
+        },
+        {
             title: t("PageOrganisations.addNewOrganisationTitle"),
         },
-    });
+    );
 }
 
 async function onOrganisationCreate(organisationPayload: CreateOrganisationPayload): Promise<void> {
     await tryCatchLoadingWrapper({
         async hook() {
             await createNewOrganisation(organisationPayload);
-            quasar.notify({
-                message: t("PageOrganisations.organisationCreatedSuccess"),
-                type: "success",
-            });
+            globalStore.notify(t("PageOrganisations.organisationCreatedSuccess"));
             return propertiesStore.initOrganisations();
         },
     });
@@ -62,9 +53,11 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
     <div class="PageOrganisations">
         <FTTitle title="Organisations" />
 
-        <div class="row q-col-gutter-md" v-if="organisations.length > 0">
-            <div
-                class="col-12 col-sm-6 col-lg-4"
+        <v-row v-if="organisations.length > 0">
+            <v-col
+                cols="12"
+                sm="6"
+                lg="4"
                 v-for="organisation of organisations"
                 :key="organisation.id"
             >
@@ -79,17 +72,16 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
                         <!-- Header Section -->
                         <div class="OrganisationCard__header">
                             <div class="OrganisationCard__icon">
-                                <i class="fas fa-building" />
+                                <v-icon>fas fa-building</v-icon>
                             </div>
                             <div class="OrganisationCard__status">
-                                <q-chip
+                                <v-chip
                                     :color="getOrganisationStatusColor(organisation.status)"
-                                    text-color="white"
-                                    size="sm"
+                                    size="small"
                                     class="OrganisationCard__status-chip"
                                 >
                                     {{ formatOrganisationStatus(organisation.status) }}
-                                </q-chip>
+                                </v-chip>
                             </div>
                         </div>
 
@@ -102,7 +94,7 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
                         <div class="OrganisationCard__stats">
                             <div class="OrganisationCard__stat">
                                 <div class="OrganisationCard__stat-icon">
-                                    <i class="fas fa-home" />
+                                    <v-icon>fas fa-home</v-icon>
                                 </div>
                                 <div class="OrganisationCard__stat-content">
                                     <span class="OrganisationCard__stat-label">
@@ -116,7 +108,7 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 
                             <div class="OrganisationCard__stat">
                                 <div class="OrganisationCard__stat-icon">
-                                    <i class="fas fa-map" />
+                                    <v-icon>fas fa-map</v-icon>
                                 </div>
                                 <div class="OrganisationCard__stat-content">
                                     <span class="OrganisationCard__stat-label">
@@ -133,18 +125,18 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
                         </div>
                     </div>
                 </router-link>
-            </div>
-        </div>
+            </v-col>
+        </v-row>
 
         <div v-else>
             <FTCenteredText>
-                <q-icon name="fa fa-briefcase" size="64px" color="grey-5" class="q-mb-md" />
-                <div class="text-grey-6 q-mb-lg">
+                <v-icon size="64" color="grey-lighten-1" class="mb-4">fas fa-briefcase</v-icon>
+                <div class="text-grey-darken-1 mb-6">
                     {{ t("PageOrganisations.noOrganisationsMessage") }}
                 </div>
                 <FTBtn
                     :label="t('PageOrganisations.createOrganisationButton')"
-                    icon="fa fa-plus"
+                    icon="fas fa-plus"
                     class="button-gradient"
                     @click="createOrganisation"
                 />
@@ -154,6 +146,8 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 </template>
 
 <style lang="scss" scoped>
+@use "../css/variables.scss" as *;
+
 .OrganisationCard {
     background: $surface-elevated;
     border-radius: $generic-border-radius;
@@ -268,7 +262,7 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 }
 
 // Dark mode support
-.body--dark .OrganisationCard {
+.v-theme--dark .OrganisationCard {
     background: $surface-elevated-dark;
     border-color: $border-light-dark;
     box-shadow:

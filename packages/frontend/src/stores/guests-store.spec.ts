@@ -7,7 +7,7 @@ import { usePropertiesStore } from "src/stores/properties-store";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createApp, ref } from "vue";
 
-import { mockedStore } from "../../test-helpers/render-component";
+import { mockedStore } from "../../test-helpers/mocked-store";
 import { useGuestsStore } from "./guests-store";
 
 const { createQuerySpy, subscribeToGuestsSpy, useFirestoreCollectionSpy, whereSpy } = vi.hoisted(

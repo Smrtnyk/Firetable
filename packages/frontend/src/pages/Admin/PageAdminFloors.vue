@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FloorDoc, VoidFunction } from "@firetable/types";
+import type { FloorDoc } from "@firetable/types";
 
 import {
     FLOOR_DEFAULT_HEIGHT,
@@ -7,16 +7,14 @@ import {
     type FloorData,
 } from "@firetable/floor-creator";
 import { property } from "es-toolkit/compat";
-import { Loading } from "quasar";
 import AddNewFloorForm from "src/components/Floor/AddNewFloorForm.vue";
-import FTBtn from "src/components/FTBtn.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTDialog from "src/components/FTDialog.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalDialog } from "src/composables/useDialog";
 import { useFloors } from "src/composables/useFloors";
 import { addFloor, deleteFloor } from "src/db";
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useGlobalStore } from "src/stores/global-store";
 import { watch } from "vue";
 import { useI18n } from "vue-i18n";
 
@@ -27,26 +25,27 @@ interface Props {
 
 const { organisationId, propertyId } = defineProps<Props>();
 
-const { createDialog } = useDialog();
+const globalStore = useGlobalStore();
 const { t } = useI18n();
 
 const { floors, isLoading } = useFloors(propertyId, organisationId);
 
 watch(isLoading, function (loadingVal) {
     if (loadingVal) {
-        Loading.show();
+        globalStore.setLoading(true);
     } else {
-        Loading.hide();
+        globalStore.setLoading(false);
     }
 });
 
-async function duplicateFloor(floor: FloorDoc, reset: VoidFunction): Promise<void> {
-    const isConfirmed = await showConfirm(
-        t("PageAdminFloors.duplicateFloorPlanMessage", { floorName: floor.name }),
-    );
+async function duplicateFloor(floor: FloorDoc): Promise<void> {
+    const isConfirmed = await globalDialog.confirm({
+        message: "",
+        title: t("PageAdminFloors.duplicateFloorPlanMessage", { floorName: floor.name }),
+    });
 
     if (!isConfirmed) {
-        return reset();
+        return;
     }
 
     const duplicatedFloor = { ...floor, name: `${floor.name}_copy` };
@@ -60,7 +59,7 @@ async function duplicateFloor(floor: FloorDoc, reset: VoidFunction): Promise<voi
                 duplicatedFloor,
             );
         },
-    }).finally(reset);
+    });
 }
 
 function makeRawFloor(name: string): Omit<FloorData, "id" | "json"> {
@@ -71,13 +70,17 @@ function makeRawFloor(name: string): Omit<FloorData, "id" | "json"> {
     };
 }
 
-async function onFloorDelete(id: string, reset: VoidFunction): Promise<void> {
-    if (!(await showConfirm(t("PageAdminFloors.deleteFloorMessage")))) {
-        return reset();
+async function onFloorDelete(id: string): Promise<void> {
+    if (
+        !(await globalDialog.confirm({
+            message: "",
+            title: t("PageAdminFloors.deleteFloorMessage"),
+        }))
+    ) {
+        return;
     }
 
     await tryCatchLoadingWrapper({
-        errorHook: reset,
         hook() {
             return deleteFloor(
                 {
@@ -91,37 +94,33 @@ async function onFloorDelete(id: string, reset: VoidFunction): Promise<void> {
 }
 
 function showAddNewFloorForm(floorDocs: FloorDoc[]): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: AddNewFloorForm,
-            componentPropsObject: {
-                allFloorNames: new Set(floorDocs.map(property("name"))),
-            },
-            listeners: {
-                create(name: string) {
-                    tryCatchLoadingWrapper({
-                        hook() {
-                            const rawFloor = {
-                                ...makeRawFloor(name),
-                                propertyId,
-                            };
+    const dialog = globalDialog.openDialog(
+        AddNewFloorForm,
+        {
+            allFloorNames: new Set(floorDocs.map(property("name"))),
+            onCreate(name: string) {
+                tryCatchLoadingWrapper({
+                    hook() {
+                        const rawFloor = {
+                            ...makeRawFloor(name),
+                            propertyId,
+                        };
 
-                            return addFloor(
-                                {
-                                    id: propertyId,
-                                    organisationId,
-                                },
-                                rawFloor,
-                            ).then(dialog.hide);
-                        },
-                    });
-                },
+                        return addFloor(
+                            {
+                                id: propertyId,
+                                organisationId,
+                            },
+                            rawFloor,
+                        ).then(() => dialog.hide());
+                    },
+                });
             },
-            maximized: false,
+        },
+        {
             title: "Add New Floor",
         },
-    });
+    );
 }
 </script>
 
@@ -129,50 +128,67 @@ function showAddNewFloorForm(floorDocs: FloorDoc[]): void {
     <div class="PageAdminFloors">
         <FTTitle :title="t('PageAdminFloors.title')">
             <template #right>
-                <FTBtn
+                <v-btn
                     rounded
                     icon="fa fa-plus"
                     class="button-gradient"
                     @click="showAddNewFloorForm(floors)"
+                    aria-label="Add new floor plan"
                 />
             </template>
         </FTTitle>
 
-        <!-- If the property has floors, display them -->
-        <q-list v-if="floors.length > 0">
-            <q-slide-item
+        <v-list v-if="floors.length > 0" lines="one">
+            <v-list-item
                 v-for="floor in floors"
                 :key="floor.id"
-                right-color="red"
-                left-color="green"
-                @right="({ reset }) => onFloorDelete(floor.id, reset)"
-                @left="({ reset }) => duplicateFloor(floor, reset)"
-                class="fa-card"
+                :to="{
+                    name: 'adminFloorEdit',
+                    params: {
+                        floorId: floor.id,
+                        organisationId,
+                        propertyId,
+                    },
+                }"
+                link
+                class="ft-card mb-2"
             >
-                <template #right>
-                    <q-icon name="fa fa-trash" />
+                <v-list-item-title>{{ floor.name }}</v-list-item-title>
+
+                <template #append>
+                    <v-tooltip location="top">
+                        <template #activator="{ props: tooltipProps }">
+                            <v-btn
+                                v-bind="tooltipProps"
+                                icon="fa fa-copy"
+                                variant="text"
+                                size="small"
+                                color="green"
+                                @click.stop.prevent="duplicateFloor(floor)"
+                                :aria-label="`Duplicate ${floor.name} floor plan`"
+                                class="mr-1"
+                            />
+                        </template>
+                        <span>Duplicate</span>
+                    </v-tooltip>
+
+                    <v-tooltip location="top">
+                        <template #activator="{ props: tooltipProps }">
+                            <v-btn
+                                v-bind="tooltipProps"
+                                icon="fa fa-trash"
+                                variant="text"
+                                size="small"
+                                color="red"
+                                @click.stop.prevent="onFloorDelete(floor.id)"
+                                :aria-label="`Delete ${floor.name} floor plan`"
+                            />
+                        </template>
+                        <span>Delete</span>
+                    </v-tooltip>
                 </template>
-                <template #left>
-                    <q-icon name="fa fa-copy" />
-                </template>
-                <q-item
-                    v-ripple
-                    clickable
-                    :to="{
-                        name: 'adminFloorEdit',
-                        params: {
-                            floorId: floor.id,
-                            organisationId,
-                            propertyId,
-                        },
-                    }"
-                >
-                    <q-item-section>
-                        <q-item-label>{{ floor.name }}</q-item-label>
-                    </q-item-section>
-                </q-item>
-            </q-slide-item>
-        </q-list>
+            </v-list-item>
+        </v-list>
 
         <FTCenteredText v-else>
             {{ t("PageAdminFloors.noFloorPlansMessage") }}

@@ -15,11 +15,9 @@ import {
 import { useEventListener } from "@vueuse/core";
 import { debounce, isString } from "es-toolkit";
 import { isNumber } from "es-toolkit/compat";
-import { exportFile, Loading } from "quasar";
 import FloorGeneratorAIPrompt from "src/components/Floor/FloorGeneratorAIPrompt.vue";
 import FTColorPickerButton from "src/components/FTColorPickerButton.vue";
-import FTDialog from "src/components/FTDialog.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalDialog } from "src/composables/useDialog";
 import {
     getFirestoreDocument,
     updateFirestoreDocument,
@@ -28,10 +26,12 @@ import {
 import { useFloorEditor } from "src/composables/useFloorEditor";
 import { ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
 import { getFloorPath } from "src/db";
-import { isTablet } from "src/global-reactives/screen-detection";
+import { useScreenDetection } from "src/global-reactives/screen-detection";
 import { compressFloorDoc, decompressFloorDoc } from "src/helpers/compress-floor-doc";
-import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { exportFile } from "src/helpers/export-file";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { AppLogger } from "src/logger/FTLogger.js";
+import { useGlobalStore } from "src/stores/global-store";
 import { computed, onMounted, reactive, ref, useTemplateRef, watch } from "vue";
 import { useRouter } from "vue-router";
 
@@ -41,9 +41,10 @@ interface Props {
     propertyId: string;
 }
 
+const { isTablet } = useScreenDetection();
 const props = defineProps<Props>();
 const router = useRouter();
-const { createDialog } = useDialog();
+const globalStore = useGlobalStore();
 const canvasRef = useTemplateRef<HTMLCanvasElement | undefined>("canvasRef");
 const pageRef = useTemplateRef<HTMLDivElement>("pageRef");
 const fileInputRef = useTemplateRef<HTMLInputElement>("fileInputRef");
@@ -72,7 +73,6 @@ const floorInstanceState = reactive({
 });
 
 const bgColor = ref("#ffffff");
-const isDrawingMode = ref(false);
 const lineWidth = ref(2);
 const drawingColor = ref("#000000");
 const selectedBrushType = ref<"circle" | "pencil" | "spray">("pencil");
@@ -81,7 +81,7 @@ const selectedTool = ref<"add" | "draw" | "select">("select");
 
 const brushOptions = [
     { icon: "fa fa-pencil", label: "Pencil", value: "pencil" },
-    { icon: "fa fa-paint-brush", label: "Spray", value: "spray" },
+    { icon: "fa fa-spray-can", label: "Spray", value: "spray" },
     { icon: "fa fa-circle", label: "Circle", value: "circle" },
 ];
 
@@ -97,6 +97,11 @@ const elementProperties = reactive({
 
 const existingLabels = computed(function () {
     return floorInstance.value ? new Set(extractAllTablesLabels(floorInstance.value)) : new Set();
+});
+
+watch(selectedTool, (newTool) => {
+    const isDrawing = newTool === "draw";
+    floorInstance.value?.setDrawingMode(isDrawing);
 });
 
 watch(
@@ -151,7 +156,7 @@ function onKeyDown(event: KeyboardEvent): void {
 }
 
 onMounted(async function () {
-    Loading.show();
+    globalStore.setLoading(true);
     await floorDataPromise.value;
     if (floor.value) {
         instantiateFloor(floor.value);
@@ -174,11 +179,17 @@ onMounted(async function () {
     } else {
         router.replace("/").catch(showErrorMessage);
     }
-    Loading.hide();
+    globalStore.setLoading(false);
 });
 
 async function exportFloor(): Promise<void> {
-    if (!floorInstance.value || !(await showConfirm("Do you want to export this floor plan?"))) {
+    if (
+        !floorInstance.value ||
+        !(await globalDialog.confirm({
+            message: "",
+            title: "Do you want to export this floor plan?",
+        }))
+    ) {
         return;
     }
     exportFile(`${floorInstance.value.name}.json`, JSON.stringify(floorInstance.value.export()));
@@ -238,18 +249,6 @@ function redoAction(): void {
     floorInstance.value.canvas.renderAll();
 }
 
-function toggleDrawingMode(): void {
-    if (selectedTool.value === "draw") {
-        selectedTool.value = "select";
-        isDrawingMode.value = false;
-        floorInstance.value?.setDrawingMode(false);
-    } else {
-        selectedTool.value = "draw";
-        isDrawingMode.value = true;
-        floorInstance.value?.setDrawingMode(true);
-    }
-}
-
 function triggerFileInput(): void {
     fileInputRef.value?.click();
 }
@@ -290,7 +289,7 @@ const setElementColor = debounce(function (newVal: unknown): void {
 
 async function deleteSelectedElement(): Promise<void> {
     if (!selectedElement.value) return;
-    if (await showConfirm("Do you really want to delete this element?")) {
+    if (await globalDialog.confirm({ title: "Do you really want to delete this element?" })) {
         onDeleteElement(selectedElement.value);
     }
 }
@@ -311,33 +310,18 @@ function openAIDialog(): void {
         return;
     }
 
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: FloorGeneratorAIPrompt,
-            componentPropsObject: {
-                floorInstance: floorInstance.value,
+    const dialog = globalDialog.openDialog(
+        FloorGeneratorAIPrompt,
+        {
+            floorInstance: floorInstance.value,
+            onDone() {
+                dialog.hide();
             },
-            listeners: {
-                done() {
-                    dialog.hide();
-                },
-            },
+        },
+        {
             title: "Read floor plan from image",
         },
-    });
-}
-
-function selectAddTool(): void {
-    selectedTool.value = "add";
-    isDrawingMode.value = false;
-    floorInstance.value?.setDrawingMode(false);
-}
-
-function selectSelectTool(): void {
-    selectedTool.value = "select";
-    isDrawingMode.value = false;
-    floorInstance.value?.setDrawingMode(false);
+    );
 }
 
 function sendBack(): void {
@@ -359,100 +343,83 @@ function updateTableLabel(newLabel: unknown): void {
         <!-- Top Toolbar -->
         <div class="top-toolbar">
             <div class="toolbar-section">
-                <q-btn-group flat>
-                    <q-btn
-                        flat
-                        :color="selectedTool === 'select' ? 'primary' : ''"
-                        icon="fa fa-mouse-pointer"
-                        @click="selectSelectTool"
-                    >
-                        <q-tooltip>Select Tool</q-tooltip>
-                    </q-btn>
-                    <q-btn
-                        flat
-                        :color="selectedTool === 'draw' ? 'primary' : ''"
-                        icon="fa fa-paint-brush"
-                        @click="toggleDrawingMode"
-                    >
-                        <q-tooltip>Drawing Tool</q-tooltip>
-                    </q-btn>
-                    <q-btn
-                        flat
-                        :color="selectedTool === 'add' ? 'primary' : ''"
-                        icon="fa fa-plus-square"
-                        @click="selectAddTool"
-                    >
-                        <q-tooltip>Add Elements</q-tooltip>
-                    </q-btn>
-                </q-btn-group>
+                <v-btn-toggle v-model="selectedTool" variant="text" mandatory>
+                    <v-btn value="select" icon>
+                        <v-icon icon="fas fa-mouse-pointer"></v-icon>
+                        <v-tooltip activator="parent" location="bottom">Select Tool</v-tooltip>
+                    </v-btn>
+                    <v-btn value="draw" icon>
+                        <v-icon icon="fas fa-paint-brush"></v-icon>
+                        <v-tooltip activator="parent" location="bottom">Drawing Tool</v-tooltip>
+                    </v-btn>
+                    <v-btn value="add" icon>
+                        <v-icon icon="far fa-plus-square"></v-icon>
+                        <v-tooltip activator="parent" location="bottom">Add Elements</v-tooltip>
+                    </v-btn>
+                </v-btn-toggle>
 
-                <q-separator vertical inset class="q-mx-sm" />
+                <v-divider vertical inset class="mx-1" />
 
-                <q-btn-group flat>
-                    <q-btn
-                        flat
-                        icon="fa fa-undo"
-                        @click="undoAction"
-                        :disabled="!floorInstanceState.canUndo"
-                    >
-                        <q-tooltip>Undo</q-tooltip>
-                    </q-btn>
-                    <q-btn
-                        flat
-                        icon="fa fa-redo"
-                        @click="redoAction"
-                        :disabled="!floorInstanceState.canRedo"
-                    >
-                        <q-tooltip>Redo</q-tooltip>
-                    </q-btn>
-                </q-btn-group>
+                <v-btn-group variant="text">
+                    <v-btn icon @click="undoAction" :disabled="!floorInstanceState.canUndo">
+                        <v-icon icon="fas fa-undo"></v-icon>
+                        <v-tooltip activator="parent" location="bottom">Undo</v-tooltip>
+                    </v-btn>
+                    <v-btn icon @click="redoAction" :disabled="!floorInstanceState.canRedo">
+                        <v-icon icon="fas fa-redo"></v-icon>
+                        <v-tooltip activator="parent" location="bottom">Redo</v-tooltip>
+                    </v-btn>
+                </v-btn-group>
 
-                <q-separator vertical inset class="q-mx-sm" />
+                <v-divider vertical inset class="mx-1" />
 
-                <q-btn flat icon="fa fa-th" @click="floorInstance?.toggleGridVisibility">
-                    <q-tooltip>Toggle Grid</q-tooltip>
-                </q-btn>
+                <v-btn variant="text" icon @click="floorInstance?.toggleGridVisibility">
+                    <v-icon icon="fas fa-th"></v-icon>
+                    <v-tooltip activator="parent" location="bottom">Toggle Grid</v-tooltip>
+                </v-btn>
             </div>
 
             <div class="toolbar-section">
-                <q-input
-                    dense
-                    outlined
+                <v-text-field
+                    density="compact"
+                    variant="outlined"
                     :model-value="floorInstance?.name"
                     @update:model-value="(event) => onFloorChange({ name: event as string })"
                     placeholder="Floor Name"
                     class="floor-name-input"
+                    hide-details
                 />
             </div>
 
             <div class="toolbar-section">
-                <q-btn-group flat>
-                    <q-btn
-                        flat
-                        icon="fa fa-magic"
-                        label="Generate from Image"
-                        @click="openAIDialog"
-                    >
-                        <q-tooltip>Generate floor plan from image using AI</q-tooltip>
-                    </q-btn>
-                    <q-btn flat icon="fa fa-file-import" @click="triggerFileInput">
-                        <q-tooltip>Import Floor</q-tooltip>
-                    </q-btn>
-                    <q-btn flat icon="fa fa-file-export" @click="exportFloor">
-                        <q-tooltip>Export Floor</q-tooltip>
-                    </q-btn>
-                </q-btn-group>
+                <v-btn-group variant="text">
+                    <v-btn @click="openAIDialog">
+                        <template #prepend>
+                            <v-icon icon="fas fa-wand-magic-sparkles"></v-icon>
+                        </template>
+                        Generate from Image
+                        <v-tooltip activator="parent" location="bottom"
+                            >Generate floor plan from image using AI</v-tooltip
+                        >
+                    </v-btn>
+                    <v-btn icon @click="triggerFileInput">
+                        <v-icon icon="fas fa-file-import"></v-icon>
+                        <v-tooltip activator="parent" location="bottom">Import Floor</v-tooltip>
+                    </v-btn>
+                    <v-btn icon @click="exportFloor">
+                        <v-icon icon="fas fa-file-export"></v-icon>
+                        <v-tooltip activator="parent" location="bottom">Export Floor</v-tooltip>
+                    </v-btn>
+                </v-btn-group>
 
-                <q-separator vertical inset class="q-mx-sm" />
+                <v-divider vertical inset class="mx-1" />
 
-                <q-btn
-                    :disabled="!hasChanges"
-                    unelevated
-                    color="primary"
-                    icon="fa fa-save"
-                    label="Save"
-                    @click="onFloorSave"
-                />
+                <v-btn :disabled="!hasChanges" variant="flat" color="primary" @click="onFloorSave">
+                    <template #prepend>
+                        <v-icon icon="fas fa-save"></v-icon>
+                    </template>
+                    Save
+                </v-btn>
             </div>
         </div>
 
@@ -470,18 +437,18 @@ function updateTableLabel(newLabel: unknown): void {
             <div class="left-panel" :class="{ 'panel-collapsed': !showPropertiesPanel }">
                 <div class="panel-header">
                     <div class="panel-title" v-if="showPropertiesPanel">Properties</div>
-                    <q-btn
-                        flat
-                        dense
-                        round
-                        :icon="showPropertiesPanel ? 'fa fa-chevron-left' : 'fa fa-chevron-right'"
+                    <v-btn
+                        variant="text"
+                        size="small"
                         @click="showPropertiesPanel = !showPropertiesPanel"
-                        size="xs"
                     >
-                        <q-tooltip>{{
+                        <v-icon>{{
+                            showPropertiesPanel ? "fa fa-chevron-left" : "fa fa-chevron-right"
+                        }}</v-icon>
+                        <v-tooltip activator="parent" location="right">{{
                             showPropertiesPanel ? "Collapse Panel" : "Expand Panel"
-                        }}</q-tooltip>
-                    </q-btn>
+                        }}</v-tooltip>
+                    </v-btn>
                 </div>
 
                 <div v-if="showPropertiesPanel" class="panel-content">
@@ -489,9 +456,9 @@ function updateTableLabel(newLabel: unknown): void {
                     <div class="property-section">
                         <div class="section-title">Floor Settings</div>
                         <div class="property-row">
-                            <q-input
-                                dense
-                                outlined
+                            <v-text-field
+                                density="compact"
+                                variant="outlined"
                                 type="number"
                                 label="Width"
                                 :model-value="floorInstanceState.width"
@@ -502,10 +469,11 @@ function updateTableLabel(newLabel: unknown): void {
                                 :max="MAX_FLOOR_WIDTH"
                                 :step="RESOLUTION"
                                 @keydown.prevent
+                                hide-details
                             />
-                            <q-input
-                                dense
-                                outlined
+                            <v-text-field
+                                density="compact"
+                                variant="outlined"
                                 type="number"
                                 label="Height"
                                 :model-value="floorInstanceState.height"
@@ -516,6 +484,7 @@ function updateTableLabel(newLabel: unknown): void {
                                 :max="MAX_FLOOR_HEIGHT"
                                 :step="RESOLUTION"
                                 @keydown.prevent
+                                hide-details
                             />
                         </div>
                         <div class="property-row">
@@ -530,28 +499,26 @@ function updateTableLabel(newLabel: unknown): void {
                     <!-- Drawing Properties -->
                     <div class="property-section" v-if="selectedTool === 'draw'">
                         <div class="section-title">Drawing Settings</div>
-                        <q-select
-                            dense
-                            outlined
+                        <v-select
+                            density="compact"
+                            variant="outlined"
                             v-model="selectedBrushType"
-                            :options="brushOptions"
+                            :items="brushOptions"
                             @update:model-value="updateBrushType"
                             label="Brush Type"
-                            emit-value
-                            option-value="value"
-                            option-label="label"
+                            item-title="label"
+                            item-value="value"
+                            hide-details
+                            class="mb-2"
                         >
-                            <template v-slot:option="scope">
-                                <q-item v-bind="scope.itemProps">
-                                    <q-item-section avatar>
-                                        <q-icon :name="scope.opt.icon" />
-                                    </q-item-section>
-                                    <q-item-section>
-                                        <q-item-label>{{ scope.opt.label }}</q-item-label>
-                                    </q-item-section>
-                                </q-item>
+                            <template v-slot:item="{ props: itemPropsInternal, item }">
+                                <v-list-item
+                                    v-bind="itemPropsInternal"
+                                    :prepend-icon="item.raw.icon"
+                                    :title="item.raw.label"
+                                ></v-list-item>
                             </template>
-                        </q-select>
+                        </v-select>
                         <div class="property-row">
                             <div class="property-label">Color</div>
                             <FTColorPickerButton
@@ -561,14 +528,16 @@ function updateTableLabel(newLabel: unknown): void {
                         </div>
                         <div class="property-row">
                             <div class="property-label">Size</div>
-                            <q-slider
+                            <v-slider
                                 v-model.number="lineWidth"
                                 :min="1"
                                 :max="50"
                                 :step="1"
-                                label
+                                thumb-label
                                 @update:model-value="updateLineWidth"
                                 color="primary"
+                                hide-details
+                                density="compact"
                             />
                         </div>
                     </div>
@@ -577,101 +546,115 @@ function updateTableLabel(newLabel: unknown): void {
                     <div class="property-section" v-if="selectedElement">
                         <div class="section-title">Element Properties</div>
                         <div class="property-grid">
-                            <q-input
-                                dense
-                                outlined
+                            <v-text-field
+                                density="compact"
+                                variant="outlined"
                                 v-model.number="elementProperties.left"
                                 type="number"
                                 label="X"
+                                hide-details
                             />
-                            <q-input
-                                dense
-                                outlined
+                            <v-text-field
+                                density="compact"
+                                variant="outlined"
                                 v-model.number="elementProperties.top"
                                 type="number"
                                 label="Y"
+                                hide-details
                             />
-                            <q-input
-                                dense
-                                outlined
+                            <v-text-field
+                                density="compact"
+                                variant="outlined"
                                 v-model.number="elementProperties.width"
                                 type="number"
                                 label="Width"
+                                hide-details
                             />
-                            <q-input
-                                dense
-                                outlined
+                            <v-text-field
+                                density="compact"
+                                variant="outlined"
                                 v-model.number="elementProperties.height"
                                 type="number"
                                 label="Height"
+                                hide-details
                             />
                         </div>
-                        <q-input
-                            dense
-                            outlined
+                        <v-text-field
+                            density="compact"
+                            variant="outlined"
                             v-model.number="elementProperties.angle"
                             type="number"
                             label="Rotation"
                             suffix="°"
-                            class="q-mt-sm"
+                            class="mt-2"
+                            hide-details
                         />
-                        <q-input
+                        <v-text-field
                             v-if="isTable(selectedElement)"
-                            dense
-                            outlined
+                            density="compact"
+                            variant="outlined"
                             :model-value="elementProperties.label"
                             @update:model-value="updateTableLabel"
                             label="Table ID"
-                            class="q-mt-sm"
-                            :debounce="500"
+                            class="mt-2"
+                            hide-details
                         />
-                        <div class="property-row q-mt-sm">
+                        <div class="property-row mt-2">
                             <div class="property-label">Color</div>
                             <FTColorPickerButton
                                 :model-value="elementProperties.color"
                                 @update:model-value="setElementColor"
                             />
                         </div>
-                        <div class="element-actions q-mt-md">
-                            <q-btn
-                                flat
-                                dense
-                                icon="fa fa-copy"
+                        <div class="element-actions mt-4">
+                            <v-btn
+                                variant="text"
+                                density="compact"
+                                icon="far fa-copy"
                                 @click="floorInstance?.copySelectedElement()"
                             >
-                                <q-tooltip>Copy</q-tooltip>
-                            </q-btn>
-                            <q-btn flat dense icon="fa fa-level-down" @click="sendBack">
-                                <q-tooltip>Send Back</q-tooltip>
-                            </q-btn>
-                            <q-btn
+                                <v-tooltip activator="parent" location="bottom">Copy</v-tooltip>
+                            </v-btn>
+                            <v-btn
+                                variant="text"
+                                density="compact"
+                                icon="fas fa-arrow-down"
+                                @click="sendBack"
+                            >
+                                <v-tooltip activator="parent" location="bottom"
+                                    >Send Back</v-tooltip
+                                >
+                            </v-btn>
+                            <v-btn
                                 v-if="'flip' in selectedElement"
-                                flat
-                                dense
-                                icon="fa fa-arrows-alt-h"
+                                variant="text"
+                                density="compact"
+                                icon="fas fa-arrows-alt-h"
                                 @click="selectedElement.flip()"
                             >
-                                <q-tooltip>Flip</q-tooltip>
-                            </q-btn>
-                            <q-btn
+                                <v-tooltip activator="parent" location="bottom">Flip</v-tooltip>
+                            </v-btn>
+                            <v-btn
                                 v-if="'nextDesign' in selectedElement"
-                                flat
-                                dense
-                                icon="fa fa-chevron-right"
+                                variant="text"
+                                density="compact"
+                                icon="fas fa-palette"
                                 @click="selectedElement.nextDesign()"
                             >
-                                <q-tooltip>Switch Design</q-tooltip>
-                            </q-btn>
-                            <q-space />
-                            <q-btn
-                                flat
-                                dense
-                                icon="fa fa-trash"
-                                color="negative"
+                                <v-tooltip activator="parent" location="bottom"
+                                    >Switch Design</v-tooltip
+                                >
+                            </v-btn>
+                            <v-spacer />
+                            <v-btn
+                                variant="text"
+                                density="compact"
+                                icon="fas fa-trash-alt"
+                                color="error"
                                 @click="deleteSelectedElement"
                             >
-                                <q-tooltip>Delete</q-tooltip>
-                            </q-btn>
+                                <v-tooltip activator="parent" location="bottom">Delete</v-tooltip>
+                            </v-btn>
                         </div>
                     </div>
 
@@ -686,7 +669,7 @@ function updateTableLabel(newLabel: unknown): void {
                                 draggable="true"
                                 @dragstart="onDragStart($event, element.tag)"
                             >
-                                <q-avatar square size="48px" class="element-preview">
+                                <v-avatar tile size="48" class="element-preview">
                                     <img
                                         v-if="element.img"
                                         :src="element.img"
@@ -695,7 +678,7 @@ function updateTableLabel(newLabel: unknown): void {
                                     <div v-else class="element-placeholder">
                                         {{ element.label.charAt(0) }}
                                     </div>
-                                </q-avatar>
+                                </v-avatar>
                                 <div class="element-label">{{ element.label }}</div>
                             </div>
                         </div>
@@ -712,9 +695,9 @@ function updateTableLabel(newLabel: unknown): void {
 
     <!-- Mobile Warning -->
     <div v-else class="mobile-warning">
-        <q-icon name="fa fa-mobile-alt" size="64px" color="grey-5" />
-        <h5 class="q-mt-md">Floor Editor Not Available on Mobile</h5>
-        <p class="text-grey-6">Please use a desktop device to edit floor plans.</p>
+        <v-icon icon="fas fa-mobile-alt" size="64" color="grey-lighten-1" />
+        <h5 class="mt-4">Floor Editor Not Available on Mobile</h5>
+        <p class="text-grey-darken-1">Please use a desktop device to edit floor plans.</p>
     </div>
 </template>
 
@@ -724,11 +707,7 @@ function updateTableLabel(newLabel: unknown): void {
     width: 100%;
     flex-direction: column;
     height: calc(100vh - 48px);
-    background: $grey-2;
-
-    .body--dark & {
-        background: $dark;
-    }
+    background: rgb(var(--v-theme-background));
 }
 
 .top-toolbar {
@@ -737,14 +716,9 @@ function updateTableLabel(newLabel: unknown): void {
     justify-content: space-between;
     height: 56px;
     padding: 0 16px;
-    background: white;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    background: rgb(var(--v-theme-surface));
+    border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
     z-index: 100;
-
-    .body--dark & {
-        background: $dark-page;
-        border-bottom-color: rgba(255, 255, 255, 0.12);
-    }
 
     .toolbar-section {
         display: flex;
@@ -765,19 +739,14 @@ function updateTableLabel(newLabel: unknown): void {
 
 .left-panel {
     width: 320px;
-    background: white;
-    border-right: 1px solid rgba(0, 0, 0, 0.12);
+    background: rgb(var(--v-theme-surface));
+    border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
     display: flex;
     flex-direction: column;
     transition: width 0.3s ease;
 
-    .body--dark & {
-        background: $dark-page;
-        border-right-color: rgba(255, 255, 255, 0.12);
-    }
-
     &.panel-collapsed {
-        width: 48px;
+        width: 56px;
         overflow: hidden;
     }
 
@@ -785,33 +754,26 @@ function updateTableLabel(newLabel: unknown): void {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 16px;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-
-        .body--dark & {
-            border-bottom-color: rgba(255, 255, 255, 0.12);
-        }
+        padding: 12px;
+        border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+        min-height: 56px;
 
         .panel-title {
             font-weight: 600;
             font-size: 14px;
-            color: $grey-7;
             text-transform: uppercase;
-
-            .body--dark & {
-                color: $grey-5;
-            }
+            color: rgb(var(--v-theme-on-surface));
         }
     }
 
     &.panel-collapsed .panel-header {
         justify-content: center;
-        padding: 16px 8px;
+        padding: 8px;
     }
 
     .panel-content {
         flex: 1;
-        overflow-y: hidden;
+        overflow-y: auto;
         padding: 16px;
     }
 }
@@ -823,12 +785,7 @@ function updateTableLabel(newLabel: unknown): void {
         font-weight: 600;
         font-size: 12px;
         text-transform: uppercase;
-        color: $grey-7;
         margin-bottom: 12px;
-
-        .body--dark & {
-            color: $grey-5;
-        }
     }
 
     .property-row {
@@ -840,11 +797,6 @@ function updateTableLabel(newLabel: unknown): void {
         .property-label {
             flex: 1;
             font-size: 13px;
-            color: $grey-8;
-
-            .body--dark & {
-                color: $grey-4;
-            }
         }
     }
 
@@ -864,7 +816,7 @@ function updateTableLabel(newLabel: unknown): void {
 
 .elements-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
     gap: 12px;
 
     .element-item {
@@ -872,14 +824,15 @@ function updateTableLabel(newLabel: unknown): void {
         flex-direction: column;
         align-items: center;
         padding: 8px;
-        border: 2px solid transparent;
+        border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
         border-radius: 8px;
         cursor: grab;
         transition: all 0.2s ease;
+        background: rgb(var(--v-theme-surface));
 
         &:hover {
-            background: rgba($primary, 0.1);
-            border-color: $primary;
+            background: rgba(var(--v-theme-primary), 0.1);
+            border-color: rgb(var(--v-theme-primary));
         }
 
         &:active {
@@ -888,23 +841,20 @@ function updateTableLabel(newLabel: unknown): void {
 
         .element-preview {
             margin-bottom: 4px;
-            background: $grey-2;
-
-            .body--dark & {
-                background: $grey-9;
-            }
+            background: rgb(var(--v-theme-surface-variant));
         }
 
         .element-placeholder {
             font-size: 20px;
             font-weight: 600;
-            color: $grey-7;
+            color: rgb(var(--v-theme-on-surface));
         }
 
         .element-label {
             font-size: 11px;
             text-align: center;
             word-break: break-word;
+            color: rgb(var(--v-theme-on-surface));
         }
     }
 }
@@ -913,23 +863,18 @@ function updateTableLabel(newLabel: unknown): void {
     flex: 1;
     position: relative;
     overflow: hidden;
-    background: $grey-2;
+    background: rgb(var(--v-theme-background));
     display: flex;
     align-items: center;
     justify-content: center;
 
-    .body--dark & {
-        background: $dark;
-    }
-
     canvas {
         display: block;
-        background: white;
+        background: rgb(var(--v-theme-surface));
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
-        .body--dark & {
-            background: $dark-page;
+        .v-theme--dark & {
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
     }
@@ -944,5 +889,195 @@ function updateTableLabel(newLabel: unknown): void {
     height: 100vh;
     text-align: center;
     padding: 20px;
+    background: rgb(var(--v-theme-background));
+}
+.floor-planner-container {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    height: calc(100vh - 48px);
+    background: rgb(var(--v-theme-background));
+}
+
+.top-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    padding: 0 16px;
+    background: rgb(var(--v-theme-surface));
+    border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+    z-index: 100;
+
+    .toolbar-section {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .floor-name-input {
+        width: 200px;
+    }
+}
+
+.main-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.left-panel {
+    width: 320px;
+    background: rgb(var(--v-theme-surface));
+    border-right: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+    display: flex;
+    flex-direction: column;
+    transition: width 0.3s ease;
+
+    &.panel-collapsed {
+        width: 56px;
+        overflow: hidden;
+    }
+
+    .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px;
+        border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+        min-height: 56px;
+
+        .panel-title {
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            color: rgb(var(--v-theme-on-surface));
+        }
+    }
+
+    &.panel-collapsed .panel-header {
+        justify-content: center;
+        padding: 8px;
+    }
+
+    .panel-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+    }
+}
+
+.property-section {
+    margin-bottom: 24px;
+
+    .section-title {
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+    }
+
+    .property-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+
+        .property-label {
+            flex: 1;
+            font-size: 13px;
+            color: rgb(var(--v-theme-on-surface));
+        }
+    }
+
+    .property-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .element-actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+}
+
+.elements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 12px;
+
+    .element-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 8px;
+        border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+        border-radius: 8px;
+        cursor: grab;
+        transition: all 0.2s ease;
+        background: rgb(var(--v-theme-surface));
+
+        &:hover {
+            background: rgba(var(--v-theme-primary), 0.1);
+            border-color: rgb(var(--v-theme-primary));
+        }
+
+        &:active {
+            cursor: grabbing;
+        }
+
+        .element-preview {
+            margin-bottom: 4px;
+            background: rgb(var(--v-theme-surface-variant));
+        }
+
+        .element-placeholder {
+            font-size: 20px;
+            font-weight: 600;
+            color: rgb(var(--v-theme-on-surface));
+        }
+
+        .element-label {
+            font-size: 11px;
+            text-align: center;
+            word-break: break-word;
+            color: rgb(var(--v-theme-on-surface));
+        }
+    }
+}
+
+.canvas-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background: rgb(var(--v-theme-background));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    canvas {
+        display: block;
+        background: rgb(var(--v-theme-surface));
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+        .v-theme--dark & {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+    }
+}
+
+.mobile-warning {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+    padding: 20px;
+    background: rgb(var(--v-theme-background));
 }
 </style>

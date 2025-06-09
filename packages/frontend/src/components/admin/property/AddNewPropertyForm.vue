@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { CreatePropertyPayload, PropertyDoc, UpdatePropertyPayload } from "@firetable/types";
+import type { VForm } from "vuetify/components";
 
 import { isString } from "es-toolkit";
-import { QForm } from "quasar";
 import FTBtn from "src/components/FTBtn.vue";
 import { minLength, validOptionalURL } from "src/helpers/form-rules";
 import { processImage } from "src/helpers/process-image";
@@ -43,9 +43,8 @@ const imageUrl = computed({
         form.value.img = val || "";
     },
 });
-const createPropertyForm = useTemplateRef<QForm>("createPropertyForm");
-const fileInput = ref<HTMLInputElement>();
-const showUrlInput = ref(false);
+const createPropertyForm = useTemplateRef<VForm>("createPropertyForm");
+const fileInput = useTemplateRef<HTMLInputElement>("fileInput");
 
 const imageProcessingOptions = {
     acceptedTypes: ["image/png", "image/jpeg", "image/svg+xml"],
@@ -72,7 +71,10 @@ watch(
             name: newVal.name,
             organisationId: props.organisationId,
         };
-        showUrlInput.value = Boolean(newVal.img);
+        // If an existing image URL is present, default to the URL input method
+        if (newVal.img) {
+            inputMethod.value = InputMethod.URL;
+        }
     },
     { immediate: true },
 );
@@ -98,7 +100,6 @@ async function handleImageUpload(event: Event): Promise<void> {
             dataUrl: processedImage,
             type: file.type,
         };
-        showUrlInput.value = false;
     } catch (error) {
         showErrorMessage(t("AddNewPropertyForm.imageProcessingError"));
     } finally {
@@ -122,11 +123,11 @@ async function processDroppedFile(file: File): Promise<void> {
 
 function removeImage(): void {
     form.value.img = "";
-    showUrlInput.value = false;
 }
 
 async function submit(): Promise<void> {
-    if (!(await createPropertyForm.value?.validate())) {
+    const { valid } = (await createPropertyForm.value?.validate()) ?? { valid: false };
+    if (!valid) {
         return;
     }
 
@@ -146,108 +147,108 @@ function triggerFileInput(): void {
 </script>
 
 <template>
-    <q-card-section>
-        <q-form ref="createPropertyForm" greedy class="q-gutter-md">
-            <q-input
+    <v-card-text>
+        <v-form
+            ref="createPropertyForm"
+            greedy
+            class="d-flex flex-column"
+            style="gap: 1.25rem"
+            @submit.prevent="submit"
+        >
+            <v-text-field
                 v-model="form.name"
                 :label="t('AddNewPropertyForm.propertyNameLabel')"
-                outlined
+                variant="outlined"
                 autofocus
                 :rules="propertyRules"
             />
 
-            <div class="brand-image q-mt-md">
-                <div class="text-subtitle2 q-mb-sm">
-                    {{ t("AddNewPropertyForm.propertyBrandImageLabel") }}
-                    <q-btn flat round dense icon="fa fa-circle-info" class="q-ml-xs">
-                        <q-tooltip>
+            <div class="brand-image">
+                <div class="d-flex align-center mb-2">
+                    <div class="text-subtitle-1">
+                        {{ t("AddNewPropertyForm.propertyBrandImageLabel") }}
+                    </div>
+                    <v-tooltip location="top">
+                        <template #activator="{ props: tooltipProps }">
+                            <v-btn
+                                v-bind="tooltipProps"
+                                variant="text"
+                                icon="fas fa-info-circle"
+                                size="x-small"
+                                class="ml-1"
+                            />
+                        </template>
+                        <span>
                             {{ t("AddNewPropertyForm.brandImageTooltip") }}
-                        </q-tooltip>
-                    </q-btn>
+                        </span>
+                    </v-tooltip>
                 </div>
 
-                <div class="row q-gutter-sm q-mb-md">
-                    <q-btn-toggle
-                        class="full-width"
-                        v-model="inputMethod"
-                        no-caps
-                        rounded
-                        spread
-                        unelevated
-                        :options="[
-                            {
-                                label: t('AddNewPropertyForm.uploadFileButtonLabel'),
-                                value: InputMethod.FILE,
-                            },
-                            {
-                                label: t('AddNewPropertyForm.pasteUrlButtonLabel'),
-                                value: InputMethod.URL,
-                            },
-                        ]"
-                    />
-                </div>
+                <v-btn-toggle v-model="inputMethod" mandatory divided class="w-100 mb-4">
+                    <v-btn :value="InputMethod.FILE" class="flex-grow-1">
+                        {{ t("AddNewPropertyForm.uploadFileButtonLabel") }}
+                    </v-btn>
+                    <v-btn :value="InputMethod.URL" class="flex-grow-1">
+                        {{ t("AddNewPropertyForm.pasteUrlButtonLabel") }}
+                    </v-btn>
+                </v-btn-toggle>
 
-                <!-- URL Input -->
-                <q-input
+                <v-text-field
                     v-if="inputMethod === InputMethod.URL"
                     v-model="imageUrl"
                     :label="t('AddNewPropertyForm.imageUrlLabel')"
-                    outlined
+                    variant="outlined"
                     :rules="imgUrlRules"
-                >
-                    <template v-if="imageUrl" #append>
-                        <q-icon name="fa fa-clear" class="cursor-pointer" @click="removeImage" />
-                    </template>
-                </q-input>
+                    clearable
+                    @click:clear="removeImage"
+                />
 
-                <!-- Image Preview and Drop Area -->
                 <div
                     v-if="inputMethod === InputMethod.FILE"
-                    class="preview-container q-mt-md ft-card full-width"
+                    class="preview-container mt-4 ft-card"
                     @click="triggerFileInput"
                     @dragover.prevent
                     @drop.prevent="handleFileDrop"
                 >
-                    <q-responsive :ratio="1">
-                        <q-img
+                    <v-responsive :aspect-ratio="1">
+                        <v-img
                             v-if="form.img"
                             :src="isString(form.img) ? form.img : form.img.dataUrl"
                             class="preview-image"
+                            cover
                         >
                             <div class="absolute-top-right">
-                                <FTBtn flat round icon="fa fa-close" @click.stop="removeImage" />
+                                <FTBtn
+                                    variant="text"
+                                    icon="fas fa-times"
+                                    @click.stop="removeImage"
+                                />
                             </div>
-                        </q-img>
-                        <div
-                            v-else
-                            class="row upload-placeholder text-center align-center content-center justify-center"
-                        >
-                            <q-icon name="fa fa-file-import" size="md" />
+                        </v-img>
+                        <div v-else class="upload-placeholder">
+                            <v-icon icon="fas fa-file-import" size="large" class="mb-2" />
                             <div>{{ t("AddNewPropertyForm.imageUploadPlaceholder") }}</div>
                         </div>
-                    </q-responsive>
+                    </v-responsive>
                 </div>
 
                 <input
                     ref="fileInput"
                     type="file"
-                    accept=".png,.svg"
+                    accept=".png,.svg,.jpeg,.jpg"
                     class="hidden"
                     @change="handleImageUpload"
                 />
             </div>
-        </q-form>
-    </q-card-section>
+        </v-form>
+    </v-card-text>
 
-    <q-card-actions align="right">
-        <q-btn
-            rounded
-            class="button-gradient"
-            size="md"
-            :label="t('Global.submit')"
-            @click="submit"
-        />
-    </q-card-actions>
+    <v-card-actions class="pa-4">
+        <v-spacer />
+        <v-btn rounded="lg" class="button-gradient" size="large" @click="submit">
+            {{ t("Global.submit") }}
+        </v-btn>
+    </v-card-actions>
 </template>
 
 <style lang="scss" scoped>
@@ -257,6 +258,9 @@ function triggerFileInput(): void {
 
 .preview-container {
     cursor: pointer;
+    border: 2px dashed rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    position: relative;
 
     .upload-placeholder {
         display: flex;
@@ -264,12 +268,13 @@ function triggerFileInput(): void {
         align-items: center;
         justify-content: center;
         height: 100%;
-        border-radius: 8px;
         text-align: center;
+    }
 
-        q-icon {
-            margin-bottom: 10px;
-        }
+    .absolute-top-right {
+        position: absolute;
+        top: 4px;
+        right: 4px;
     }
 }
 </style>

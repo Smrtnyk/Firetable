@@ -1,3 +1,15 @@
+<template>
+    <v-list-item :to="link.route" class="AppDrawerLink" :aria-labelledby="`label-${link.route}`">
+        <template v-slot:prepend>
+            <v-icon :icon="link.icon" class="AppDrawerLink__icon" aria-hidden="true" size="xs" />
+        </template>
+
+        <v-list-item-title class="AppDrawerLink__label" :id="`label-${link.route}`">
+            {{ link.label }}
+        </v-list-item-title>
+    </v-list-item>
+</template>
+
 <script setup lang="ts">
 import type { Link } from "src/types";
 
@@ -8,45 +20,21 @@ interface Props {
 const { link } = defineProps<Props>();
 </script>
 
-<template>
-    <q-item
-        :to="link.route"
-        clickable
-        class="AppDrawerLink"
-        :aria-labelledby="`label-${link.route}`"
-    >
-        <q-item-section avatar class="AppDrawerLink__icon-section">
-            <i :class="link.icon" class="AppDrawerLink__icon" aria-hidden="true" />
-        </q-item-section>
-        <q-item-section class="AppDrawerLink__label" :id="`label-${link.route}`">
-            {{ link.label }}
-        </q-item-section>
-    </q-item>
-</template>
-
 <style lang="scss" scoped>
-.AppDrawerLink {
-    &__icon-section {
-        min-width: 32px;
-        margin-right: 4px;
-    }
+@use "src/css/variables.scss" as *;
 
+.AppDrawerLink {
     &__icon {
-        width: 16px;
-        color: $icon-primary;
-        font-size: 14px;
-        text-align: center;
-        display: block;
+        color: $icon-secondary;
+        transition: color 0.2s ease;
     }
 
     &__label {
-        font-size: 14px;
         color: $text-secondary;
-        font-weight: 500;
+        transition: color 0.2s ease;
     }
 
-    // Active/selected state
-    &.q-router-link--active {
+    &.v-list-item--active {
         background: $state-active-light;
         color: $icon-primary;
 
@@ -60,7 +48,6 @@ const { link } = defineProps<Props>();
         }
     }
 
-    // Hover state
     &:hover {
         .AppDrawerLink__icon {
             color: $icon-hover;
@@ -72,17 +59,16 @@ const { link } = defineProps<Props>();
     }
 }
 
-// Dark mode styles
-.body--dark .AppDrawerLink {
+.v-theme--dark .AppDrawerLink {
     &__icon {
-        color: $icon-primary-dark;
+        color: $icon-secondary-dark;
     }
 
     &__label {
         color: $text-secondary-dark;
     }
 
-    &.q-router-link--active {
+    &.v-list-item--active {
         background: $state-active-dark;
 
         .AppDrawerLink__icon {

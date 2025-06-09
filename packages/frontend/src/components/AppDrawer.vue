@@ -3,9 +3,9 @@ import type { GuardedLink, LinkWithChildren } from "src/types";
 
 import { AdminRole, Role } from "@firetable/types";
 import { storeToRefs } from "pinia";
-import { Dark, LocalStorage } from "quasar";
 import { dynamicallySwitchLang } from "src/boot/i18n";
 import AppDrawerLink from "src/components/AppDrawerLink.vue";
+import { useAppTheme } from "src/composables/useAppTheme";
 import { logoutUser } from "src/db";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
@@ -13,6 +13,7 @@ import { usePermissionsStore } from "src/stores/permissions-store";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { useLocale } from "vuetify";
 
 export interface AppDrawerProps {
     modelValue: boolean;
@@ -30,6 +31,7 @@ const propertiesStore = usePropertiesStore();
 const props = defineProps<AppDrawerProps>();
 const emit = defineEmits<(e: "update:modelValue", value: boolean) => void>();
 const { locale, t } = useI18n();
+const { isDark, toggleTheme } = useAppTheme();
 
 const lang = ref(locale);
 const langOptions = computed(() => [
@@ -45,7 +47,7 @@ const inventoryLink = computed(function () {
     }
 
     return buildExpandableLink({
-        childIcon: "home",
+        childIcon: "fa fa-home",
         icon: "fa fa-warehouse",
         isVisible: true,
         label: t("Global.manageInventoryLink"),
@@ -59,7 +61,7 @@ const manageFloorsLink = computed(function () {
     }
 
     return buildExpandableLink({
-        childIcon: "home",
+        childIcon: "fa fa-home",
         icon: "fa fa-map",
         isVisible: true,
         label: t("AppDrawer.links.manageFloors"),
@@ -86,7 +88,7 @@ const manageEventsLink = computed(function () {
     }
 
     return buildExpandableLink({
-        childIcon: "home",
+        childIcon: "fa fa-home",
         icon: "fa fa-calendar",
         isVisible: true,
         label: t("AppDrawer.links.manageEvents"),
@@ -100,7 +102,7 @@ const digitalDrinkCardsLink = computed(function () {
     }
 
     return buildExpandableLink({
-        childIcon: "home",
+        childIcon: "fa fa-home",
         icon: "fa fa-cocktail",
         isVisible: true,
         label: t("AppDrawer.links.manageDrinkCards"),
@@ -115,7 +117,7 @@ const propertySettingsLink = computed(function () {
     const role = nonNullableUser.value.role;
 
     return buildExpandableLink({
-        childIcon: "home",
+        childIcon: "fa fa-home",
         icon: "fa fa-gears",
         isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
         label: t("AppDrawer.links.settings"),
@@ -260,6 +262,15 @@ function buildExpandableLink(options: {
         label,
     };
 }
+const { current } = useLocale();
+function changeLang(newLang: string): void {
+    dynamicallySwitchLang(newLang);
+    current.value = newLang;
+}
+
+function handleDrawerUpdate(value: boolean): void {
+    emit("update:modelValue", value);
+}
 
 function isLinkWithChildren(link: GuardedLink | LinkWithChildren): link is LinkWithChildren {
     return "children" in link;
@@ -272,34 +283,28 @@ async function onLogoutUser(): Promise<void> {
         },
     });
 }
-
-function setDarkMode(newValue: boolean): void {
-    Dark.set(newValue);
-    LocalStorage.set("FTDarkMode", newValue);
-}
 </script>
 
 <template>
-    <q-drawer
-        no-swipe-open
+    <v-navigation-drawer
+        temporary
         :model-value="props.modelValue"
-        @update:model-value="emit('update:modelValue', $event)"
-        side="right"
-        behavior="mobile"
-        bordered
-        class="AppDrawer"
+        @update:model-value="handleDrawerUpdate"
+        location="right"
+        width="300"
+        class="AppDrawer border"
     >
         <!-- Header Section with User Info -->
         <div class="AppDrawer__header">
             <div class="AppDrawer__user-section">
-                <q-avatar size="4rem" class="AppDrawer__avatar">
+                <v-avatar size="64" class="AppDrawer__avatar">
                     {{ avatar }}
-                </q-avatar>
+                </v-avatar>
                 <div class="AppDrawer__user-info">
                     <div class="AppDrawer__user-name">{{ nonNullableUser.name }}</div>
                     <div class="AppDrawer__user-email">{{ nonNullableUser.email }}</div>
                     <div class="AppDrawer__user-role">
-                        <i class="fas fa-shield-alt" />
+                        <v-icon size="small" class="me-1">fas fa-shield-alt</v-icon>
                         <span>{{ roleDisplayName }}</span>
                     </div>
                 </div>
@@ -310,27 +315,36 @@ function setDarkMode(newValue: boolean): void {
         <div class="AppDrawer__nav">
             <div class="AppDrawer__nav-title">{{ t("AppDrawer.sectionTitles.navigation") }}</div>
 
-            <q-list class="AppDrawer__nav-list">
+            <v-list class="AppDrawer__nav-list">
                 <template v-for="(link, index) in links" :key="index">
-                    <q-expansion-item
+                    <v-list-group
                         v-if="isLinkWithChildren(link)"
-                        :label="link.label"
-                        :icon="link.icon"
-                        expand-separator
-                        :aria-label="link.label"
                         class="AppDrawer__nav-item AppDrawer__nav-item--expandable"
                     >
+                        <template v-slot:activator="{ props: activatorProps }">
+                            <v-list-item
+                                v-bind="activatorProps"
+                                :title="link.label"
+                                :aria-label="link.label"
+                                class="AppDrawer__nav-item-activator"
+                            >
+                                <template v-slot:prepend>
+                                    <v-icon :icon="link.icon" size="xs" />
+                                </template>
+                            </v-list-item>
+                        </template>
+
                         <AppDrawerLink
                             v-for="(childLink, childIndex) in link.children"
                             :link="childLink"
                             :key="childIndex"
                             class="AppDrawer__nav-child"
                         />
-                    </q-expansion-item>
+                    </v-list-group>
 
                     <AppDrawerLink :link="link" v-else class="AppDrawer__nav-item" />
                 </template>
-            </q-list>
+            </v-list>
         </div>
 
         <!-- Settings Section -->
@@ -340,62 +354,64 @@ function setDarkMode(newValue: boolean): void {
             <!-- Language Selector -->
             <div class="AppDrawer__setting-item">
                 <div class="AppDrawer__setting-label">
-                    <i class="fas fa-globe" />
+                    <v-icon size="small" class="me-2">fas fa-globe</v-icon>
                     <span>{{ t("AppDrawer.languageSelectorLabel") }}</span>
                 </div>
-                <q-select
+                <v-select
                     :model-value="lang"
-                    :options="langOptions"
-                    dense
-                    borderless
-                    emit-value
-                    map-options
-                    options-dense
-                    @update:model-value="dynamicallySwitchLang"
+                    :items="langOptions"
+                    density="compact"
+                    variant="plain"
+                    item-title="label"
+                    item-value="value"
+                    @update:model-value="changeLang"
                     class="AppDrawer__language-select"
                     aria-label="Language switcher"
+                    hide-details
                 />
             </div>
 
             <!-- Dark Mode Toggle -->
             <div class="AppDrawer__setting-item">
                 <div class="AppDrawer__setting-label">
-                    <i class="fas fa-moon" />
+                    <v-icon size="small" class="me-2">fas fa-moon</v-icon>
                     <span>{{ t("AppDrawer.toggles.darkMode") }}</span>
                 </div>
-                <q-toggle
-                    :model-value="Dark.isActive"
-                    @update:model-value="setDarkMode"
+                <v-switch
+                    :model-value="isDark"
+                    @update:model-value="toggleTheme"
                     color="primary"
-                    size="md"
                     class="AppDrawer__dark-toggle"
                     aria-label="Toggle Dark Mode"
+                    hide-details
+                    inset
                 />
             </div>
         </div>
 
         <!-- Footer Section -->
         <div class="AppDrawer__footer">
-            <q-btn
-                flat
-                no-caps
-                class="AppDrawer__logout-btn full-width"
+            <v-btn
+                variant="text"
+                class="AppDrawer__logout-btn"
+                block
                 @click="onLogoutUser"
                 :aria-label="t('AppDrawer.logoutAriaLabel')"
             >
-                <q-icon name="fas fa-sign-out-alt" class="q-mr-sm" />
+                <v-icon class="me-2">fas fa-sign-out-alt</v-icon>
                 {{ t("AppDrawer.links.logout") }}
-            </q-btn>
+            </v-btn>
         </div>
-    </q-drawer>
+    </v-navigation-drawer>
 </template>
 
 <style lang="scss" scoped>
+@use "src/css/variables.scss" as *;
+@use "sass:color";
+
 .AppDrawer {
-    :deep(.q-drawer__content) {
+    :deep(.v-navigation-drawer__content) {
         background: $page-bg;
-        display: flex;
-        flex-direction: column;
     }
 
     &__header {
@@ -460,10 +476,6 @@ function setDarkMode(newValue: boolean): void {
         font-size: 12px;
         font-weight: 500;
         backdrop-filter: blur(10px);
-
-        i {
-            font-size: 10px;
-        }
     }
 
     &__profile-btn {
@@ -498,89 +510,76 @@ function setDarkMode(newValue: boolean): void {
     }
 
     &__nav-item {
-        :deep(.q-item) {
-            margin: 0 12px 4px;
-            border-radius: 12px;
+        :deep(.v-list-item) {
             transition: all 0.2s ease;
             color: $text-secondary;
 
             &:hover {
                 background: $state-hover-light;
-                transform: translateX(4px);
                 color: $text-primary;
             }
         }
 
-        :deep(.q-expansion-item__container) {
-            .q-item {
-                margin: 0 12px 4px;
-                border-radius: 12px;
+        :deep(.v-list-group__items) {
+            padding-left: 16px;
+            .v-list-item {
                 color: $text-secondary;
 
                 &:hover {
                     background: $state-hover-light;
-                    transform: translateX(4px);
                     color: $text-primary;
                 }
             }
         }
 
         &--expandable {
-            :deep(.q-expansion-item__toggle-icon) {
-                color: $text-secondary;
-                font-size: 16px;
-                transition: color 0.2s ease;
-            }
-
-            :deep(.q-item__section--avatar) {
-                .q-icon {
+            :deep(.v-list-group__header) {
+                .v-list-item {
                     color: $text-secondary;
-                    font-size: 16px;
+
+                    &:hover {
+                        background: $state-hover-light;
+                        color: $text-primary;
+
+                        .v-list-item__prepend .v-icon {
+                            color: $accent;
+                        }
+                    }
+                }
+
+                .v-list-item__prepend .v-icon {
+                    color: $text-secondary;
                     transition: color 0.2s ease;
                 }
             }
 
-            :deep(.q-item__label) {
-                color: $text-secondary;
-                font-weight: 500;
+            :deep(.v-list-group__header .v-list-item__append .v-icon) {
+                font-size: 13px;
+                color: $text-tertiary;
+                transition:
+                    transform 0.2s ease,
+                    color 0.2s ease;
             }
 
-            :deep(.q-item:hover) {
-                .q-item__label {
-                    color: $text-primary;
-                }
-
-                .q-item__section--avatar .q-icon {
-                    color: $accent;
-                }
-
-                .q-expansion-item__toggle-icon {
-                    color: $accent;
-                }
+            :deep(.v-list-item__title) {
+                color: $text-secondary;
             }
         }
     }
 
     &__nav-child {
-        :deep(.q-item) {
-            margin-left: 24px;
+        :deep(.v-list-item) {
+            margin-left: 8px;
             background: rgba($surface-secondary, 0.8);
             color: $text-secondary;
 
             &:hover {
                 background: $state-hover-light;
                 color: $text-primary;
-                transform: translateX(4px);
-            }
 
-            .q-item__section--avatar .q-icon {
-                color: $text-tertiary;
-                font-size: 14px;
-                transition: color 0.2s ease;
-            }
-
-            &:hover .q-item__section--avatar .q-icon {
-                color: $accent;
+                .v-list-item__prepend .v-icon {
+                    color: $accent;
+                }
             }
         }
     }
@@ -616,28 +615,21 @@ function setDarkMode(newValue: boolean): void {
     &__setting-label {
         display: flex;
         align-items: center;
-        gap: 8px;
         font-size: 14px;
         color: $text-secondary;
-        font-weight: 500;
-
-        i {
-            width: 16px;
-            color: $text-tertiary;
-            font-size: 14px;
-        }
     }
 
     &__language-select {
         min-width: 120px;
+        max-width: 120px;
 
-        :deep(.q-field__control) {
+        :deep(.v-field__input) {
             padding: 4px 8px;
         }
     }
 
     &__dark-toggle {
-        :deep(.q-toggle__inner) {
+        :deep(.v-switch__thumb) {
             color: $icon-primary;
         }
     }
@@ -662,8 +654,8 @@ function setDarkMode(newValue: boolean): void {
 }
 
 // Dark mode styles
-.body--dark .AppDrawer {
-    :deep(.q-drawer__content) {
+.v-theme--dark .AppDrawer {
+    :deep(.v-navigation-drawer__content) {
         background: $page-bg-dark;
     }
 
@@ -677,7 +669,7 @@ function setDarkMode(newValue: boolean): void {
     }
 
     &__nav-item {
-        :deep(.q-item) {
+        :deep(.v-list-item) {
             color: $text-secondary-dark;
 
             &:hover {
@@ -686,8 +678,8 @@ function setDarkMode(newValue: boolean): void {
             }
         }
 
-        :deep(.q-expansion-item__container) {
-            .q-item {
+        :deep(.v-list-group__items) {
+            .v-list-item {
                 color: $text-secondary-dark;
 
                 &:hover {
@@ -698,52 +690,47 @@ function setDarkMode(newValue: boolean): void {
         }
 
         &--expandable {
-            :deep(.q-expansion-item__toggle-icon) {
-                color: $text-secondary-dark;
-            }
+            :deep(.v-list-group__header) {
+                .v-list-item {
+                    color: $text-secondary-dark;
 
-            :deep(.q-item__section--avatar) {
-                .q-icon {
+                    &:hover {
+                        background: $state-hover-dark;
+                        color: $text-primary-dark;
+
+                        .v-list-item__prepend .v-icon {
+                            color: $accent;
+                        }
+                    }
+                }
+
+                .v-list-item__prepend .v-icon {
                     color: $text-secondary-dark;
                 }
             }
 
-            :deep(.q-item__label) {
+            :deep(.v-list-item__title) {
                 color: $text-secondary-dark;
-            }
-
-            :deep(.q-item:hover) {
-                .q-item__label {
-                    color: $text-primary-dark;
-                }
-
-                .q-item__section--avatar .q-icon {
-                    color: $accent;
-                }
-
-                .q-expansion-item__toggle-icon {
-                    color: $accent;
-                }
             }
         }
     }
 
     &__nav-child {
-        :deep(.q-item) {
+        :deep(.v-list-item) {
             background: $role-bg-dark;
             color: $text-secondary-dark;
 
             &:hover {
                 background: $state-hover-dark;
                 color: $text-primary-dark;
+
+                .v-list-item__prepend .v-icon {
+                    color: $icon-primary-dark;
+                }
             }
 
-            .q-item__section--avatar .q-icon {
+            .v-list-item__prepend .v-icon {
                 color: $icon-secondary-dark;
-            }
-
-            &:hover .q-item__section--avatar .q-icon {
-                color: $icon-primary-dark;
             }
         }
     }
@@ -763,14 +750,10 @@ function setDarkMode(newValue: boolean): void {
 
     &__setting-label {
         color: $text-secondary-dark;
-
-        i {
-            color: $text-tertiary-dark;
-        }
     }
 
     &__dark-toggle {
-        :deep(.q-toggle__inner) {
+        :deep(.v-switch__thumb) {
             color: $icon-primary-dark;
         }
     }
@@ -781,10 +764,10 @@ function setDarkMode(newValue: boolean): void {
     }
 
     &__logout-btn {
-        color: lighten($negative, 10%);
+        color: color.adjust($negative, $lightness: 10%);
 
         &:hover {
-            background: rgba(lighten($negative, 10%), 0.2);
+            background: rgba(color.adjust($negative, $lightness: 10%), 0.2);
         }
     }
 }
@@ -819,7 +802,7 @@ function setDarkMode(newValue: boolean): void {
         }
 
         &__nav-item {
-            :deep(.q-item) {
+            :deep(.v-list-item) {
                 margin: 0 8px 4px;
                 padding: 8px 12px;
             }

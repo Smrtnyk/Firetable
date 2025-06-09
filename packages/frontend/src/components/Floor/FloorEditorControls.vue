@@ -4,10 +4,10 @@ import type { FloorEditor, FloorEditorElement, FloorElementTypes } from "@fireta
 import { MAX_FLOOR_HEIGHT, MAX_FLOOR_WIDTH, RESOLUTION } from "@firetable/floor-creator";
 import { isString } from "es-toolkit";
 import { isNumber } from "es-toolkit/compat";
-import { exportFile } from "quasar";
 import FTColorPickerButton from "src/components/FTColorPickerButton.vue";
+import { globalDialog } from "src/composables/useDialog";
 import { ELEMENTS_TO_ADD_COLLECTION } from "src/config/floor";
-import { showConfirm } from "src/helpers/ui-helpers";
+import { exportFile } from "src/helpers/export-file";
 import { AppLogger } from "src/logger/FTLogger.js";
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
 
@@ -42,10 +42,10 @@ onMounted(function () {
 });
 
 async function exportFloor(floorVal: FloorEditor): Promise<void> {
-    if (!(await showConfirm("Do you want to export this floor plan?"))) {
+    if (!(await globalDialog.confirmTitle("Do you want to export this floor plan?"))) {
         return;
     }
-    exportFile(`${floorVal.name}.json`, JSON.stringify(floorVal.export()));
+    exportFile(JSON.stringify(floorVal.export()), `${floorVal.name}.json`);
 }
 
 function redoAction(): void {
@@ -63,6 +63,7 @@ function undoAction(): void {
     floorInstance.undo();
     floorInstance.canvas.renderAll();
 }
+
 const fileInputRef = useTemplateRef<HTMLInputElement>("fileInputRef");
 
 function onDragStart(event: DragEvent, item: FloorElementTypes): void {
@@ -111,14 +112,10 @@ const selectedBrushType = ref<"circle" | "pencil" | "spray">("pencil");
 const brushSettingsOpen = ref(false);
 
 const brushOptions = [
-    { label: "Pencil", value: "pencil" },
-    { label: "Spray", value: "spray" },
-    { label: "Circle", value: "circle" },
+    { title: "Pencil", value: "pencil" },
+    { title: "Spray", value: "spray" },
+    { title: "Circle", value: "circle" },
 ];
-
-function openBrushSettings(): void {
-    brushSettingsOpen.value = true;
-}
 
 function toggleDrawingMode(): void {
     isDrawingMode.value = !isDrawingMode.value;
@@ -152,202 +149,196 @@ function updateLineWidth(width: unknown): void {
 </script>
 
 <template>
-    <q-card
-        class="FloorEditorControls row q-gutter-xs q-pa-xs q-pt-md q-pb-md justify-around ft-card"
-    >
-        <div class="row items-center justify-around q-col-gutter-xs q-pa-xs">
-            <q-btn
-                :disabled="!canSave"
-                class="button-gradient"
-                icon="fa fa-save"
-                @click="onFloorSave"
-                label="save"
-                rounded
-            />
-            <input
-                ref="fileInputRef"
-                type="file"
-                @change="onFileSelected"
-                style="display: none"
-                accept=".json"
-            />
+    <v-card class="FloorEditorControls pa-2 pt-4 pb-4 ft-card">
+        <v-row class="ga-2 justify-space-around">
+            <v-col cols="12">
+                <div class="d-flex align-center justify-space-around ga-2 pa-2">
+                    <v-btn
+                        :disabled="!canSave"
+                        class="button-gradient"
+                        rounded
+                        @click="onFloorSave"
+                    >
+                        <v-icon start>fas fa-save</v-icon>
+                        save
+                    </v-btn>
 
-            <q-input
-                outlined
-                label="Floor name"
-                @update:model-value="(event) => onFloorChange('name', event)"
-                :model-value="floorInstance.name"
-                class="full-width"
-            />
+                    <input
+                        ref="fileInputRef"
+                        type="file"
+                        @change="onFileSelected"
+                        style="display: none"
+                        accept=".json"
+                    />
 
-            <q-input
-                @keydown.prevent
-                :min="300"
-                :max="MAX_FLOOR_WIDTH"
-                :step="RESOLUTION"
-                :model-value="floorInstanceState.width"
-                @update:model-value="(event) => onFloorChange('width', event)"
-                outlined
-                type="number"
-                label="Floor width"
-                class="col-6"
-            />
-            <q-input
-                @keydown.prevent
-                :min="300"
-                :max="MAX_FLOOR_HEIGHT"
-                :step="RESOLUTION"
-                @update:model-value="(event) => onFloorChange('height', event)"
-                :model-value="floorInstanceState.height"
-                outlined
-                type="number"
-                label="Floor height"
-                class="col-6"
-            />
+                    <v-text-field
+                        variant="outlined"
+                        label="Floor name"
+                        :model-value="floorInstance.name"
+                        @update:model-value="(event) => onFloorChange('name', event)"
+                        class="flex-grow-1"
+                    />
 
-            <div class="row justify-between">
-                <q-btn
-                    flat
-                    padding="md"
-                    title="Undo"
-                    :disabled="!floorInstanceState.canUndo"
-                    @click="undoAction"
-                    icon="fa fa-undo"
-                />
-                <q-btn
-                    flat
-                    padding="md"
-                    title="Redo"
-                    :disabled="!floorInstanceState.canRedo"
-                    @click="redoAction"
-                    icon="fa fa-redo"
-                />
+                    <v-text-field
+                        variant="outlined"
+                        type="number"
+                        label="Floor width"
+                        :min="300"
+                        :max="MAX_FLOOR_WIDTH"
+                        :step="RESOLUTION"
+                        :model-value="floorInstanceState.width"
+                        @update:model-value="(event) => onFloorChange('width', event)"
+                        style="min-width: 140px"
+                    />
 
-                <q-btn
-                    flat
-                    padding="md"
-                    title="Toggle grid"
-                    @click="floorInstance.toggleGridVisibility"
-                    icon="fa fa-th"
-                />
-                <q-btn
-                    flat
-                    padding="md"
-                    icon="fa fa-file-export"
-                    title="Export floor plan"
-                    @click="exportFloor(floorInstance as FloorEditor)"
-                />
-                <q-btn
-                    flat
-                    padding="md"
-                    title="Import floor plan"
-                    icon="fa fa-file-import"
-                    @click="triggerFileInput"
-                />
-            </div>
-        </div>
+                    <v-text-field
+                        variant="outlined"
+                        type="number"
+                        label="Floor height"
+                        :min="300"
+                        :max="MAX_FLOOR_HEIGHT"
+                        :step="RESOLUTION"
+                        :model-value="floorInstanceState.height"
+                        @update:model-value="(event) => onFloorChange('height', event)"
+                        style="min-width: 140px"
+                    />
 
-        <!-- Drawing Controls -->
-        <div class="q-pa-md row items-center">
-            <div class="q-mr-sm">
-                <FTColorPickerButton
-                    round
-                    :model-value="bgColor"
-                    @update:model-value="updateBgColor"
-                />
-            </div>
+                    <div class="d-flex justify-space-between">
+                        <v-btn
+                            variant="text"
+                            :disabled="!floorInstanceState.canUndo"
+                            @click="undoAction"
+                            title="Undo"
+                        >
+                            <v-icon>fas fa-undo</v-icon>
+                        </v-btn>
 
-            <q-btn
-                flat
-                round
-                icon="fa fa-paint-brush"
-                :color="isDrawingMode ? 'negative' : ''"
-                @click="toggleDrawingMode"
-                class="q-mr-sm"
-            />
+                        <v-btn
+                            variant="text"
+                            :disabled="!floorInstanceState.canRedo"
+                            @click="redoAction"
+                            title="Redo"
+                        >
+                            <v-icon>fas fa-redo</v-icon>
+                        </v-btn>
 
-            <q-btn
-                round
-                flat
-                icon="fa fa-cog"
-                @click="openBrushSettings"
-                :disabled="!isDrawingMode"
-            />
+                        <v-btn
+                            variant="text"
+                            @click="floorInstance.toggleGridVisibility"
+                            title="Toggle grid"
+                        >
+                            <v-icon>fas fa-th</v-icon>
+                        </v-btn>
 
-            <!-- Popup with brush controls -->
-            <q-popup-proxy
-                v-model="brushSettingsOpen"
-                transition-show="scale"
-                transition-hide="scale"
-                no-parent-event
-                cover
-                class="ft-card"
-            >
-                <div style="min-width: 280px">
-                    <q-card-section class="q-pa-sm">
-                        <q-select
-                            v-model="selectedBrushType"
-                            :options="brushOptions"
-                            @update:model-value="updateBrushType"
-                            label="Brush Type"
-                            outlined
-                            rounded
-                            dense
-                            emit-value
-                        />
-                    </q-card-section>
+                        <v-btn
+                            variant="text"
+                            @click="exportFloor(floorInstance as FloorEditor)"
+                            title="Export floor plan"
+                        >
+                            <v-icon>fas fa-file-export</v-icon>
+                        </v-btn>
 
-                    <!-- Color Picker -->
-                    <q-card-section class="q-pa-sm">
-                        <div class="column items-start q-gutter-sm">
-                            <span class="text-caption">Color</span>
-
-                            <FTColorPickerButton
-                                :model-value="drawingColor"
-                                @update:model-value="updateBrushColor"
-                                round
-                            />
-                        </div>
-                    </q-card-section>
-
-                    <!-- Line Width -->
-                    <q-card-section class="q-pa-sm">
-                        <div class="row items-center q-col-gutter-sm">
-                            <span class="text-caption">Brush Size</span>
-                            <q-slider
-                                v-model.number="lineWidth"
-                                :min="1"
-                                :max="50"
-                                :step="1"
-                                label
-                                @update:model-value="updateLineWidth"
-                            />
-                        </div>
-                    </q-card-section>
+                        <v-btn variant="text" @click="triggerFileInput" title="Import floor plan">
+                            <v-icon>fas fa-file-import</v-icon>
+                        </v-btn>
+                    </div>
                 </div>
-            </q-popup-proxy>
-        </div>
+            </v-col>
 
-        <!-- Add Element -->
-        <q-separator inset />
+            <!-- Drawing Controls -->
+            <v-col cols="12">
+                <div class="pa-4 d-flex align-center">
+                    <div class="me-2">
+                        <FTColorPickerButton
+                            :model-value="bgColor"
+                            @update:model-value="updateBgColor"
+                        />
+                    </div>
 
-        <div class="row items-center justify-around">
-            <div
-                draggable="true"
-                v-for="element in ELEMENTS_TO_ADD_COLLECTION"
-                :key="element.tag"
-                class="col-5 justify-even text-center q-my-sm q-py-sm"
-                @dragstart="onDragStart($event, element.tag)"
-            >
-                <p>{{ element.label }}</p>
+                    <v-btn
+                        variant="text"
+                        icon
+                        :color="isDrawingMode ? 'error' : ''"
+                        @click="toggleDrawingMode"
+                        class="me-2"
+                    >
+                        <v-icon>fas fa-paint-brush</v-icon>
+                    </v-btn>
 
-                <q-avatar square size="42px">
-                    <img v-if="element.img" :src="element.img" alt="Floor element" />
-                    <p v-else>{{ element.label }}</p>
-                </q-avatar>
-            </div>
-        </div>
-    </q-card>
+                    <v-menu v-model="brushSettingsOpen" :close-on-content-click="false">
+                        <template #activator="{ props }">
+                            <v-btn icon variant="text" :disabled="!isDrawingMode" v-bind="props">
+                                <v-icon>fas fa-cog</v-icon>
+                            </v-btn>
+                        </template>
+
+                        <v-card style="min-width: 280px">
+                            <v-card-text class="pa-2">
+                                <v-select
+                                    v-model="selectedBrushType"
+                                    :items="brushOptions"
+                                    @update:model-value="updateBrushType"
+                                    label="Brush Type"
+                                    variant="outlined"
+                                    density="compact"
+                                />
+                            </v-card-text>
+
+                            <!-- Color Picker -->
+                            <v-card-text class="pa-2">
+                                <div class="d-flex flex-column align-start ga-2">
+                                    <span class="text-caption">Color</span>
+                                    <FTColorPickerButton
+                                        :model-value="drawingColor"
+                                        @update:model-value="updateBrushColor"
+                                    />
+                                </div>
+                            </v-card-text>
+
+                            <!-- Line Width -->
+                            <v-card-text class="pa-2">
+                                <div class="d-flex align-center ga-2">
+                                    <span class="text-caption">Brush Size</span>
+                                    <v-slider
+                                        v-model.number="lineWidth"
+                                        :min="1"
+                                        :max="50"
+                                        :step="1"
+                                        show-ticks
+                                        @update:model-value="updateLineWidth"
+                                    />
+                                </div>
+                            </v-card-text>
+                        </v-card>
+                    </v-menu>
+                </div>
+            </v-col>
+
+            <!-- Add Element -->
+            <v-col cols="12">
+                <v-divider />
+            </v-col>
+
+            <v-col cols="12">
+                <v-row class="justify-space-around">
+                    <v-col
+                        cols="5"
+                        v-for="element in ELEMENTS_TO_ADD_COLLECTION"
+                        :key="element.tag"
+                        draggable="true"
+                        class="text-center my-2 py-2"
+                        @dragstart="onDragStart($event, element.tag)"
+                    >
+                        <p>{{ element.label }}</p>
+                        <v-avatar size="42" variant="flat">
+                            <v-img v-if="element.img" :src="element.img" alt="Floor element" />
+                            <span v-else>{{ element.label }}</span>
+                        </v-avatar>
+                    </v-col>
+                </v-row>
+            </v-col>
+        </v-row>
+    </v-card>
 </template>
 
 <style lang="scss">

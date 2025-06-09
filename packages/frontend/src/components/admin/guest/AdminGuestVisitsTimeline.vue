@@ -3,10 +3,9 @@ import type { Visit } from "@firetable/types";
 
 import EditVisitDialog from "src/components/admin/guest/EditVisitDialog.vue";
 import ReservationVIPChip from "src/components/Event/reservation/ReservationVIPChip.vue";
-import FTDialog from "src/components/FTDialog.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalDialog } from "src/composables/useDialog";
 import { updateGuestVisit } from "src/db";
-import { buttonSize } from "src/global-reactives/screen-detection";
+import { useScreenDetection } from "src/global-reactives/screen-detection";
 import { formatEventDate } from "src/helpers/date-utils";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useI18n } from "vue-i18n";
@@ -19,10 +18,11 @@ interface Props {
     visits: Visit[];
 }
 
+const { buttonSize } = useScreenDetection();
+
 const emit = defineEmits<(e: "visit-updated") => void>();
 
 const { locale, t } = useI18n();
-const { createDialog } = useDialog();
 const { guestId, organisationId, propertyId, timezone, visits } = defineProps<Props>();
 
 function formatSubtitleForGuestVisit(visit: Visit): string {
@@ -41,12 +41,12 @@ function getVisitColor(visit: Visit): string {
 
 function getVisitIcon(visit: Visit): string {
     if (visit.cancelled) {
-        return "fa fa-close";
+        return "fas fa-times";
     }
     if (visit.arrived) {
-        return "fa fa-check";
+        return "fas fa-check";
     }
-    return "fa fa-minus";
+    return "fas fa-minus";
 }
 
 function isUpcomingVisit(visit: Visit): boolean {
@@ -57,66 +57,60 @@ function isUpcomingVisit(visit: Visit): boolean {
 }
 
 function openEditDialog(visit: Visit): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: EditVisitDialog,
-            componentPropsObject: {
-                visit: { ...visit },
+    const dialog = globalDialog.openDialog(
+        EditVisitDialog,
+        {
+            onUpdate(updatedVisit: Visit) {
+                tryCatchLoadingWrapper({
+                    async hook() {
+                        await updateGuestVisit(organisationId, propertyId, guestId, updatedVisit);
+                        emit("visit-updated");
+                        dialog.hide();
+                    },
+                });
             },
-            listeners: {
-                update(updatedVisit: Visit) {
-                    tryCatchLoadingWrapper({
-                        async hook() {
-                            await updateGuestVisit(
-                                organisationId,
-                                propertyId,
-                                guestId,
-                                updatedVisit,
-                            );
-                            emit("visit-updated");
-                            dialog.hide();
-                        },
-                    });
-                },
-            },
-            maximized: false,
+            visit: { ...visit },
+        },
+        {
             title: t("PageAdminGuest.editVisitTitle"),
         },
-    });
+    );
 }
 </script>
 
 <template>
-    <q-card class="ft-card q-pa-xs q-pa-md-md">
-        <q-timeline color="primary">
-            <q-timeline-entry
-                class="q-ml-md"
+    <v-card class="ft-card pa-1 pa-md-4">
+        <v-timeline side="end" align="start" density="compact">
+            <v-timeline-item
                 v-for="(visit, index) in visits"
                 :key="visit.date + index"
-                :color="getVisitColor(visit)"
-                :icon="getVisitIcon(visit)"
-                :title="visit.eventName"
-                :subtitle="formatSubtitleForGuestVisit(visit)"
+                :dot-color="getVisitColor(visit)"
+                size="small"
             >
-                <div class="row items-center">
-                    <div class="col">
+                <template #icon>
+                    <v-icon :icon="getVisitIcon(visit)" color="white" size="x-small"></v-icon>
+                </template>
+
+                <div class="text-h6">{{ visit.eventName }}</div>
+                <div class="text-caption">{{ formatSubtitleForGuestVisit(visit) }}</div>
+
+                <div class="d-flex align-center mt-2">
+                    <div class="flex-grow-1">
                         <ReservationVIPChip v-if="visit.isVIPVisit" />
-                        <q-chip v-if="isUpcomingVisit(visit)" color="orange">
+                        <v-chip v-if="isUpcomingVisit(visit)" color="orange" size="small">
                             {{ t("PageAdminGuest.upcomingChipLabel") }}
-                        </q-chip>
+                        </v-chip>
                     </div>
-                    <div class="col-auto">
-                        <q-btn
-                            flat
-                            round
+                    <div>
+                        <v-btn
+                            variant="text"
+                            icon="fas fa-pencil-alt"
                             :size="buttonSize"
-                            icon="fa fa-pencil"
                             @click="openEditDialog(visit)"
                         />
                     </div>
                 </div>
-            </q-timeline-entry>
-        </q-timeline>
-    </q-card>
+            </v-timeline-item>
+        </v-timeline>
+    </v-card>
 </template>

@@ -3,7 +3,7 @@ import type { EventFloorDoc, FloorDoc, ReservationDoc } from "@firetable/types";
 import type { SortableEvent } from "vue-draggable-plus";
 
 import { property } from "es-toolkit/compat";
-import { buttonSize, isMobile } from "src/global-reactives/screen-detection";
+import { useScreenDetection } from "src/global-reactives/screen-detection";
 import { computed } from "vue";
 import { vDraggable } from "vue-draggable-plus";
 
@@ -29,15 +29,17 @@ interface Emits {
 
 const props = defineProps<AdminEventFloorManagerProps>();
 const emit = defineEmits<Emits>();
-const draggableFloors = computed(() => [...props.floors]);
+const { buttonSize } = useScreenDetection();
+const draggableFloors = computed(() => props.floors);
+
 const draggableOptions = computed(() => ({
     animation: props.animationDuration ?? 150,
+    // Specify the class of the items that can be dragged
+    draggable: ".drag-item",
+    // Specify the class of the handle within the item
+    handle: ".drag-handle",
+    // The onEnd function will be called by the directive
     onEnd: onDrop,
-    ...(isMobile.value
-        ? {
-              handle: ".drag-handle",
-          }
-        : {}),
 }));
 
 const floorsWithReservations = computed(function () {
@@ -53,14 +55,14 @@ function canDeleteFloor(floorId: string): boolean {
 }
 
 const remainingFloors = computed(function () {
-    if (!props.maxFloors) {
-        return;
+    if (props.maxFloors === undefined) {
+        return Infinity;
     }
     return props.maxFloors - props.floors.length;
 });
 
 function onAddFloor(floor: EventFloorDoc): void {
-    if (remainingFloors.value === 0) {
+    if (remainingFloors.value <= 0) {
         return;
     }
     emit("add", {
@@ -80,7 +82,8 @@ function onDrop(event: SortableEvent): void {
         return;
     }
 
-    const newFloors = [...props.floors];
+    // Create a new array from the proxy to manipulate
+    const newFloors = [...draggableFloors.value];
     const [movedItem] = newFloors.splice(oldDraggableIndex, 1);
     newFloors.splice(newDraggableIndex, 0, movedItem);
 
@@ -104,89 +107,110 @@ function onRemoveFloor(index: number): void {
 </script>
 
 <template>
-    <div class="EventFloorManager q-ma-none">
-        <div v-if="availableFloors?.length" class="row items-center justify-between q-mb-md">
+    <div class="event-floor-manager ma-0">
+        <div v-if="availableFloors?.length" class="d-flex align-center justify-space-between mb-4">
             <div>
                 <div class="text-h6">Floor plans</div>
-                <div v-if="maxFloors" class="text-caption text-grey-7">
+                <div v-if="maxFloors !== undefined" class="text-caption text-grey-darken-1">
                     {{ floors.length }}/{{ maxFloors }} floors used
                 </div>
             </div>
-            <q-btn
-                flat
-                rounded
-                :size="buttonSize"
-                color="primary"
-                icon="fa fa-plus"
-                class="button-gradient"
-                aria-label="Add floor plan"
-                :disabled="remainingFloors === 0"
-            >
-                <q-tooltip v-if="remainingFloors === 0">
-                    Maximum number of floors ({{ maxFloors }}) reached
-                </q-tooltip>
-                <q-menu class="ft-card">
-                    <q-list>
-                        <q-item
-                            v-for="floor in availableFloors"
-                            :key="floor.id"
-                            clickable
-                            v-close-popup
-                            @click="onAddFloor(floor)"
-                            :aria-label="`Add ${floor.name} floor plan`"
+            <v-menu>
+                <template #activator="{ props: menuActivatorProps }">
+                    <v-tooltip location="top">
+                        <template #activator="{ props: tooltipActivatorProps }">
+                            <v-btn
+                                v-bind="{ ...menuActivatorProps, ...tooltipActivatorProps }"
+                                variant="tonal"
+                                :rounded="true"
+                                :size="buttonSize"
+                                icon="fa fa-plus"
+                                class="button-gradient"
+                                aria-label="Add floor plan"
+                                :disabled="remainingFloors <= 0"
+                            />
+                        </template>
+                        <span v-if="remainingFloors <= 0"
+                            >Maximum number of floors ({{ maxFloors }}) reached</span
                         >
-                            <q-item-section>{{ floor.name }}</q-item-section>
-                        </q-item>
-                    </q-list>
-                </q-menu>
-            </q-btn>
+                        <span v-else>Add floor</span>
+                    </v-tooltip>
+                </template>
+                <v-list class="ft-card">
+                    <v-list-item
+                        v-for="floor in availableFloors"
+                        :key="floor.id"
+                        link
+                        @click="onAddFloor(floor)"
+                        :aria-label="`Add ${floor.name} floor plan`"
+                    >
+                        <v-list-item-title>{{ floor.name }}</v-list-item-title>
+                    </v-list-item>
+                </v-list>
+            </v-menu>
         </div>
 
-        <q-list v-draggable="[draggableFloors, draggableOptions]" class="q-gutter-y-sm">
-            <q-item
-                v-for="(floor, index) in floors"
+        <div
+            v-if="floors.length > 0"
+            v-draggable="[draggableFloors, draggableOptions]"
+            class="d-flex flex-column"
+            style="gap: 8px"
+        >
+            <div
+                v-for="(floor, index) in draggableFloors"
                 :key="`${floor.id}-${index}`"
-                class="ft-card"
-                :aria-label="`${floor.id} draggable floor plan item`"
+                class="drag-item"
             >
-                <q-item-section avatar>
-                    <q-icon
-                        name="fa fa-grip-lines"
-                        class="drag-handle cursor-move"
-                        :aria-label="`${floor.id} draggable floor plan item drag handle`"
-                    />
-                </q-item-section>
+                <v-card variant="outlined" class="ft-card">
+                    <v-list-item>
+                        <template #prepend>
+                            <v-icon
+                                icon="fa fa-bars"
+                                class="drag-handle cursor-move mr-2"
+                                :aria-label="`${floor.id} draggable floor plan item drag handle`"
+                            ></v-icon>
+                        </template>
 
-                <q-item-section>
-                    <q-item-label>{{ floor.name }}</q-item-label>
-                    <q-item-label caption v-if="!canDeleteFloor(floor.id)">
-                        Has active reservations
-                    </q-item-label>
-                </q-item-section>
+                        <v-list-item-title>{{ floor.name }}</v-list-item-title>
+                        <v-list-item-subtitle v-if="!canDeleteFloor(floor.id)">
+                            Has active reservations
+                        </v-list-item-subtitle>
 
-                <q-item-section side class="row items-center">
-                    <q-btn
-                        v-if="showEditButton"
-                        flat
-                        round
-                        color="primary"
-                        icon="fa fa-pencil"
-                        size="sm"
-                        @click="onEditFloor(floor)"
-                        :aria-label="`Edit ${floor.name} floor plan`"
-                    />
-                    <q-btn
-                        flat
-                        round
-                        color="negative"
-                        icon="fa fa-trash"
-                        size="sm"
-                        @click="onRemoveFloor(index)"
-                        :disabled="!canDeleteFloor(floor.id)"
-                        :aria-label="`Remove ${floor.name} floor plan`"
-                    />
-                </q-item-section>
-            </q-item>
-        </q-list>
+                        <template #append>
+                            <div class="d-flex align-center">
+                                <v-btn
+                                    v-if="showEditButton"
+                                    variant="text"
+                                    icon="fa fa-pencil"
+                                    color="primary"
+                                    size="small"
+                                    @click="onEditFloor(floor)"
+                                    :aria-label="`Edit ${floor.name} floor plan`"
+                                />
+                                <v-btn
+                                    variant="text"
+                                    icon="fa fa-trash"
+                                    color="error"
+                                    size="small"
+                                    @click="onRemoveFloor(index)"
+                                    :disabled="!canDeleteFloor(floor.id)"
+                                    :aria-label="`Remove ${floor.name} floor plan`"
+                                />
+                            </div>
+                        </template>
+                    </v-list-item>
+                </v-card>
+            </div>
+        </div>
+
+        <div v-else-if="!availableFloors?.length" class="text-center text-grey-darken-1 pa-4">
+            No floor plans available to add or manage.
+        </div>
     </div>
 </template>
+
+<style scoped>
+.cursor-move {
+    cursor: move;
+}
+</style>

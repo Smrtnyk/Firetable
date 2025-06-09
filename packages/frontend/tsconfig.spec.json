@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "skipLibCheck": true,
+        "strict": true,
+        "jsx": "preserve",
+        "sourceMap": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "lib": [
+            "ESNext",
+            "DOM"
+        ]
+    },
+    "include": [
+        "src/**/*.ts",
+        "vitest.config.ts",
+        "vitest.workspace.ts"
+    ],
+    "references": [
+        {
+            "path": "tsconfig.json"
+        }
+    ]
+}
+

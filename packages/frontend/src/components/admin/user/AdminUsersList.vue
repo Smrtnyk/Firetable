@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { User, VoidFunction } from "@firetable/types";
+import type { User } from "@firetable/types";
 
 import { Role } from "@firetable/types";
 import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
@@ -26,21 +26,21 @@ function getLastSignInStatus(lastSignInTime: null | number | undefined): {
     text: string;
 } {
     if (!lastSignInTime) {
-        return { color: "negative", text: "Never signed in" };
+        return { color: "error", text: "Never signed in" };
     }
 
     const now = Date.now();
     const daysSinceLastSignIn = (now - lastSignInTime) / (1000 * 60 * 60 * 24);
 
     if (daysSinceLastSignIn < 1) {
-        return { color: "positive", text: "Active today" };
+        return { color: "success", text: "Active today" };
     } else if (daysSinceLastSignIn < 7) {
-        return { color: "positive", text: "Active this week" };
+        return { color: "success", text: "Active this week" };
     } else if (daysSinceLastSignIn < 30) {
         return { color: "warning", text: "Active this month" };
     }
     return {
-        color: "grey",
+        color: "grey-darken-1",
         text: formatEventDate(lastSignInTime, locale.value, getDefaultTimezone()),
     };
 }
@@ -65,147 +65,100 @@ function getUserInitials(name: string): string {
         .slice(0, 2);
 }
 
-function onUserSlideRight(user: BucketizedUser, reset: VoidFunction): void {
+function onDeleteUser(user: BucketizedUser): void {
     emit("delete", user);
-    reset();
 }
 
-function showEditUserDialog(user: BucketizedUser, reset: VoidFunction): void {
+function onEditUser(user: BucketizedUser): void {
     emit("edit", user);
-    reset();
 }
 </script>
 
 <template>
-    <q-list class="admin-users-list">
-        <q-slide-item
+    <v-list class="admin-users-list" lines="three">
+        <v-list-item
             v-for="user in props.users"
             :key="user.id"
-            right-color="negative"
-            left-color="primary"
-            @right="({ reset }) => onUserSlideRight(user, reset)"
-            @left="({ reset }) => showEditUserDialog(user, reset)"
-            class="user-slide-item ft-card"
+            class="user-item ft-card mb-2"
+            elevation="1"
         >
-            <template #right>
-                <div class="slide-action">
-                    <q-icon name="fa fa-trash" size="20px" />
-                    <div class="slide-action-text">Delete</div>
-                </div>
+            <template #prepend>
+                <v-avatar size="48" :color="getRoleColor(user.role)" class="user-avatar me-3">
+                    <span class="text-white font-weight-bold">{{
+                        getUserInitials(user.name)
+                    }}</span>
+                </v-avatar>
             </template>
 
-            <template #left>
-                <div class="slide-action">
-                    <q-icon name="fa fa-pencil" size="20px" />
-                    <div class="slide-action-text">Edit</div>
-                </div>
-            </template>
+            <v-list-item-title class="user-name font-weight-bold text-h6 mb-1">
+                {{ user.name }}
+                <v-chip
+                    :color="getRoleColor(user.role)"
+                    size="small"
+                    class="ms-2 role-badge"
+                    label
+                    v-if="user.role === Role.PROPERTY_OWNER"
+                >
+                    Owner
+                </v-chip>
+            </v-list-item-title>
 
-            <q-item class="user-item">
-                <q-item-section avatar>
-                    <q-avatar
-                        size="48px"
-                        :color="getRoleColor(user.role)"
-                        text-color="white"
-                        class="user-avatar"
+            <v-list-item-subtitle class="user-email mb-2">
+                <v-icon icon="fas fa-envelope" size="x-small" class="me-1" />
+                {{ user.email }}
+            </v-list-item-subtitle>
+
+            <div class="user-meta text-caption">
+                <div
+                    class="meta-row d-flex align-center mb-1"
+                    v-if="user.memberOf && user.memberOf.length > 0"
+                >
+                    <v-icon icon="fas fa-home" size="x-small" class="me-1" />
+                    <span>{{ user.memberOf.join(", ") }}</span>
+                </div>
+                <div class="meta-row d-flex align-center">
+                    <v-icon icon="fas fa-clock" size="x-small" class="me-1" />
+                    <span :class="`text-${getLastSignInStatus(user.lastSignInTime).color}`">
+                        {{ getLastSignInStatus(user.lastSignInTime).text }}
+                    </span>
+                </div>
+            </div>
+
+            <template #append>
+                <div class="d-flex flex-column ga-1">
+                    <v-btn
+                        icon
+                        variant="text"
+                        size="small"
+                        color="primary"
+                        @click="onEditUser(user)"
                     >
-                        <div class="avatar-content">
-                            {{ getUserInitials(user.name) }}
-                        </div>
-                    </q-avatar>
-                </q-item-section>
-
-                <q-item-section>
-                    <q-item-label class="user-name">
-                        {{ user.name }}
-                        <q-badge
-                            :color="getRoleColor(user.role)"
-                            class="q-ml-sm role-badge"
-                            v-if="user.role === Role.PROPERTY_OWNER"
-                        >
-                            Owner
-                        </q-badge>
-                    </q-item-label>
-
-                    <q-item-label class="user-email">
-                        <q-icon name="fa fa-envelope" size="12px" class="q-mr-xs" />
-                        {{ user.email }}
-                    </q-item-label>
-
-                    <q-item-label caption class="user-meta">
-                        <div class="meta-row" v-if="user.memberOf && user.memberOf.length > 0">
-                            <q-icon name="fa fa-home" size="12px" class="q-mr-xs" />
-                            <span>{{ user.memberOf.join(", ") }}</span>
-                        </div>
-
-                        <div class="meta-row">
-                            <q-icon name="fa fa-clock" size="12px" class="q-mr-xs" />
-                            <span :class="`text-${getLastSignInStatus(user.lastSignInTime).color}`">
-                                {{ getLastSignInStatus(user.lastSignInTime).text }}
-                            </span>
-                        </div>
-                    </q-item-label>
-                </q-item-section>
-
-                <q-item-section side>
-                    <q-icon name="fa fa-chevron-left" size="12px" color="grey-5" />
-                </q-item-section>
-            </q-item>
-        </q-slide-item>
-    </q-list>
+                        <v-icon>fas fa-pencil</v-icon>
+                        <v-tooltip activator="parent" location="top">Edit</v-tooltip>
+                    </v-btn>
+                    <v-btn
+                        icon
+                        variant="text"
+                        size="small"
+                        color="error"
+                        @click="onDeleteUser(user)"
+                    >
+                        <v-icon>fas fa-trash</v-icon>
+                        <v-tooltip activator="parent" location="bottom">Delete</v-tooltip>
+                    </v-btn>
+                </div>
+            </template>
+        </v-list-item>
+    </v-list>
 </template>
 
 <style scoped lang="scss">
 .admin-users-list {
-    padding: 0;
-
-    .user-slide-item {
-        margin-bottom: 8px;
-
-        &:last-child {
-            margin-bottom: 0;
-        }
-
-        .slide-action {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            padding: 0 24px;
-
-            .slide-action-text {
-                font-size: 12px;
-                margin-top: 4px;
-                font-weight: 500;
-            }
-        }
-    }
-
     .user-item {
-        padding: 16px;
-        background: white;
         border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        transition: all 0.2s ease;
-
-        .body--dark & {
-            background: var(--q-dark);
-            box-shadow: 0 1px 3px rgba(255, 255, 255, 0.05);
-        }
-
-        &:active {
-            transform: scale(0.98);
-        }
 
         .user-avatar {
-            position: relative;
-
             .avatar-content {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
                 font-weight: 600;
                 font-size: 16px;
                 line-height: 1;
@@ -213,23 +166,17 @@ function showEditUserDialog(user: BucketizedUser, reset: VoidFunction): void {
         }
 
         .user-name {
-            font-weight: 600;
-            font-size: 16px;
-            margin-bottom: 4px;
             display: flex;
             align-items: center;
 
             .role-badge {
                 font-size: 10px;
-                padding: 2px 6px;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
             }
         }
 
         .user-email {
-            font-size: 14px;
-            margin-bottom: 8px;
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;
@@ -239,17 +186,12 @@ function showEditUserDialog(user: BucketizedUser, reset: VoidFunction): void {
 
         .user-meta {
             .meta-row {
-                display: flex;
-                align-items: center;
-                margin-bottom: 4px;
-                font-size: 12px;
-
                 &:last-child {
                     margin-bottom: 0;
                 }
 
-                q-icon {
-                    opacity: 0.6;
+                .v-icon {
+                    opacity: 0.7;
                 }
             }
         }

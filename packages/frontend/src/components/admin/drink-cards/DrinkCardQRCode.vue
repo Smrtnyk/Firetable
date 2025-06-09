@@ -41,25 +41,27 @@ onMounted(generateQRCode);
 </script>
 
 <template>
-    <div class="DrinkCardQRCode">
+    <div class="drink-card-qr-code">
         <img
             v-if="qrCodeDataUrl"
             :src="qrCodeDataUrl"
             :alt="t('PageAdminPropertyDrinkCards.qrCodeAlt')"
-            class="q-mb-md"
+            class="mb-4"
         />
-        <q-btn
-            rounded
+        <v-btn
+            rounded="lg"
             color="primary"
-            :label="t('PageAdminPropertyDrinkCards.downloadQRCode')"
-            icon="fa fa-download"
+            prepend-icon="fas fa-download"
             @click="downloadQRCode"
-        />
+            size="large"
+        >
+            {{ t("PageAdminPropertyDrinkCards.downloadQRCode") }}
+        </v-btn>
     </div>
 </template>
 
 <style lang="scss" scoped>
-.DrinkCardQRCode {
+.drink-card-qr-code {
     display: flex;
     flex-direction: column;
     align-items: center;

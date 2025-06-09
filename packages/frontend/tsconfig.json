@@ -1,26 +1,19 @@
 {
-    "extends": "./.quasar/tsconfig.json",
     "compilerOptions": {
-        "sourceMap": true,
-        "forceConsistentCasingInFileNames": true,
-        "useDefineForClassFields": true,
-        "types": ["vitest", "vitest-browser-vue", "@vitest/browser/providers/playwright"],
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "skipLibCheck": true,
         "strict": true,
-        "noImplicitAny": true,
-        /* Enable error reporting for expressions and declarations with an implied `any` type.. */
-        "strictNullChecks": true,
-        "strictFunctionTypes": true,
-        "strictBindCallApply": true,
-        "strictPropertyInitialization": true,
-        "noImplicitThis": true,
-        "useUnknownInCatchVariables": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
+        "jsx": "preserve",
+        "sourceMap": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
         "exactOptionalPropertyTypes": true,
-        "noImplicitReturns": true,
-        "noFallthroughCasesInSwitch": true,
-        // "noUncheckedIndexedAccess": true,
-        "noImplicitOverride": true,
+        "lib": [
+            "ESNext",
+            "DOM"
+        ],
         "paths": {
             "src/*": [
                 "./src/*"
@@ -34,5 +27,14 @@
         {
             "path": "../types"
         }
+    ],
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "vitest.config.ts",
+        "src/**/*.spec.ts"
     ]
 }
+
