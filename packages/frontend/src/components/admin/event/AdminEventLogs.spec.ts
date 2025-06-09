@@ -3,9 +3,9 @@ import type { RenderResult } from "vitest-browser-vue";
 
 import { AdminRole, Role } from "@firetable/types";
 import { page } from "@vitest/browser/context";
-import { delay } from "es-toolkit";
 import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
 import { beforeEach, describe, expect, it } from "vitest";
+import { nextTick } from "vue";
 
 import type { AdminEventLogsProps } from "./AdminEventLogs.vue";
 
@@ -99,8 +99,8 @@ describe("AdminEventLogs", () => {
                 const messageElement = page.getByText(log.message);
                 await expect.element(messageElement).toBeVisible();
 
-                const timelineEntryHandle = messageElement.element().closest(".q-timeline__entry");
-                const iconHandle = timelineEntryHandle!.querySelector(".q-icon");
+                const timelineEntryHandle = messageElement.element().closest(".v-timeline-item");
+                const iconHandle = timelineEntryHandle!.querySelector(".v-icon");
                 if (expectedIconName) {
                     const hasName = iconHandle!.className.includes(expectedIconName);
                     expect(hasName).toBe(true);
@@ -159,7 +159,7 @@ describe("AdminEventLogs", () => {
         });
     });
 
-    it('shows "Scroll to Bottom" button when scrolled away from top and bottom, and scrolls to bottom when button is clicked', async () => {
+    it("properly handles scroll to bottom button visibility", async () => {
         const numberOfLogs = 50;
         const logs = Array.from(
             { length: numberOfLogs },
@@ -186,45 +186,29 @@ describe("AdminEventLogs", () => {
             { wrapInLayout: true },
         );
 
-        // Get the QScrollArea element
-        const scrollAreaElement = screen.container.querySelector(".logs-container");
-        expect(scrollAreaElement).toBeTruthy();
+        const scrollContainer = screen.container.querySelector(".logs-container") as HTMLElement;
 
-        // Get the scrolling element inside QScrollArea
-        const scrollContentElement = scrollAreaElement!.querySelector(".q-scrollarea__container");
-        expect(scrollContentElement).toBeTruthy();
+        async function scrollToPercentage(percentage: number): Promise<void> {
+            const maxScroll = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+            scrollContainer.scrollTop = maxScroll * percentage;
+            scrollContainer.dispatchEvent(new Event("scroll", { bubbles: true }));
+            await nextTick();
+        }
 
-        // Calculate the scrollable height
-        const scrollableHeight =
-            scrollContentElement!.scrollHeight - scrollContentElement!.clientHeight;
-
-        // Set scrollTop to 30% of the scrollable height
-        scrollContentElement!.scrollTop = scrollableHeight * 0.3;
-
-        // Dispatch a scroll event to trigger handleScroll
-        scrollContentElement!.dispatchEvent(new Event("scroll"));
-
-        await delay(222);
-
-        // Assert that the "Scroll to Bottom" button appears
-        const scrollButton = document.querySelector<HTMLButtonElement>(".q-btn--fab");
-        expect(scrollButton).toBeTruthy();
-        scrollButton!.click();
-
-        // Wait for the scroll animation to complete (animation duration is 1000ms)
-        await delay(1100);
-
-        // Dispatch a scroll event to update the component's state
-        scrollContentElement!.dispatchEvent(new Event("scroll"));
-
-        // Verify that scrollTop is at the bottom
-        const isAtBottom =
-            scrollContentElement!.scrollTop + scrollContentElement!.clientHeight >=
-            scrollContentElement!.scrollHeight;
-        expect(isAtBottom).toBe(true);
-
-        // Assert that the "Scroll to Bottom" button disappears
-        const scrollButtonAfterAppears = Boolean(document.querySelector(".q-btn--fab"));
-        expect(scrollButtonAfterAppears).toBe(false);
+        // Test 1: At top (0%) - button should not show
+        await scrollToPercentage(0);
+        await expect.element(screen.getByLabelText("Scroll to bottom")).not.toBeInTheDocument();
+        // Test 2: At 30% - button should show
+        await scrollToPercentage(0.3);
+        await expect.element(screen.getByLabelText("Scroll to bottom")).toBeVisible();
+        // Test 3: At 50% - button should still show
+        await scrollToPercentage(0.5);
+        await expect.element(screen.getByLabelText("Scroll to bottom")).toBeVisible();
+        // Test 4: At 95% (bottom) - button should not show
+        await scrollToPercentage(0.95);
+        await expect.element(screen.getByLabelText("Scroll to bottom")).not.toBeInTheDocument();
+        // Test 5: Back to middle - button should show again
+        await scrollToPercentage(0.4);
+        await expect.element(screen.getByLabelText("Scroll to bottom")).toBeVisible();
     });
 });

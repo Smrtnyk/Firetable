@@ -1,7 +1,8 @@
 import type { InventoryItemDoc } from "@firetable/types";
 
 import { isDrinkItem } from "@firetable/types";
-import { exportFile } from "quasar";
+
+import { exportFile } from "../export-file";
 
 export function exportInventory(items: InventoryItemDoc[]): void {
     // Headers exactly matching the interface property names
@@ -48,8 +49,7 @@ export function exportInventory(items: InventoryItemDoc[]): void {
     // we generate filename with date just so we can see immediately when the export was done
     const date = new Date().toISOString().split("T")[0];
     const filename = `inventory_export_${date}.csv`;
-
-    exportFile(filename, blob);
+    exportFile(blob, filename);
 }
 
 function escapeCsvField(field: string): string {

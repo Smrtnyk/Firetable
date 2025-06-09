@@ -1,49 +1,19 @@
 import type { TestingOptions } from "@pinia/testing";
-import type { Store, StoreDefinition } from "pinia";
-import type { Mock } from "vitest";
 import type { RenderResult } from "vitest-browser-vue";
-import type { UnwrapRef, WritableComputedRef } from "vue";
+import type { WritableComputedRef } from "vue";
 
 import { createTestingPinia } from "@pinia/testing";
-import {
-    BottomSheet,
-    Dialog,
-    Loading,
-    Notify,
-    QAvatar,
-    QBtn,
-    QDialog,
-    QDrawer,
-    QIcon,
-    QInput,
-    QItem,
-    QItemLabel,
-    QItemSection,
-    QLayout,
-    QList,
-    QMenu,
-    QPageSticky,
-    QRadio,
-    QScrollArea,
-    QSelect,
-    QSeparator,
-    QSlideItem,
-    QTable,
-    QTd,
-    QTimeline,
-    QTimelineEntry,
-    QToggle,
-    Quasar,
-} from "quasar";
-import fontAwesomeV6 from "quasar/icon-set/fontawesome-v6";
 import { i18n, loadLanguage } from "src/boot/i18n";
+import RouteLoadingBar from "src/components/RouteLoadingBar.vue";
+import GenericDialog from "src/components/ui/GenericDialog.vue";
+import GlobalLoadingOverlay from "src/components/ui/GlobalLoadingOverlay.vue";
+import GlobalSnackbar from "src/components/ui/GlobalSnackbar.vue";
+import { globalDialog } from "src/composables/useDialog";
+import { vuetifyApp } from "src/vuetify-app";
 import { vi } from "vitest";
 import { render } from "vitest-browser-vue";
 import { defineComponent, h } from "vue";
-import "quasar/dist/quasar.css";
-import "@quasar/extras/fontawesome-v6/fontawesome-v6.css";
-
-import "../src/css/app.scss";
+import { VApp, VMain } from "vuetify/components";
 
 document.body.style.height = "100vh";
 document.body.style.width = "100vw";
@@ -53,57 +23,61 @@ i18n.global.locale.value = "en-GB";
 i18n.global.setLocaleMessage("en-GB", languageStrings.default);
 
 export const t = i18n.global.t;
+
+export function cleanupAfterTest(): void {
+    globalDialog.closeAllDialogs();
+}
+
 export function getLocaleForTest(): WritableComputedRef<string, string> {
     return i18n.global.locale;
 }
 
-export function mockedStore<TStoreDef extends () => unknown>(
-    useStore: TStoreDef,
-): TStoreDef extends StoreDefinition<infer Id, infer State, infer Getters, infer Actions>
-    ? Store<
-          Id,
-          State,
-          Record<string, never>,
-          {
-              [K in keyof Actions]: Actions[K] extends (...args: any[]) => any
-                  ? Mock<Actions[K]>
-                  : Actions[K];
-          }
-      > & {
-          [K in keyof Getters]: UnwrapRef<Getters[K]>;
-      }
-    : ReturnType<TStoreDef> {
-    return useStore() as any;
-}
-
 /**
- * Function to render a component with Quasar plugins and components.
- * Also registers the i18n plugin with messages.
+ * Function to render a component with Vuetify plugins and components.
+ * Also registers the i18n plugin with messages and global components.
  */
 export function renderComponent<T>(
     component: Parameters<typeof render>[0],
     props?: any,
     options?: {
+        includeGlobalComponents?: boolean;
         piniaStoreOptions?: Partial<TestingOptions>;
         provide?: Record<PropertyKey, unknown>;
         wrapInLayout?: boolean;
     },
 ): RenderResult<T> {
     const wrapInLayout = options?.wrapInLayout ?? false;
+    const includeGlobalComponents = options?.includeGlobalComponents ?? false;
+
     i18n.global.setLocaleMessage("en-GB", languageStrings.default);
     i18n.global.locale.value = "en-GB";
 
     const componentToRender = wrapInLayout
         ? defineComponent({
-              components: { QLayout },
+              name: "TestWrapper",
               setup() {
                   return () =>
                       h(
-                          QLayout,
+                          VApp,
                           {},
                           {
-                              // @ts-expect-error -- not sure why this is not working
-                              default: () => h(component, props),
+                              default: () => [
+                                  ...(includeGlobalComponents
+                                      ? [
+                                            h(GlobalSnackbar),
+                                            h(GenericDialog),
+                                            h(RouteLoadingBar),
+                                            h(GlobalLoadingOverlay),
+                                        ]
+                                      : []),
+                                  h(
+                                      VMain,
+                                      {},
+                                      {
+                                          default: () => h(component, props),
+                                      },
+                                  ),
+                              ],
                           },
                       );
               },
@@ -111,32 +85,8 @@ export function renderComponent<T>(
         : component;
 
     const renderOptions: any = {
+        container: document.body,
         global: {
-            components: {
-                QAvatar,
-                QBtn,
-                QDialog,
-                QDrawer,
-                QIcon,
-                QInput,
-                QItem,
-                QItemLabel,
-                QItemSection,
-                QLayout,
-                QList,
-                QMenu,
-                QPageSticky,
-                QRadio,
-                QScrollArea,
-                QSelect,
-                QSeparator,
-                QSlideItem,
-                QTable,
-                QTd,
-                QTimeline,
-                QTimelineEntry,
-                QToggle,
-            },
             plugins: [
                 createTestingPinia({
                     stubActions: false,
@@ -144,18 +94,13 @@ export function renderComponent<T>(
                     createSpy: vi.fn,
                     fakeApp: true,
                 }),
-                [
-                    Quasar,
-                    {
-                        iconSet: fontAwesomeV6,
-                        plugins: { BottomSheet, Dialog, Loading, Notify },
-                    },
-                ],
+                vuetifyApp,
                 i18n,
             ],
             provide: options?.provide,
         },
     };
+
     if (props && !wrapInLayout) {
         renderOptions.props = props;
     }

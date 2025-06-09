@@ -7,15 +7,14 @@ import AddNewGuestForm from "src/components/admin/guest/AddNewGuestForm.vue";
 import AdminGuestVisitsTimeline from "src/components/admin/guest/AdminGuestVisitsTimeline.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTDialog from "src/components/FTDialog.vue";
 import FTTabPanels from "src/components/FTTabPanels.vue";
 import FTTabs from "src/components/FTTabs.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalDialog } from "src/composables/useDialog";
 import { useFirestoreDocument } from "src/composables/useFirestore";
 import { deleteGuest, getGuestPath, updateGuestInfo } from "src/db";
 import { formatEventDate, getDefaultTimezone } from "src/helpers/date-utils";
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
 import { useGuestsStore } from "src/stores/guests-store";
 import { usePropertiesStore } from "src/stores/properties-store";
@@ -35,7 +34,6 @@ interface VisitsByProperty {
     };
 }
 const router = useRouter();
-const { createDialog } = useDialog();
 const guestsStore = useGuestsStore();
 const propertiesStore = usePropertiesStore();
 const { isAdmin } = storeToRefs(useAuthStore());
@@ -89,47 +87,44 @@ watch(
 );
 
 async function editGuest(guestVal: GuestDoc): Promise<void> {
-    const shouldEdit = await showConfirm(
-        t("PageAdminGuest.editGuestConfirmMsg", {
+    const shouldEdit = await globalDialog.confirm({
+        message: "",
+        title: t("PageAdminGuest.editGuestConfirmMsg", {
             name: guestVal.name,
         }),
-    );
+    });
     if (!shouldEdit) {
         return;
     }
 
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: AddNewGuestForm,
-            componentPropsObject: {
-                initialData: guestVal,
-                mode: "edit",
+    const dialog = globalDialog.openDialog(
+        AddNewGuestForm,
+        {
+            initialData: guestVal,
+            mode: "edit",
+            onUpdate(updatedData: CreateGuestPayload) {
+                dialog.hide();
+                return tryCatchLoadingWrapper({
+                    async hook() {
+                        await updateGuestInfo(organisationId, guestId, updatedData);
+                        guestsStore.invalidateGuestCache(guestId);
+                    },
+                });
             },
-            listeners: {
-                update(updatedData: CreateGuestPayload) {
-                    dialog.hide();
-                    return tryCatchLoadingWrapper({
-                        async hook() {
-                            await updateGuestInfo(organisationId, guestId, updatedData);
-                            guestsStore.invalidateGuestCache(guestId);
-                        },
-                    });
-                },
-            },
-            maximized: false,
+        },
+        {
             title: t("PageAdminGuest.editGuestDialogTitle", {
                 name: guestVal.name,
             }),
         },
-    });
+    );
 }
 
 async function onDeleteGuest(): Promise<void> {
-    const shouldDelete = await showConfirm(
-        t("PageAdminGuest.deleteGuestConfirmTitle"),
-        t("PageAdminGuest.deleteGuestConfirmMessage"),
-    );
+    const shouldDelete = await globalDialog.confirm({
+        message: t("PageAdminGuest.deleteGuestConfirmMessage"),
+        title: t("PageAdminGuest.deleteGuestConfirmTitle"),
+    });
     if (!shouldDelete) {
         return;
     }
@@ -145,66 +140,68 @@ async function onDeleteGuest(): Promise<void> {
 </script>
 
 <template>
-    <div class="PageAdminGuest">
+    <div class="page-admin-guest pa-4">
         <div v-if="guest">
             <FTTitle :title="guest.name" :subtitle="guest.contact">
                 <template #right>
                     <FTBtn
-                        class="q-mr-sm"
+                        class="mr-2"
                         rounded
-                        icon="fa fa-pencil"
+                        icon="fas fa-pencil-alt"
                         color="secondary"
                         @click="editGuest(guest)"
                         aria-label="Edit guest"
                     />
                     <FTBtn
                         rounded
-                        icon="fa fa-trash"
-                        color="negative"
+                        icon="fas fa-trash-alt"
+                        color="error"
                         @click="onDeleteGuest()"
                         aria-label="Delete guest"
                     />
                 </template>
             </FTTitle>
 
-            <div class="q-mb-sm q-ml-sm" v-if="guest.lastModified && isAdmin">
+            <div class="mb-2 ml-1" v-if="guest.lastModified && isAdmin">
                 <span class="text-caption"
                     >{{ t("PageAdminGuest.lastModified") }}:
                     {{ formatEventDate(guest.lastModified, locale, getDefaultTimezone()) }}</span
                 >
             </div>
 
-            <div v-if="guest.tags && guest.tags.length > 0" class="q-mt-sm q-mb-sm q-ml-sm">
-                <div class="row content-center items-center vertical-middle">
-                    <p class="q-ma-none q-mr-sm">{{ t("Global.tagsLabel") }}:</p>
-                    <q-chip
+            <div v-if="guest.tags && guest.tags.length > 0" class="mt-2 mb-2 ml-1">
+                <div class="d-flex align-center">
+                    <p class="ma-0 mr-2">{{ t("Global.tagsLabel") }}:</p>
+                    <v-chip
                         v-for="(tag, index) in guest.tags"
                         :key="index"
-                        class="q-mr-xs"
+                        class="mr-1"
+                        size="small"
                         :aria-label="'Guest tag ' + tag"
                     >
                         {{ tag }}
-                    </q-chip>
+                    </v-chip>
                 </div>
             </div>
 
             <div v-if="Object.keys(propertiesVisits).length > 0">
                 <!-- Check if there are multiple properties -->
                 <template v-if="Object.keys(propertiesVisits).length > 1">
-                    <FTTabs v-model="tab">
-                        <q-tab
+                    <FTTabs v-model="tab" class="mb-4">
+                        <v-tab
                             v-for="(item, propertyId) in propertiesVisits"
                             :key="propertyId"
-                            :name="propertyId"
-                            :label="item.name"
-                        />
+                            :value="propertyId"
+                        >
+                            {{ item.name }}
+                        </v-tab>
                     </FTTabs>
 
                     <FTTabPanels v-model="tab">
-                        <q-tab-panel
+                        <v-window-item
                             v-for="(item, propertyId) in propertiesVisits"
                             :key="propertyId"
-                            :name="propertyId"
+                            :value="propertyId"
                         >
                             <AdminGuestVisitsTimeline
                                 :timezone="
@@ -217,7 +214,7 @@ async function onDeleteGuest(): Promise<void> {
                                 :guest-id="guestId"
                                 @visit-updated="guestsStore.invalidateGuestCache(guestId)"
                             />
-                        </q-tab-panel>
+                        </v-window-item>
                     </FTTabPanels>
                 </template>
 

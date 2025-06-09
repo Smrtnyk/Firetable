@@ -46,6 +46,8 @@ export default config(
             ecmaVersion: "latest",
             globals: {
                 ...globals.browser,
+                __BUILD_NUMBER__: "readonly",
+                __GIT_COMMIT_HASH__: "readonly",
             },
             parser: vueParser,
             parserOptions: {
@@ -257,7 +259,7 @@ export default config(
             "no-underscore-dangle": [
                 "error",
                 {
-                    allow: ["_doc", "_objects"],
+                    allow: ["_doc", "_objects", "__BUILD_NUMBER__", "__GIT_COMMIT_HASH__"],
                 },
             ],
             "no-unexpected-multiline": "error",

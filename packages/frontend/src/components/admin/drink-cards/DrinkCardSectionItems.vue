@@ -10,11 +10,10 @@ import type { SortableEvent } from "vue-draggable-plus";
 import { isDrinkItem } from "@firetable/types";
 import DrinkCardBuilderItemSelectionDialog from "src/components/admin/drink-cards/DrinkCardBuilderItemSelectionDialog.vue";
 import DrinkCardBuilderSectionListItem from "src/components/admin/drink-cards/DrinkCardBuilderSectionListItem.vue";
-import FTBottomDialog from "src/components/FTBottomDialog.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import { useDialog } from "src/composables/useDialog";
-import { buttonSize } from "src/global-reactives/screen-detection";
-import { showConfirm } from "src/helpers/ui-helpers";
+import { globalBottomSheet } from "src/composables/useBottomSheet";
+import { globalDialog } from "src/composables/useDialog";
+import { useScreenDetection } from "src/global-reactives/screen-detection";
 import { computed } from "vue";
 import { vDraggable } from "vue-draggable-plus";
 import { useI18n } from "vue-i18n";
@@ -29,11 +28,9 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 const { t } = useI18n();
-const { createDialog } = useDialog();
+const { buttonSize } = useScreenDetection();
 
-const draggableItems = computed(function () {
-    return Array.from(props.section.items);
-});
+const draggableItems = computed(() => props.section.items);
 const draggableOptions = computed(function () {
     return {
         animation: 150,
@@ -87,7 +84,6 @@ function handleAddItem(inventoryItem: InventoryItemDoc): void {
         name: inventoryItem.name,
         order: props.section.items.length,
         price: 0,
-        region: inventoryItem.region,
         servingSize,
 
         specialPrice: createEmptySpecialPrice(),
@@ -117,7 +113,9 @@ function handleItemUpdate(index: number, updates: Partial<DrinkCardItem>): void 
 }
 
 async function handleRemoveItem(index: number): Promise<void> {
-    const confirm = await showConfirm("Are you sure you want to remove this item?");
+    const confirm = await globalDialog.confirm({
+        title: "Are you sure you want to remove this item?",
+    });
     if (!confirm) return;
 
     const newItems = Array.from(props.section.items);
@@ -175,50 +173,45 @@ function onDrop(event: SortableEvent): void {
 }
 
 function showItemSelectionDialog(): void {
-    const dialog = createDialog({
-        component: FTBottomDialog,
-        componentProps: {
-            component: DrinkCardBuilderItemSelectionDialog,
-            componentPropsObject: {
-                inventoryItems: props.inventoryItems,
-            },
-            listeners: {
-                select(addedItem) {
-                    dialog.hide();
-                    handleAddItem(addedItem);
-                },
-            },
+    const dialog = globalBottomSheet.openBottomSheet(DrinkCardBuilderItemSelectionDialog, {
+        inventoryItems: props.inventoryItems,
+        // @ts-expect-error -- FIXME - infer this type correctly
+        onSelect(addedItem) {
+            dialog.hide();
+            handleAddItem(addedItem);
         },
     });
 }
 </script>
 
 <template>
-    <div class="DrinkCardSectionItems q-gutter-y-sm">
-        <div class="row items-center justify-end q-my-md">
-            <q-btn
-                flat
-                rounded
+    <div class="drink-card-section-items d-flex flex-column" style="gap: 8px">
+        <div class="d-flex justify-end my-4">
+            <v-btn
+                variant="tonal"
+                rounded="lg"
                 :size="buttonSize"
+                prepend-icon="fas fa-plus"
                 color="primary"
-                icon="fa fa-plus"
-                class="button-gradient"
-                :disable="props.inventoryItems.length === 0"
+                :disabled="props.inventoryItems.length === 0"
                 @click="showItemSelectionDialog"
-            />
+            >
+                Add Item
+            </v-btn>
         </div>
 
         <FTCenteredText v-if="section.items.length === 0">
             {{ t("PageAdminPropertyDrinkCards.noItemsMessage") }}
         </FTCenteredText>
 
-        <q-list
+        <div
             v-else
             v-draggable="[draggableItems, draggableOptions]"
-            class="q-gutter-y-sm q-pa-sm"
+            class="d-flex flex-column pa-2"
+            style="gap: 8px"
         >
             <DrinkCardBuilderSectionListItem
-                v-for="(item, index) in section.items"
+                v-for="(item, index) in draggableItems"
                 :key="item.inventoryItemId"
                 :item="item"
                 :formatted-name="formatItemName(item)"
@@ -228,18 +221,18 @@ function showItemSelectionDialog(): void {
                 @toggle-visibility="handleItemUpdate(index, { isVisible: !item.isVisible })"
                 @remove="handleRemoveItem(index)"
             />
-        </q-list>
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 .draggable-ghost {
     opacity: 0.5;
-    background: var(--q-primary);
+    background: rgb(var(--v-theme-primary));
 }
 
 .draggable-chosen {
-    background: var(--q-grey-2);
+    background: rgb(var(--v-theme-grey-lighten-4));
 }
 
 .draggable-drag {

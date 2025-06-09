@@ -6,7 +6,7 @@ import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createApp, nextTick, ref } from "vue";
 
-import { mockedStore } from "../../test-helpers/render-component";
+import { mockedStore } from "../../test-helpers/mocked-store";
 import { AuthState, useAuthStore } from "./auth-store";
 import { usePropertiesStore } from "./properties-store";
 
@@ -41,11 +41,6 @@ vi.mock("src/db", () => ({
 vi.mock("src/helpers/ui-helpers", () => ({
     showErrorMessage: showErrorMessageSpy,
     tryCatchLoadingWrapper: vi.fn(),
-}));
-
-vi.mock("quasar", async (importOriginal) => ({
-    ...(await importOriginal()),
-    Loading: loadingSpy,
 }));
 
 function createTestFBUser(options: Partial<FBUser> = {}): FBUser {

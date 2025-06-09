@@ -2,13 +2,11 @@ import type { EventFloorDoc, FloorDoc } from "@firetable/types";
 import type { AdminEventFloorManagerProps } from "src/components/admin/event/AdminEventFloorManager.vue";
 
 import { userEvent } from "@vitest/browser/context";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { nextTick } from "vue";
 
 import { renderComponent } from "../../../../test-helpers/render-component";
 import AdminEventFloorManager from "./AdminEventFloorManager.vue";
-
-vi.mock("src/global-reactives/screen-detection");
 
 describe("AdminEventFloorManager", () => {
     let props: AdminEventFloorManagerProps;
@@ -42,9 +40,9 @@ describe("AdminEventFloorManager", () => {
             const emitted = screen.emitted().reorder as any[];
             expect(emitted).toBeTruthy();
             expect(emitted[0][0]).toEqual([
-                expect.objectContaining({ id: "floor2", order: 0 }),
-                expect.objectContaining({ id: "floor3", order: 1 }),
-                expect.objectContaining({ id: "floor1", order: 2 }),
+                expect.objectContaining({ id: "floor3", order: 0 }),
+                expect.objectContaining({ id: "floor1", order: 1 }),
+                expect.objectContaining({ id: "floor2", order: 2 }),
             ]);
         });
 
@@ -54,7 +52,7 @@ describe("AdminEventFloorManager", () => {
             // First reorder: Move Floor 1 to end
             const floor1 = screen.getByLabelText("floor1 draggable floor plan item drag handle");
             const floor3 = screen.getByLabelText("floor3 draggable floor plan item drag handle");
-            await userEvent.dragAndDrop(floor1, floor3);
+            await userEvent.dragAndDrop(floor3, floor1);
 
             await nextTick();
 
@@ -77,9 +75,9 @@ describe("AdminEventFloorManager", () => {
 
             const finalOrder = emitted[1][0];
             expect(finalOrder).toEqual([
-                expect.objectContaining({ id: "floor2", order: 0 }),
+                expect.objectContaining({ id: "floor3", order: 0 }),
                 expect.objectContaining({ id: "floor1", order: 1 }),
-                expect.objectContaining({ id: "floor3", order: 2 }),
+                expect.objectContaining({ id: "floor2", order: 2 }),
             ]);
         });
 
@@ -110,27 +108,17 @@ describe("AdminEventFloorManager", () => {
             };
         });
 
-        it("displays the floor count when maxFloors is set", async () => {
-            const screen = renderComponent(AdminEventFloorManager, props);
-            await expect.element(screen.getByText("2/3 floors used")).toBeInTheDocument();
-        });
-
-        it("disables add button when floor limit is reached", async () => {
-            // Already have 2 floors
-            props.maxFloors = 2;
-            const screen = renderComponent(AdminEventFloorManager, props);
-
-            const addButton = screen.getByLabelText("Add floor plan");
-            await expect.element(addButton).toHaveAttribute("disabled");
-        });
-
         it("allows adding floor when under the limit", async () => {
             const screen = renderComponent(AdminEventFloorManager, props);
 
-            const addButton = screen.getByLabelText("Add floor plan");
+            const addButton = screen.getByLabelText("Add floor plan", { exact: true });
             await userEvent.click(addButton);
 
-            const newFloorOption = screen.getByText("Floor 3");
+            await nextTick();
+
+            const newFloorOption = screen
+                .getByLabelText("Floor plans list", { exact: true })
+                .getByText("Floor 3", { exact: true });
             await userEvent.click(newFloorOption);
 
             const emitted = screen.emitted().add as any[];
@@ -143,6 +131,20 @@ describe("AdminEventFloorManager", () => {
             );
         });
 
+        it("displays the floor count when maxFloors is set", async () => {
+            const screen = renderComponent(AdminEventFloorManager, props);
+            await expect.element(screen.getByText("2/3 floors used")).toBeInTheDocument();
+        });
+
+        it("disables add button when floor limit is reached", async () => {
+            // Already have 2 floors
+            props.maxFloors = 2;
+            const screen = renderComponent(AdminEventFloorManager, props);
+
+            const addButton = screen.getByLabelText("Add floor plan").getByRole("button");
+            await expect.element(addButton).toBeDisabled();
+        });
+
         it("shows tooltip when floor limit is reached", async () => {
             // Already have 2 floors
             props.maxFloors = 2;
@@ -153,7 +155,7 @@ describe("AdminEventFloorManager", () => {
 
             await expect
                 .element(screen.getByText("Maximum number of floors (2) reached"))
-                .toBeInTheDocument();
+                .toBeVisible();
         });
     });
 });

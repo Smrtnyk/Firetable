@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { EventDoc, VoidFunction } from "@firetable/types";
+import type { EventDoc } from "@firetable/types";
 
 import PageAdminEventsListItem from "src/components/admin/event/PageAdminEventsListItem.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
@@ -18,9 +18,11 @@ const emit = defineEmits<{
 }>();
 const { locale, t } = useI18n();
 const { done, events, timezone } = defineProps<Props>();
+
 const eventsLength = computed(function () {
     return events.length;
 });
+
 const bucketizedEvents = computed(function () {
     const upcomingEvents = new Map<string, Map<string, EventDoc[]>>();
     const pastEvents = new Map<string, Map<string, EventDoc[]>>();
@@ -67,14 +69,12 @@ const hasPastEvents = computed(() => {
     return bucketizedEvents.value.pastEvents.size > 0;
 });
 
-function emitDelete(event: EventDoc, reset: VoidFunction): void {
+function emitDelete(event: EventDoc): void {
     emit("delete", event);
-    reset();
 }
 
-function emitEdit(event: EventDoc, reset: VoidFunction): void {
+function emitEdit(event: EventDoc): void {
     emit("edit", event);
-    reset();
 }
 
 function handleLoad(): void {
@@ -83,7 +83,7 @@ function handleLoad(): void {
 </script>
 
 <template>
-    <div class="q-pa-sm">
+    <div class="pa-2">
         <FTCenteredText v-if="!eventsLength">
             {{ t("PageAdminEvents.noEventsMessage") }}
         </FTCenteredText>
@@ -99,19 +99,19 @@ function handleLoad(): void {
                     </p>
 
                     <div
-                        class="q-mb-sm"
+                        class="mb-4"
                         v-for="[month, monthEvents] in [...yearBuckets.entries()]"
                         :key="month"
                     >
-                        <p>{{ month }}</p>
+                        <p class="mb-2">{{ month }}</p>
 
                         <PageAdminEventsListItem
                             v-for="event in monthEvents"
                             :key="event.id"
                             :event="event"
                             :timezone="timezone"
-                            @right="({ reset }) => emitDelete(event, reset)"
-                            @left="({ reset }) => emitEdit(event, reset)"
+                            @delete="emitDelete"
+                            @edit="emitEdit"
                         />
                     </div>
                 </div>
@@ -135,31 +135,29 @@ function handleLoad(): void {
                     </p>
 
                     <div
-                        class="q-mb-sm"
+                        class="mb-4"
                         v-for="[month, monthEvents] in [...yearBuckets.entries()]"
                         :key="month"
                     >
-                        <p>{{ month }}</p>
+                        <p class="mb-2">{{ month }}</p>
 
                         <PageAdminEventsListItem
                             v-for="event in monthEvents"
                             :key="event.id"
                             :event="event"
                             :timezone="timezone"
-                            @right="({ reset }) => emitDelete(event, reset)"
-                            @left="({ reset }) => emitEdit(event, reset)"
+                            @delete="emitDelete"
+                            @edit="emitEdit"
                         />
                     </div>
                 </div>
             </div>
 
             <!-- Load More Button -->
-            <div class="row justify-center q-my-md">
-                <q-btn
-                    v-if="!done"
-                    :label="t('AdminPropertyEventsList.buttons.loadMore')"
-                    @click="handleLoad"
-                />
+            <div class="d-flex justify-center my-6">
+                <v-btn v-if="!done" @click="handleLoad">
+                    {{ t("AdminPropertyEventsList.buttons.loadMore") }}
+                </v-btn>
             </div>
         </template>
     </div>

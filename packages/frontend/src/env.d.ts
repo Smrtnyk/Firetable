@@ -21,5 +21,6 @@ interface ImportMeta {
 
 interface ImportMetaEnv {
     readonly DEV: boolean;
+    readonly MODE: "development" | "production" | "test";
     readonly PROD: boolean;
 }

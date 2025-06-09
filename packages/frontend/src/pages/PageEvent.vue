@@ -13,17 +13,15 @@ import type { EventOwner } from "src/db";
 import { isPlannedReservation, ReservationStatus } from "@firetable/types";
 import { useAsyncState } from "@vueuse/core";
 import { where } from "firebase/firestore";
-import { Loading } from "quasar";
 import EventFloorCanvasList from "src/components/Event/EventFloorCanvasList.vue";
 import EventGuestList from "src/components/Event/EventGuestList.vue";
 import EventGuestSearch from "src/components/Event/EventGuestSearch.vue";
 import EventInfo from "src/components/Event/EventInfo.vue";
 import EventQueuedReservations from "src/components/Event/EventQueuedReservations.vue";
 import EventViewControls from "src/components/Event/EventViewControls.vue";
-import FTDialog from "src/components/FTDialog.vue";
 import { useReservations } from "src/composables/reservations/useReservations";
 import { TableOperationType } from "src/composables/reservations/useTableOperations";
-import { useDialog } from "src/composables/useDialog";
+import { globalDialog } from "src/composables/useDialog";
 import {
     createQuery,
     useFirestoreCollection,
@@ -42,8 +40,9 @@ import {
     saveQueuedReservation,
 } from "src/db";
 import { exportReservations } from "src/helpers/reservation/export-reservations";
-import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useEventsStore } from "src/stores/events-store";
+import { useGlobalStore } from "src/stores/global-store";
 import { usePermissionsStore } from "src/stores/permissions-store";
 import { computed, onMounted, onUnmounted, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
@@ -63,11 +62,11 @@ const eventOwner: EventOwner = {
     propertyId,
 };
 
+const globalStore = useGlobalStore();
 const permissionStore = usePermissionsStore();
 const eventsStore = useEventsStore();
 const router = useRouter();
 const { t } = useI18n();
-const { createDialog } = useDialog();
 const pageRef = useTemplateRef<HTMLDivElement>("pageRef");
 
 const { execute: loadUsersPromise, state: users } = useAsyncState(
@@ -141,14 +140,14 @@ const canExportReservations = computed(function () {
 });
 
 async function init(): Promise<void> {
-    Loading.show();
+    globalStore.setLoading(true);
     await Promise.all([
         eventDataPromise.value,
         reservationsDataPromise.value,
         queuedResPromise.value,
         loadUsersPromise(),
     ]);
-    Loading.hide();
+    globalStore.setLoading(false);
 
     if (!event.value) {
         showErrorMessage("Event not found", function () {
@@ -186,7 +185,9 @@ async function onCreateQueuedReservation(reservation: QueuedReservation): Promis
 }
 
 async function onDeleteQueuedReservation(reservation: QueuedReservationDoc): Promise<void> {
-    const shouldDelete = await showConfirm(t("PageEvent.deleteQueuedReservationConfirmMsg"));
+    const shouldDelete = await globalDialog.confirmTitle(
+        t("PageEvent.deleteQueuedReservationConfirmMsg"),
+    );
 
     if (!shouldDelete) {
         return;
@@ -203,7 +204,7 @@ async function onExportReservations(): Promise<void> {
     if (!event.value) {
         return;
     }
-    const confirmed = await showConfirm(t("PageEvent.exportReservationsConfirmMsg"));
+    const confirmed = await globalDialog.confirmTitle(t("PageEvent.exportReservationsConfirmMsg"));
 
     if (!confirmed) {
         return;
@@ -227,21 +228,18 @@ function showEventInfo(): void {
     if (!event.value) {
         return;
     }
-    createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: EventInfo,
-            componentPropsObject: {
-                activeReservations: reservations.value,
-                eventInfo: event.value.info,
-                floors: eventFloors.value,
-                returningGuests: returningGuests.value,
-            },
-            listeners: {},
-            maximized: false,
+    globalDialog.openDialog(
+        EventInfo,
+        {
+            activeReservations: reservations.value,
+            eventInfo: event.value.info,
+            floors: eventFloors.value,
+            returningGuests: returningGuests.value,
+        },
+        {
             title: event.value.name,
         },
-    });
+    );
 }
 
 onMounted(init);
@@ -254,8 +252,12 @@ onUnmounted(function () {
 </script>
 
 <template>
-    <div v-if="event" class="PageEvent flex column justify-between" ref="pageRef">
-        <div class="PageEvent__header q-mb-md">
+    <div
+        v-if="event"
+        class="PageEvent d-flex flex-column justify-space-between fill-height"
+        ref="pageRef"
+    >
+        <div class="PageEvent__header mb-4">
             <EventGuestSearch
                 :floors="eventFloors"
                 :show-floor-name-in-option="hasMultipleFloorPlans"

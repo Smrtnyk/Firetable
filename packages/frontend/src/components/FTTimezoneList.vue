@@ -1,52 +1,65 @@
 <script setup lang="ts">
+import { refDebounced } from "@vueuse/core";
 import { timezones } from "src/helpers/date-utils";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
+
+const VIRTUAL_SCROLL_HEIGHT = 300;
+const VIRTUAL_SCROLL_ITEM_HEIGHT = 48;
+const SEARCH_DEBOUNCE_MS = 300;
 
 const { t } = useI18n();
 const searchQuery = ref("");
+const debouncedSearchQuery = refDebounced(searchQuery, SEARCH_DEBOUNCE_MS);
+
 const emit = defineEmits<(event: "timezoneSelected", timezone: string) => void>();
 
-function emitTimezoneSelected(timezone: string): void {
-    emit("timezoneSelected", timezone);
-}
-
-function getFilteredTimezones(): string[] {
-    const query = searchQuery.value.toLowerCase();
+const filteredTimezones = computed(function () {
+    const query = debouncedSearchQuery.value.toLowerCase();
     return timezones().filter(function (timezone) {
         return timezone.toLowerCase().includes(query);
     });
+});
+
+function emitTimezoneSelected(timezone: string): void {
+    emit("timezoneSelected", timezone);
 }
 </script>
 
 <template>
     <div class="timezone-selector">
-        <q-input
+        <v-text-field
             v-model="searchQuery"
             :placeholder="t('FTTimezoneList.searchTimezonesPlaceholder')"
-            outlined
-            dense
-            class="q-mb-md"
-            :debounce="300"
+            variant="outlined"
+            density="compact"
+            class="mb-4"
+            clearable
+            hide-details
             :aria-label="t('FTTimezoneList.searchTimezonesAriaLabel')"
         >
-            <template #prepend>
-                <q-icon name="fa fa-search" />
+            <template #prepend-inner>
+                <v-icon icon="fa fa-search" />
             </template>
-        </q-input>
+        </v-text-field>
 
-        <q-virtual-scroll
-            :items="getFilteredTimezones()"
-            style="height: 300px"
-            :virtual-scroll-item-size="48"
+        <v-virtual-scroll
+            :items="filteredTimezones"
+            :height="VIRTUAL_SCROLL_HEIGHT"
+            :item-height="VIRTUAL_SCROLL_ITEM_HEIGHT"
         >
-            <template #default="{ item: timezone, index }">
-                <q-item :key="index" clickable v-ripple @click="emitTimezoneSelected(timezone)">
-                    <q-item-section>
-                        <q-item-label>{{ timezone }}</q-item-label>
-                    </q-item-section>
-                </q-item>
+            <template #default="{ item, index }">
+                <v-list-item :key="index" :value="item" @click="emitTimezoneSelected(item)">
+                    <v-list-item-title>{{ item }}</v-list-item-title>
+                </v-list-item>
+                <v-divider v-if="index < filteredTimezones.length - 1" />
             </template>
-        </q-virtual-scroll>
+        </v-virtual-scroll>
     </div>
 </template>
+
+<style scoped>
+.timezone-selector {
+    width: 100%;
+}
+</style>

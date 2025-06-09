@@ -1,15 +1,12 @@
 <script setup lang="ts">
-import { isMobile } from "src/global-reactives/screen-detection";
+import { useScreenDetection } from "src/global-reactives/screen-detection";
 import { ref, watch } from "vue";
 
 const props = defineProps<{
     modelValue: number | string;
 }>();
-const emit = defineEmits<{
-    (e: "update:modelValue", value: number | string): void;
-    (e: "input", value: any): void;
-}>();
-
+const emit = defineEmits<(e: "update:modelValue", value: number | string) => void>();
+const { isMobile } = useScreenDetection();
 const selectedTab = ref(props.modelValue);
 
 watch(
@@ -22,41 +19,32 @@ watch(
 watch(selectedTab, function (newValue) {
     emit("update:modelValue", newValue);
 });
-
-function handleInput(event: any): void {
-    emit("input", event);
-}
 </script>
 
 <template>
     <div class="full-width">
-        <q-tabs
-            class="ft-q-tabs q-pa-none"
+        <v-tabs
+            class="ft-tabs"
             v-model="selectedTab"
-            outside-arrows
-            mobile-arrows
-            active-class="ft-active-tab"
-            align="left"
-            @input="handleInput"
-            :dense="isMobile"
-            narrow-indicator
+            selected-class="ft-active-tab"
+            align-tabs="start"
+            :density="isMobile ? 'compact' : 'default'"
+            show-arrows
         >
             <slot></slot>
-        </q-tabs>
+        </v-tabs>
     </div>
 </template>
 
 <style lang="scss">
-.ft-q-tabs {
+@use "src/css/variables.scss" as *;
+
+.ft-tabs {
     margin-bottom: 8px;
     border-radius: $border-radius !important;
 
-    .q-tab__indicator {
+    .v-tabs-slider {
         background: $gradient-primary;
-    }
-
-    .q-tab:not(:last-child) {
-        margin-right: 4px;
     }
 }
 </style>

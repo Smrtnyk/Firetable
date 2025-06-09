@@ -5,20 +5,17 @@ import type { BucketizedUser, BucketizedUsers } from "src/components/admin/user/
 import { Role } from "@firetable/types";
 import { useAsyncState } from "@vueuse/core";
 import { matchesProperty } from "es-toolkit/compat";
-import { Loading, useQuasar } from "quasar";
 import AdminUsersList from "src/components/admin/user/AdminUsersList.vue";
 import UserCreateForm from "src/components/admin/user/UserCreateForm.vue";
 import UserEditForm from "src/components/admin/user/UserEditForm.vue";
 import FTBtn from "src/components/FTBtn.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
-import FTDialog from "src/components/FTDialog.vue";
-import FTTabPanels from "src/components/FTTabPanels.vue";
-import FTTabs from "src/components/FTTabs.vue";
 import FTTitle from "src/components/FTTitle.vue";
-import { useDialog } from "src/composables/useDialog";
+import { globalDialog } from "src/composables/useDialog";
 import { createUserWithEmail, deleteUser, fetchUsersByRole, updateUser } from "src/db";
-import { showConfirm, showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { showErrorMessage, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
 import { useAuthStore } from "src/stores/auth-store";
+import { useGlobalStore } from "src/stores/global-store";
 import { usePropertiesStore } from "src/stores/properties-store";
 import { computed, onBeforeMount, onUnmounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
@@ -32,7 +29,7 @@ const props = defineProps<PageAdminUsersProps>();
 
 const { t } = useI18n();
 const router = useRouter();
-const quasar = useQuasar();
+const globalStore = useGlobalStore();
 const authStore = useAuthStore();
 const propertiesStore = usePropertiesStore();
 
@@ -44,8 +41,6 @@ const {
     immediate: true,
     onError: showErrorMessage,
 });
-
-const { createDialog } = useDialog();
 
 const activeTab = ref(0);
 
@@ -118,7 +113,7 @@ async function onUpdateUser(updatedUser: EditUserPayload): Promise<void> {
         async hook() {
             await updateUser(updatedUser);
             await executeFetchUsers();
-            quasar.notify(t("PageAdminUsers.userUpdatedSuccess"));
+            globalStore.notify(t("PageAdminUsers.userUpdatedSuccess"));
         },
     });
 }
@@ -130,18 +125,16 @@ onBeforeMount(function () {
 });
 
 onUnmounted(function () {
-    if (Loading.isActive) {
-        Loading.hide();
-    }
+    globalStore.setLoading(false);
 });
 
 watch(
     isLoading,
     function (loading) {
         if (loading) {
-            Loading.show();
+            globalStore.setLoading(true);
         } else {
-            Loading.hide();
+            globalStore.setLoading(false);
         }
     },
     { immediate: true },
@@ -162,30 +155,31 @@ async function onCreateUserFormSubmit(newUser: CreateUserPayload): Promise<void>
 }
 
 async function onUserSlideRight(user: User): Promise<void> {
-    if (await showConfirm(t("PageAdminUsers.deleteUserConfirmTitle"))) {
+    if (
+        await globalDialog.confirm({
+            message: "",
+            title: t("PageAdminUsers.deleteUserConfirmTitle"),
+        })
+    ) {
         await onDeleteUser(user);
     }
 }
 
 function showCreateUserDialog(): void {
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: UserCreateForm,
-            componentPropsObject: {
-                organisation: organisation.value,
-                properties: properties.value,
+    const dialog = globalDialog.openDialog(
+        UserCreateForm,
+        {
+            onSubmit(userPayload: CreateUserPayload) {
+                onCreateUserFormSubmit(userPayload);
+                dialog.hide();
             },
-            listeners: {
-                submit(userPayload: CreateUserPayload) {
-                    onCreateUserFormSubmit(userPayload);
-                    dialog.hide();
-                },
-            },
-            maximized: false,
+            organisation: organisation.value,
+            properties: properties.value,
+        },
+        {
             title: t("PageAdminUsers.createNewUserDialogTitle"),
         },
-    });
+    );
 }
 
 async function showEditUserDialog(user: User): Promise<void> {
@@ -194,38 +188,37 @@ async function showEditUserDialog(user: User): Promise<void> {
         return;
     }
     if (
-        !(await showConfirm(t("PageAdminUsers.editUserConfirmationMessage", { name: user.name })))
+        !(await globalDialog.confirm({
+            message: "",
+            title: t("PageAdminUsers.editUserConfirmationMessage", { name: user.name }),
+        }))
     ) {
         return;
     }
     const selectedProperties = properties.value.filter(function (ownProperty) {
         return user.relatedProperties.includes(ownProperty.id);
     });
-    const dialog = createDialog({
-        component: FTDialog,
-        componentProps: {
-            component: UserEditForm,
-            componentPropsObject: {
-                organisation: organisation.value,
-                properties: properties.value,
-                selectedProperties,
-                user: { ...user },
-            },
-            listeners: {
-                async submit(userPayload: EditUserPayload["updatedUser"]) {
-                    await onUpdateUser({
-                        organisationId: userPayload.organisationId,
-                        updatedUser: userPayload,
-                        userId: userPayload.id,
-                    });
+    const dialog = globalDialog.openDialog(
+        UserEditForm,
+        {
+            async onSubmit(userPayload: EditUserPayload["updatedUser"]) {
+                await onUpdateUser({
+                    organisationId: userPayload.organisationId,
+                    updatedUser: userPayload,
+                    userId: userPayload.id,
+                });
 
-                    dialog.hide();
-                },
+                dialog.hide();
             },
-            maximized: false,
+            organisation: organisation.value,
+            properties: properties.value,
+            selectedProperties,
+            user: { ...user },
+        },
+        {
             title: t("PageAdminUsers.editUserDialogTitle", { name: user.name }),
         },
-    });
+    );
 }
 
 const uniqueUsersCount = computed(() => users.value.length);
@@ -236,9 +229,10 @@ const uniqueUsersCount = computed(() => users.value.length);
         <FTTitle :title="`${t('PageAdminUsers.title')} (${uniqueUsersCount})`">
             <template #right>
                 <FTBtn
+                    aria-label="Add user button"
                     rounded
                     icon="fa fa-plus"
-                    class="button-gradient"
+                    color="primary"
                     @click="showCreateUserDialog"
                 />
             </template>
@@ -252,7 +246,7 @@ const uniqueUsersCount = computed(() => users.value.length);
                 @edit="showEditUserDialog"
                 @delete="onUserSlideRight"
                 :users="unassignedUsers"
-                class="q-mb-md"
+                class="mb-4"
             />
         </template>
 
@@ -260,34 +254,35 @@ const uniqueUsersCount = computed(() => users.value.length);
         <div v-if="Object.keys(bucketizedUsers).length > 0 && !isLoading">
             <template v-if="Object.keys(bucketizedUsers).length > 1">
                 <!-- Multiple properties: Show tabs -->
-                <FTTabs v-model="activeTab">
-                    <q-tab
+                <v-tabs v-model="activeTab" align-tabs="start">
+                    <v-tab
                         v-for="(bucket, index) in Object.values(bucketizedUsers)"
                         :key="bucket.propertyName"
-                        :name="index"
-                        :label="
-                            t('PageAdminUsers.propertyUserCountTabLabel', {
+                        :value="index"
+                    >
+                        {{
+                            t("PageAdminUsers.propertyUserCountTabLabel", {
                                 propertyName: bucket.propertyName,
                                 count: bucket.users.length,
                             })
-                        "
-                    />
-                </FTTabs>
+                        }}
+                    </v-tab>
+                </v-tabs>
 
-                <FTTabPanels v-model="activeTab" class="bg-transparent q-mt-md">
-                    <q-tab-panel
+                <v-window v-model="activeTab" class="bg-transparent mt-4">
+                    <v-window-item
                         v-for="(bucket, index) in Object.values(bucketizedUsers)"
                         :key="bucket.propertyName"
-                        :name="index"
-                        class="q-pa-none"
+                        :value="index"
+                        class="pa-0"
                     >
                         <AdminUsersList
                             @edit="showEditUserDialog"
                             @delete="onUserSlideRight"
                             :users="bucket.users"
                         />
-                    </q-tab-panel>
-                </FTTabPanels>
+                    </v-window-item>
+                </v-window>
             </template>
             <template v-else>
                 <!-- Single property: Show users without tabs -->

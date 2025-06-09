@@ -22,13 +22,13 @@
     "devDependencies": {
         "@faker-js/faker": "9.8.0",
         "@firebase/rules-unit-testing": "4.0.1",
-        "@types/node": "24.0.0",
+        "@types/node": "24.0.1",
         "cac": "6.7.14",
         "tinyrainbow": "2.0.0",
         "vitest": "3.2.3",
-        "knip": "5.60.2",
+        "knip": "5.61.0",
         "typescript": "5.8.3",
-        "tsx": "4.19.4"
+        "tsx": "4.20.3"
     },
     "private": true
 }

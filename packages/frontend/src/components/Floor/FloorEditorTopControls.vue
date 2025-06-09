@@ -10,7 +10,8 @@ import {
 import { useEventListener } from "@vueuse/core";
 import { debounce, isString } from "es-toolkit";
 import FTColorPickerButton from "src/components/FTColorPickerButton.vue";
-import { showConfirm, showErrorMessage } from "src/helpers/ui-helpers";
+import { globalDialog } from "src/composables/useDialog";
+import { showErrorMessage } from "src/helpers/ui-helpers";
 import { computed, onMounted, ref, watch } from "vue";
 
 type EmitEvents = (e: "delete", element: FloorEditorElement) => void;
@@ -104,7 +105,7 @@ async function deleteElement(): Promise<void> {
     if (!selectedFloorElement) {
         return;
     }
-    if (await showConfirm("Do you really want to delete this element?")) {
+    if (await globalDialog.confirm({ title: "Do you really want to delete this element?" })) {
         emit("delete", selectedFloorElement);
     }
 }
@@ -132,81 +133,112 @@ onMounted(function () {
 </script>
 
 <template>
-    <div class="row FloorEditorTopControls q-gutter-xs">
+    <div class="d-flex align-center pa-2" style="gap: 8px">
         <!-- Position Coordinates -->
-        <div class="col-1">
-            <q-input outlined v-model.number="localLeft" type="number" label="X" />
-        </div>
-        <div class="col-1">
-            <q-input outlined v-model.number="localTop" type="number" label="Y" />
-        </div>
+        <v-text-field
+            v-model.number="localLeft"
+            type="number"
+            label="X"
+            variant="outlined"
+            density="compact"
+            hide-details
+            style="width: 80px"
+        />
+        <v-text-field
+            v-model.number="localTop"
+            type="number"
+            label="Y"
+            variant="outlined"
+            density="compact"
+            hide-details
+            style="width: 80px"
+        />
 
-        <div class="col-1">
-            <q-input outlined v-model.number="localWidth" type="number" label="Width" />
-        </div>
-        <div class="col-1">
-            <q-input outlined v-model.number="localHeight" type="number" label="Height" />
-        </div>
+        <!-- Dimensions -->
+        <v-text-field
+            v-model.number="localWidth"
+            type="number"
+            label="Width"
+            variant="outlined"
+            density="compact"
+            hide-details
+            style="width: 90px"
+        />
+        <v-text-field
+            v-model.number="localHeight"
+            type="number"
+            label="Height"
+            variant="outlined"
+            density="compact"
+            hide-details
+            style="width: 90px"
+        />
 
         <!-- Angle Control -->
-        <div class="col-1">
-            <q-input outlined v-model.number="localAngle" type="number" label="Angle°" />
-        </div>
+        <v-text-field
+            v-model.number="localAngle"
+            type="number"
+            label="Angle°"
+            variant="outlined"
+            density="compact"
+            hide-details
+            style="width: 90px"
+        />
 
-        <div class="col-2" v-if="isTable(selectedFloorElement)">
-            <q-input
-                :debounce="500"
-                :model-value="selectedFloorElement.label"
-                @update:model-value="(newLabel) => updateTableLabel(selectedFloorElement, newLabel)"
-                type="text"
-                outlined
-                label="Table label"
-            />
-        </div>
+        <!-- Table Label Input -->
+        <v-text-field
+            v-if="isTable(selectedFloorElement)"
+            :model-value="selectedFloorElement.label"
+            @update:model-value="(newLabel) => updateTableLabel(selectedFloorElement, newLabel)"
+            type="text"
+            label="Table label"
+            variant="outlined"
+            density="compact"
+            hide-details
+            style="width: 150px"
+        />
 
-        <q-space />
+        <v-spacer />
 
-        <div class="col-auto flex q-gutter-xs q-ma-none">
+        <div class="d-flex align-center" style="gap: 4px">
             <FTColorPickerButton
                 :model-value="elementColor"
                 @update:model-value="setElementColor"
             />
 
-            <q-btn
-                flat
-                title="Send back"
+            <v-btn
                 v-if="deleteAllowed"
-                icon="fa fa-level-down"
+                variant="text"
+                icon="fas fa-level-down-alt"
+                title="Send back"
                 @click="sendBack"
             />
-            <q-btn
-                flat
+            <v-btn
+                variant="text"
+                icon="far fa-copy"
                 title="Copy element"
-                icon="fa fa-copy"
                 @click="floorInstance.copySelectedElement()"
             />
-            <q-btn
-                flat
+            <v-btn
                 v-if="'flip' in selectedFloorElement"
+                variant="text"
+                icon="fas fa-arrows-alt-h"
                 title="Flip element"
-                icon="fa fa-arrows-alt-h"
                 @click="selectedFloorElement.flip()"
             />
-
-            <q-btn
-                flat
+            <v-btn
                 v-if="'nextDesign' in selectedFloorElement"
+                variant="text"
+                icon="fas fa-chevron-right"
                 title="Switch to fill element"
-                icon="fa fa-chevron-right"
                 @click="selectedFloorElement.nextDesign()"
             />
-
-            <q-btn
-                unelevated
-                title="Delete element"
+            <v-btn
                 v-if="deleteAllowed"
-                icon="fa fa-trash"
-                color="negative"
+                variant="flat"
+                color="error"
+                icon="fas fa-trash-alt"
+                title="Delete element"
                 @click="deleteElement"
             />
         </div>

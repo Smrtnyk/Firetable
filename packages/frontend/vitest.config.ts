@@ -2,20 +2,15 @@
 
 import { defineConfig } from "vitest/config";
 import tsconfigPaths from "vite-tsconfig-paths";
-import { quasar, transformAssetUrls } from "@quasar/vite-plugin";
 import vue from "@vitejs/plugin-vue";
+import vuetify from "vite-plugin-vuetify";
 
 export default defineConfig({
     plugins: [
-        tsconfigPaths({
-            // This is needed to avoid Vitest picking up tsconfig.json files from other unrelated projects in the monorepo
-            ignoreConfigErrors: true,
-        }),
-        vue({
-            template: { transformAssetUrls },
-        }),
-        quasar({
-            sassVariables: "src/css/quasar.variables.scss",
+        tsconfigPaths(),
+        vue(),
+        vuetify({
+            autoImport: true,
         }),
     ],
     test: {
@@ -27,20 +22,17 @@ export default defineConfig({
         alias: {
             "src/": new URL("./src/", import.meta.url).pathname,
         },
-        deps: {
-            optimizer: {
-                web: {
-                    enabled: true,
-                    include: ["@vue/test-utils", "quasar", "vue-i18n", "pinia", "@pinia/testing", "vue"],
-                }
-            }
-        },
         pool: "threads",
         poolOptions: {
             threads: {
                 useAtomics: true,
                 minThreads: "80%"
             }
+        },
+        server: {
+            deps: {
+                inline: ['vuetify'],
+            },
         },
         clearMocks: true,
         reporters: ["default"],

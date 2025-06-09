@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import type { EventLog, EventLogsDoc } from "@firetable/types";
-import type { QScrollAreaProps } from "quasar";
 
 import { AdminRole } from "@firetable/types";
-import { QScrollArea } from "quasar";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import { getFormatedDateFromTimestamp } from "src/helpers/date-utils";
 import { computed, ref, useTemplateRef } from "vue";
@@ -28,7 +26,7 @@ const logs = computed(function () {
     });
 });
 const showScrollButton = ref(false);
-const logsContainer = useTemplateRef<QScrollArea>("logsContainer");
+const logsContainer = useTemplateRef("logsContainer");
 
 function formatSubtitleForEventLog({ creator, timestamp }: EventLog): string {
     const datePart = getFormatedDateFromTimestamp(timestamp, locale.value, props.timezone);
@@ -45,7 +43,7 @@ function getIconNameForLogEntry(logMessage: string): string {
         return "fa fa-link";
     }
     if (logMessage.includes("deleted")) {
-        return "fa fa-trash";
+        return "fa fa-trash-alt";
     }
 
     if (logMessage.includes("transferred") || logMessage.includes("swapped")) {
@@ -57,7 +55,7 @@ function getIconNameForLogEntry(logMessage: string): string {
     }
 
     if (logMessage.includes("edited")) {
-        return "fa fa-pencil";
+        return "fa fa-pencil-alt";
     }
 
     if (logMessage.includes("copied")) {
@@ -69,62 +67,85 @@ function getIconNameForLogEntry(logMessage: string): string {
     }
 
     if (logMessage.includes("cancelled")) {
-        return "fa fa-close";
+        return "fa fa-times";
     }
 
-    return "";
+    return "fa fa-info-circle";
 }
 
-function handleScroll(ev: Parameters<NonNullable<QScrollAreaProps["onScroll"]>>[0]): void {
-    showScrollButton.value = ev.verticalPercentage > 0.1 && ev.verticalPercentage < 0.9;
+function handleScroll(event: Event): void {
+    const el = event.target as HTMLElement;
+    if (!el) return;
+
+    // Ensure we don't divide by zero if content is smaller than container
+    const scrollableHeight = el.scrollHeight - el.clientHeight;
+    if (scrollableHeight <= 0) {
+        showScrollButton.value = false;
+        return;
+    }
+
+    const verticalPercentage = el.scrollTop / scrollableHeight;
+    showScrollButton.value = verticalPercentage > 0.1 && verticalPercentage < 0.9;
 }
 
 function scrollToBottom(): void {
-    logsContainer.value?.setScrollPosition(
-        "vertical",
-        logsContainer.value.getScroll().verticalSize,
-        1000,
-    );
+    const el = logsContainer.value;
+    if (!el) return;
+    el.scrollTo({
+        behavior: "smooth",
+        top: el.scrollHeight,
+    });
 }
 </script>
 
 <template>
-    <q-card class="ft-card AdminEventLogs q-pa-sm">
+    <v-card class="ft-card admin-event-logs pa-2">
         <div v-if="logs.length > 0">
-            <q-scroll-area ref="logsContainer" class="logs-container" @scroll="handleScroll">
-                <q-timeline color="primary" class="q-ml-sm q-mt-none">
-                    <q-timeline-entry
+            <div ref="logsContainer" class="logs-container" @scroll="handleScroll">
+                <v-timeline side="end" align="start" density="compact" class="mt-0">
+                    <v-timeline-item
                         v-for="log of logs"
                         :key="log.timestamp.toString()"
-                        :subtitle="formatSubtitleForEventLog(log)"
-                        :icon="getIconNameForLogEntry(log.message)"
+                        dot-color="primary"
+                        size="x-small"
                     >
-                        <div class="whitespace-pre-line">
+                        <template #icon>
+                            <v-icon :icon="getIconNameForLogEntry(log.message)" size="x-small" />
+                        </template>
+                        <div class="whitespace-pre-line text-body-2">
                             {{ log.message }}
                         </div>
-                    </q-timeline-entry>
-                </q-timeline>
-            </q-scroll-area>
+                        <div class="text-caption text-grey-darken-1">
+                            {{ formatSubtitleForEventLog(log) }}
+                        </div>
+                    </v-timeline-item>
+                </v-timeline>
+            </div>
 
-            <q-page-sticky
+            <v-fab
                 v-if="showScrollButton"
-                position="bottom"
-                :offset="[18, 18]"
-                class="scroll-to-bottom"
-            >
-                <q-btn @click="scrollToBottom" fab icon="fa fa-chevron-down" color="secondary" />
-            </q-page-sticky>
+                icon="fas fa-chevron-down"
+                location="bottom end"
+                size="small"
+                app
+                appear
+                color="secondary"
+                @click="scrollToBottom"
+                aria-label="Scroll to bottom"
+            ></v-fab>
         </div>
         <FTCenteredText v-else>No logs recorded for this event.</FTCenteredText>
-    </q-card>
+    </v-card>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
+/* position: relative is needed for the v-fab to be positioned correctly */
+.admin-event-logs {
+    position: relative;
+}
 .logs-container {
     height: calc(100vh - 200px);
-}
-.scroll-to-bottom {
-    z-index: 999999;
+    overflow-y: auto;
 }
 .whitespace-pre-line {
     white-space: pre-line;

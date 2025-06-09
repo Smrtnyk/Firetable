@@ -2,19 +2,24 @@
 import type { IssueReportDoc } from "@firetable/types";
 
 import { IssueCategory, IssueStatus } from "@firetable/types";
-import { useQuasar } from "quasar";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTTitle from "src/components/FTTitle.vue";
+import { globalDialog } from "src/composables/useDialog";
 import { useFirestoreCollection } from "src/composables/useFirestore";
 import { deleteIssueReport, getIssueReportsPath, updateIssueReport } from "src/db";
 import { getIssueStatusColor } from "src/helpers/issue-helpers";
-import { showConfirm, tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
+import { useGlobalStore } from "src/stores/global-store";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-const { t } = useI18n();
-const quasar = useQuasar();
+const MIN_MENU_WIDTH = 150;
 
+const { t } = useI18n();
+const globalStore = useGlobalStore();
 const { data: issueReports } = useFirestoreCollection<IssueReportDoc>(getIssueReportsPath());
+
+const menuStates = ref<Record<string, boolean>>({});
 
 const statusOptions = [
     { color: "warning", label: t("PageAdminIssueReports.status.new"), value: IssueStatus.NEW },
@@ -24,33 +29,54 @@ const statusOptions = [
         value: IssueStatus.IN_PROGRESS,
     },
     {
-        color: "positive",
+        color: "success",
         label: t("PageAdminIssueReports.status.resolved"),
         value: IssueStatus.RESOLVED,
     },
     {
-        color: "negative",
+        color: "error",
         label: t("PageAdminIssueReports.status.wont_fix"),
         value: IssueStatus.WONT_FIX,
     },
 ];
 
+function closeMenu(issueId: string): void {
+    menuStates.value[issueId] = false;
+}
+
+function formatDate(timestamp: number): string {
+    return new Date(timestamp).toLocaleString();
+}
+
+function getIssueCategoryColor(category: IssueCategory): string {
+    return category === IssueCategory.BUG ? "error" : "info";
+}
+
 async function onDeleteIssue(issueId: string): Promise<void> {
-    if (await showConfirm(t("PageAdminIssueReports.deleteConfirmation"))) {
+    closeMenu(issueId);
+
+    if (
+        await globalDialog.confirm({
+            message: "",
+            title: t("PageAdminIssueReports.deleteConfirmation"),
+        })
+    ) {
         await tryCatchLoadingWrapper({
             async hook() {
                 await deleteIssueReport(issueId);
-                quasar.notify(t("PageAdminIssueReports.issueDeleted"));
+                globalStore.notify(t("PageAdminIssueReports.issueDeleted"));
             },
         });
     }
 }
 
 async function updateIssueStatus(issueId: string, status: IssueStatus): Promise<void> {
+    closeMenu(issueId);
+
     await tryCatchLoadingWrapper({
         async hook() {
             await updateIssueReport(issueId, { status });
-            quasar.notify(t("PageAdminIssueReports.statusUpdated"));
+            globalStore.notify(t("PageAdminIssueReports.statusUpdated"));
         },
     });
 }
@@ -60,77 +86,105 @@ async function updateIssueStatus(issueId: string, status: IssueStatus): Promise<
     <div class="PageAdminIssueReports">
         <FTTitle :title="t('PageAdminIssueReports.title')" />
 
-        <q-list bordered separator v-if="issueReports.length > 0">
-            <q-item v-for="issue in issueReports" :key="issue.id">
-                <q-item-section>
-                    <q-item-label>
-                        <q-badge
-                            :color="issue.category === IssueCategory.BUG ? 'negative' : 'info'"
-                            class="q-mr-sm"
+        <v-list v-if="issueReports.length > 0" lines="two">
+            <template v-for="(issue, index) in issueReports" :key="issue.id">
+                <v-list-item>
+                    <template #prepend>
+                        <v-chip
+                            :color="getIssueCategoryColor(issue.category)"
+                            size="small"
+                            class="mr-3"
                         >
                             {{ t(`PageIssueReport.categories.${issue.category.toLowerCase()}`) }}
-                        </q-badge>
+                        </v-chip>
+                    </template>
+
+                    <v-list-item-title>
                         {{ issue.description }}
-                    </q-item-label>
-                    <q-item-label caption>
+                    </v-list-item-title>
+
+                    <v-list-item-subtitle>
                         {{ issue.user.name }} ({{ issue.user.email }}) -
                         {{ issue.organisation.name }} -
-                        {{ new Date(issue.createdAt).toLocaleString() }}
-                    </q-item-label>
-                </q-item-section>
+                        {{ formatDate(issue.createdAt) }}
+                    </v-list-item-subtitle>
 
-                <q-item-section side>
-                    <q-badge :color="getIssueStatusColor(issue.status)">
-                        {{ t(`PageAdminIssueReports.status.${issue.status.toLowerCase()}`) }}
-                    </q-badge>
-                </q-item-section>
+                    <template #append>
+                        <v-chip
+                            :color="getIssueStatusColor(issue.status)"
+                            size="small"
+                            class="mr-2"
+                        >
+                            {{ t(`PageAdminIssueReports.status.${issue.status.toLowerCase()}`) }}
+                        </v-chip>
 
-                <q-item-section side>
-                    <q-btn
-                        flat
-                        round
-                        color="grey"
-                        icon="fa fa-ellipsis-v"
-                        :aria-label="`Actions for issue ${issue.description}`"
-                    >
-                        <q-menu>
-                            <q-list style="min-width: 150px">
-                                <q-item-label header>{{
-                                    t("PageAdminIssueReports.updateStatus")
-                                }}</q-item-label>
+                        <v-menu
+                            v-model="menuStates[issue.id]"
+                            location="bottom end"
+                            :close-on-content-click="false"
+                        >
+                            <template #activator="{ props }">
+                                <v-btn
+                                    v-bind="props"
+                                    variant="text"
+                                    icon="fa fa-ellipsis-v"
+                                    size="small"
+                                    :aria-label="`Actions for issue ${issue.description}`"
+                                />
+                            </template>
 
-                                <q-item
+                            <v-list :min-width="MIN_MENU_WIDTH">
+                                <v-list-subheader>
+                                    {{ t("PageAdminIssueReports.updateStatus") }}
+                                </v-list-subheader>
+
+                                <v-list-item
                                     v-for="option in statusOptions"
                                     :key="option.value"
-                                    clickable
-                                    v-close-popup
                                     @click="updateIssueStatus(issue.id, option.value)"
                                     :aria-label="`Set status to ${option.label}`"
                                 >
-                                    <q-item-section>
-                                        <q-item-label>{{ option.label }}</q-item-label>
-                                    </q-item-section>
-                                    <q-item-section side>
-                                        <q-badge :color="getIssueStatusColor(option.value)" />
-                                    </q-item-section>
-                                </q-item>
+                                    <v-list-item-title>{{ option.label }}</v-list-item-title>
 
-                                <q-separator />
+                                    <template #append>
+                                        <v-chip
+                                            :color="getIssueStatusColor(option.value)"
+                                            size="x-small"
+                                            class="status-indicator"
+                                        />
+                                    </template>
+                                </v-list-item>
 
-                                <q-item clickable v-close-popup @click="onDeleteIssue(issue.id)">
-                                    <q-item-section class="text-negative">
+                                <v-divider />
+
+                                <v-list-item @click="onDeleteIssue(issue.id)" class="text-error">
+                                    <v-list-item-title>
                                         {{ t("Global.delete") }}
-                                    </q-item-section>
-                                </q-item>
-                            </q-list>
-                        </q-menu>
-                    </q-btn>
-                </q-item-section>
-            </q-item>
-        </q-list>
+                                    </v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </template>
+                </v-list-item>
+
+                <v-divider v-if="index < issueReports.length - 1" />
+            </template>
+        </v-list>
 
         <FTCenteredText v-else>
             {{ t("PageAdminIssueReports.noIssuesMessage") }}
         </FTCenteredText>
     </div>
 </template>
+
+<style scoped>
+.v-list-item {
+    padding: 16px;
+}
+
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    min-width: 12px;
+}
+</style>

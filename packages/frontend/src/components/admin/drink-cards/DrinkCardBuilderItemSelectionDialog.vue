@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { DrinkCardItem, InventoryItemDoc } from "@firetable/types";
 
+import { refDebounced } from "@vueuse/core";
 import { uniq } from "es-toolkit";
 import { property } from "es-toolkit/compat";
 import { computed, ref } from "vue";
@@ -18,8 +19,10 @@ interface Props {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 const { t } = useI18n();
-const searchQuery = ref("");
 const selectedCategories = ref<string[]>([]);
+
+const immediateSearchQuery = ref("");
+const searchQuery = refDebounced(immediateSearchQuery, 300);
 
 const categories = computed(function () {
     const mainCategories = props.inventoryItems.map(property("mainCategory"));
@@ -62,56 +65,49 @@ function toggleCategory(category: string): void {
 </script>
 
 <template>
-    <!-- Category Pills -->
-    <q-card-section class="q-pa-none">
-        <div class="q-gutter-sm q-mb-md flex-wrap justify-center">
-            <q-chip
-                clickable
-                v-for="category in categories"
-                :key="category"
-                outline
-                :color="isCategorySelected(category) ? 'primary' : ''"
-                @click="toggleCategory(category)"
-                class="cursor-pointer"
-            >
-                {{ category }}
-            </q-chip>
-        </div>
-    </q-card-section>
+    <div>
+        <v-card-text>
+            <div class="d-flex flex-wrap justify-center mb-4" style="gap: 8px">
+                <v-chip
+                    v-for="category in categories"
+                    :key="category"
+                    :variant="isCategorySelected(category) ? 'elevated' : 'outlined'"
+                    :color="isCategorySelected(category) ? 'primary' : 'default'"
+                    @click="toggleCategory(category)"
+                    style="cursor: pointer"
+                >
+                    {{ category }}
+                </v-chip>
+            </div>
+        </v-card-text>
 
-    <q-card-section class="q-pa-none">
-        <q-input
-            v-model="searchQuery"
-            outlined
-            debounce="300"
-            :placeholder="t('DrinkCardBuilderItemSelectionDialog.searchItemsPlaceholder')"
-            class="q-mb-md"
-        >
-            <template #prepend>
-                <q-icon name="fa fa-search" />
-            </template>
-        </q-input>
+        <v-card-text class="pt-0">
+            <v-text-field
+                v-model="immediateSearchQuery"
+                variant="outlined"
+                :placeholder="t('DrinkCardBuilderItemSelectionDialog.searchItemsPlaceholder')"
+                class="mb-4"
+                prepend-inner-icon="fas fa-search"
+                clearable
+                hide-details
+            />
 
-        <q-list separator>
-            <q-item
-                v-for="item in filteredItems"
-                :key="'id' in item ? item.id : item.inventoryItemId"
-                clickable
-                @click="handleSelect(item)"
-            >
-                <q-item-section>
-                    <q-item-label>{{ item.name }}</q-item-label>
-                    <q-item-label caption>{{ item.mainCategory }}</q-item-label>
-                </q-item-section>
-            </q-item>
+            <v-list lines="two" style="max-height: 400px; overflow-y: auto">
+                <v-list-item
+                    v-for="item in filteredItems"
+                    :key="'id' in item ? item.id : item.inventoryItemId"
+                    @click="handleSelect(item)"
+                >
+                    <v-list-item-title>{{ item.name }}</v-list-item-title>
+                    <v-list-item-subtitle>{{ item.mainCategory }}</v-list-item-subtitle>
+                </v-list-item>
 
-            <q-item v-if="filteredItems.length === 0">
-                <q-item-section class="text-center text-grey">
+                <div v-if="filteredItems.length === 0" class="text-center text-grey-darken-1 pa-4">
                     {{ t("DrinkCardBuilderItemSelectionDialog.noItemsFoundText") }}
-                </q-item-section>
-            </q-item>
-        </q-list>
-    </q-card-section>
+                </div>
+            </v-list>
+        </v-card-text>
+    </div>
 </template>
 
 <style lang="scss" scoped>

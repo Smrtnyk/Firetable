@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { CreateGuestPayload } from "@firetable/types";
+import type { VForm } from "vuetify/components/VForm";
 
-import { QForm } from "quasar";
 import TelNumberInput from "src/components/TelNumberInput/TelNumberInput.vue";
 import { capitalizeName } from "src/helpers/capitalize-name";
-import { minLength } from "src/helpers/form-rules";
+import { minLength, validateForm } from "src/helpers/form-rules";
 import { hashString } from "src/helpers/hash-string";
 import { maskPhoneNumber } from "src/helpers/mask-phone-number";
 import { ref, useTemplateRef } from "vue";
@@ -27,7 +27,7 @@ const { t } = useI18n();
 const guestName = ref("");
 const guestContact = ref("");
 const guestTags = ref<string[]>([]);
-const createGuestForm = useTemplateRef<QForm>("createGuestForm");
+const createGuestForm = useTemplateRef<VForm>("createGuestForm");
 const guestNameRules = [minLength(t("AddNewGuestForm.validation.nameMinLength"), 3)];
 
 if (mode === "edit" && initialData) {
@@ -40,17 +40,14 @@ function capitalizeGuestName(): void {
     guestName.value = capitalizeName(guestName.value);
 }
 
-function onNewTag(inputValue: string, done: (item?: any) => void): void {
-    const trimmedValue = inputValue.trim();
-    if (trimmedValue === "") {
-        done();
-        return;
-    }
-    done(trimmedValue.toLowerCase());
+function handleTagsUpdate(newTags: string[]): void {
+    guestTags.value = newTags
+        .map((tag) => tag.trim().toLowerCase())
+        .filter((tag, index, arr) => tag !== "" && arr.indexOf(tag) === index);
 }
 
 async function submit(): Promise<void> {
-    if (!(await createGuestForm.value?.validate())) {
+    if (!(await validateForm(createGuestForm.value))) {
         return;
     }
 
@@ -72,45 +69,37 @@ async function submit(): Promise<void> {
 </script>
 
 <template>
-    <q-card-section>
-        <q-form ref="createGuestForm" class="q-gutter-md" greedy>
-            <q-input
-                :label="t('AddNewGuestForm.guestNameInputLabel')"
+    <v-card-text>
+        <v-form ref="createGuestForm" class="d-flex flex-column ga-4">
+            <v-text-field
                 v-model="guestName"
-                outlined
+                :label="t('AddNewGuestForm.guestNameInputLabel')"
+                variant="outlined"
                 autofocus
-                @blur="capitalizeGuestName"
                 :rules="guestNameRules"
+                @blur="capitalizeGuestName"
             />
-            <TelNumberInput required v-model="guestContact" />
 
-            <q-select
-                v-model="guestTags"
+            <TelNumberInput v-model="guestContact" required />
+
+            <v-combobox
+                :model-value="guestTags"
+                @update:model-value="handleTagsUpdate"
                 :label="t('Global.tagsLabel')"
-                outlined
-                use-input
-                use-chips
+                :aria-label="t('Global.tagsLabel')"
+                variant="outlined"
                 multiple
-                emit-value
-                map-options
-                input-debounce="0"
-                hide-dropdown-icon
-                fill-input
-                clear-icon="fa fa-close"
-                @new-value="onNewTag"
-                new-value-mode="add-unique"
-                :options="[]"
+                chips
+                closable-chips
+                :items="[]"
+                hide-no-data
             />
-        </q-form>
-    </q-card-section>
+        </v-form>
+    </v-card-text>
 
-    <q-card-actions align="right">
-        <q-btn
-            rounded
-            class="button-gradient"
-            size="md"
-            :label="t('Global.submit')"
-            @click="submit"
-        />
-    </q-card-actions>
+    <v-card-actions class="justify-end">
+        <v-btn rounded variant="flat" color="primary" size="default" @click="submit">
+            {{ t("Global.submit") }}
+        </v-btn>
+    </v-card-actions>
 </template>

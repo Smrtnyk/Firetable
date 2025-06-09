@@ -116,9 +116,9 @@ describe("EditVisitDialog", () => {
             const cancelledToggle = screen.getByLabelText(t("Global.cancelled"));
             const vipToggle = screen.getByLabelText("VIP");
 
-            await expect.element(arrivedToggle).toHaveAttribute("aria-checked", "true");
-            await expect.element(cancelledToggle).toHaveAttribute("aria-checked", "false");
-            await expect.element(vipToggle).toHaveAttribute("aria-checked", "true");
+            await expect.element(arrivedToggle).toBeChecked();
+            await expect.element(cancelledToggle).not.toBeChecked();
+            await expect.element(vipToggle).toBeChecked();
         });
     });
 });

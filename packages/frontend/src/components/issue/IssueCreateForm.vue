@@ -2,7 +2,6 @@
 import type { IssueReportDoc } from "@firetable/types";
 
 import { IssueCategory } from "@firetable/types";
-import { QForm } from "quasar";
 import { minLength } from "src/helpers/form-rules";
 import { ref, useTemplateRef } from "vue";
 import { useI18n } from "vue-i18n";
@@ -22,23 +21,24 @@ const emit =
 
 const issueDescription = ref(props.issueToEdit?.description ?? "");
 const selectedCategory = ref<IssueCategory>(props.issueToEdit?.category ?? IssueCategory.BUG);
-const issueForm = useTemplateRef<QForm>("issueForm");
+const issueForm = useTemplateRef("issueForm");
 
 const descriptionRules = [minLength(t("IssueCreateForm.validation.descriptionMinLength"), 10)];
 
 const categoryOptions = [
     {
-        label: t("PageIssueReport.categories.bug"),
+        title: t("PageIssueReport.categories.bug"),
         value: IssueCategory.BUG,
     },
     {
-        label: t("PageIssueReport.categories.feature_request"),
+        title: t("PageIssueReport.categories.feature_request"),
         value: IssueCategory.FEATURE_REQUEST,
     },
 ];
 
 async function submit(): Promise<void> {
-    if (!(await issueForm.value?.validate())) {
+    const { valid } = (await issueForm.value?.validate()) ?? { valid: false };
+    if (!valid) {
         return;
     }
 
@@ -56,35 +56,29 @@ async function submit(): Promise<void> {
 </script>
 
 <template>
-    <q-form ref="issueForm" @submit="submit">
-        <q-select
+    <v-form ref="issueForm" @submit.prevent="submit">
+        <v-select
             v-model="selectedCategory"
-            :options="categoryOptions"
+            :items="categoryOptions"
             :label="t('PageIssueReport.categoryLabel')"
-            class="q-mb-md"
-            outlined
-            emit-value
-            map-options
+            class="mb-4"
+            variant="outlined"
         />
 
-        <q-input
+        <v-textarea
             v-model="issueDescription"
-            type="textarea"
             :label="t('PageIssueReport.descriptionLabel')"
             :hint="t('PageIssueReport.descriptionHint')"
             :rules="descriptionRules"
             rows="6"
-            class="q-mb-md"
-            outlined
+            class="mb-4"
+            variant="outlined"
         />
 
-        <div class="row justify-end">
-            <q-btn
-                :label="t(props.issueToEdit ? 'Global.edit' : 'Global.submit')"
-                type="submit"
-                rounded
-                class="button-gradient"
-            />
+        <div class="d-flex justify-end">
+            <v-btn flat type="submit" rounded="lg" color="primary">
+                {{ t(props.issueToEdit ? "Global.edit" : "Global.submit") }}
+            </v-btn>
         </div>
-    </q-form>
+    </v-form>
 </template>

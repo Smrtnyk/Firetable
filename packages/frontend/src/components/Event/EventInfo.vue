@@ -2,6 +2,7 @@
 import type { FloorDoc, ReservationDoc } from "@firetable/types";
 
 import AdminEventRTInfo from "src/components/admin/event/AdminEventRTInfo.vue";
+import FTCard from "src/components/FTCard.vue";
 
 interface Props {
     activeReservations: ReservationDoc[];
@@ -16,9 +17,9 @@ const props = defineProps<Props>();
 <template>
     <div>
         <!-- Event Info -->
-        <q-card v-if="props.eventInfo" class="q-mt-md ft-card">
+        <FTCard v-if="props.eventInfo" class="mt-md">
             <div>{{ props.eventInfo }}</div>
-        </q-card>
+        </FTCard>
 
         <!-- Overview Stats -->
         <AdminEventRTInfo

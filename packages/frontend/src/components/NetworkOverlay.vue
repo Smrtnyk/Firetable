@@ -1,19 +1,24 @@
 <template>
-    <q-dialog :model-value="!isOnline" persistent maximized>
-        <q-card class="flex flex-center column justify-center" style="height: 100%">
-            <div class="text-h6 q-mb-md">
+    <v-dialog :model-value="!isOnline" persistent fullscreen>
+        <v-card class="d-flex flex-column justify-center align-center h-100">
+            <div class="text-h6 mb-4">
                 <FTCenteredText>
-                    <q-spinner color="primary" /> {{ t("NetworkOverlay.noInternetConnectionText") }}
+                    <v-progress-circular
+                        indeterminate
+                        color="primary"
+                        class="mr-2"
+                    ></v-progress-circular>
+                    {{ t("NetworkOverlay.noInternetConnectionText") }}
                 </FTCenteredText>
             </div>
             <p class="text-subtitle1">{{ t("NetworkOverlay.waitOrReloadText") }}</p>
             <p>
-                <q-btn rounded class="button-gradient" @click="refreshApp">{{
+                <v-btn flat rounded="lg" color="primary" @click="refreshApp">{{
                     t("NetworkOverlay.reloadButtonLabel")
-                }}</q-btn>
+                }}</v-btn>
             </p>
-        </q-card>
-    </q-dialog>
+        </v-card>
+    </v-dialog>
 </template>
 
 <script setup lang="ts">
