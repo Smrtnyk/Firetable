@@ -25,7 +25,7 @@ const emit = defineEmits<Emits>();
 </script>
 
 <template>
-    <q-item class="ft-border ft-card">
+    <q-item class="ft-card">
         <q-item-section avatar class="q-ml-lg">
             <q-icon name="fa fa-bars" class="cursor-move" />
         </q-item-section>

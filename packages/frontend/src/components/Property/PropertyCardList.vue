@@ -4,7 +4,6 @@ import type { PropertyDoc } from "@firetable/types";
 import PropertyCard from "src/components/Property/PropertyCard.vue";
 
 interface Props {
-    aspectRatio: number;
     properties: PropertyDoc[];
 }
 const props = defineProps<Props>();
@@ -17,7 +16,7 @@ const props = defineProps<Props>();
             class="col-12 col-sm-6 q-pa-xs"
             :key="property.id"
         >
-            <PropertyCard :property="property" :aspect-ratio="props.aspectRatio" />
+            <PropertyCard :property="property" />
         </div>
     </div>
 </template>

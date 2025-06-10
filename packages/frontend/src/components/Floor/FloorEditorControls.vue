@@ -336,7 +336,7 @@ function updateLineWidth(width: unknown): void {
                 draggable="true"
                 v-for="element in ELEMENTS_TO_ADD_COLLECTION"
                 :key="element.tag"
-                class="col-5 justify-even text-center q-my-sm ft-border q-py-sm"
+                class="col-5 justify-even text-center q-my-sm q-py-sm"
                 @dragstart="onDragStart($event, element.tag)"
             >
                 <p>{{ element.label }}</p>

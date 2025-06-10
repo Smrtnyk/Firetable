@@ -154,7 +154,7 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
             <template v-for="element in draggableElements" :key="element.id">
                 <!-- Header -->
                 <template v-if="isHeader(element)">
-                    <q-item class="ft-card ft-border drag-item">
+                    <q-item class="ft-card drag-item">
                         <q-item-section avatar>
                             <q-icon name="fa fa-bars" class="cursor-move drag-handle" />
                         </q-item-section>
@@ -181,7 +181,7 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
 
                 <!-- Header End -->
                 <template v-else-if="isHeaderEnd(element)">
-                    <q-item class="ft-card ft-border drag-item">
+                    <q-item class="ft-card drag-item">
                         <q-item-section avatar>
                             <q-icon name="fa fa-bars" class="cursor-move drag-handle" />
                         </q-item-section>
@@ -203,7 +203,7 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
 
                 <!-- Bundle -->
                 <template v-else-if="isBundle(element)">
-                    <q-item class="ft-card ft-border drag-item">
+                    <q-item class="ft-card drag-item">
                         <q-item-section avatar>
                             <q-icon name="fa fa-bars" class="cursor-move drag-handle" />
                         </q-item-section>
@@ -236,10 +236,7 @@ function updateSectionItems(sectionId: string, items: DrinkCardItem[]): void {
 
                 <!-- Root Level Section -->
                 <template v-else-if="isSection(element)">
-                    <q-expansion-item
-                        class="ft-card ft-border drag-item"
-                        :data-section-id="element.id"
-                    >
+                    <q-expansion-item class="ft-card drag-item" :data-section-id="element.id">
                         <template #header>
                             <q-item-section avatar>
                                 <q-icon name="fa fa-bars" class="cursor-move drag-handle" />

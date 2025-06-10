@@ -201,7 +201,7 @@ function triggerFileInput(): void {
 
             <div class="col-12 col-md-6">
                 <div class="text-subtitle2 q-mb-sm">Optional background image</div>
-                <q-responsive class="preview-container col-12 ft-border" ratio="1">
+                <q-responsive class="preview-container col-12" ratio="1">
                     <template v-if="form.backgroundImage">
                         <q-img :src="form.backgroundImage" class="preview-image" alt="" />
                         <div>

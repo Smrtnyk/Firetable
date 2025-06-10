@@ -25,10 +25,10 @@ const subtitleClass = computed(() => {
             </div>
 
             <div>
-                <h3 aria-level="3" :class="['ft-title', 'q-ma-none', titleClass]">
+                <h3 aria-level="3" :class="['ft-title', 'q-my-none', titleClass]">
                     {{ title }}
                 </h3>
-                <h6 v-if="subtitle" :class="['ft-subtitle', 'q-ma-none', subtitleClass]">
+                <h6 v-if="subtitle" :class="['ft-subtitle', 'q-my-none', subtitleClass]">
                     {{ subtitle }}
                 </h6>
             </div>

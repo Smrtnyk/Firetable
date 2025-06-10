@@ -4,7 +4,6 @@ import type { PropertyDoc } from "@firetable/types";
 import { computed } from "vue";
 
 interface Props {
-    aspectRatio: number;
     property: PropertyDoc;
 }
 
@@ -17,7 +16,7 @@ const backgroundImageUrl = computed(function () {
 
 <template>
     <div
-        class="PropertyCard ft-card ft-border"
+        class="PropertyCard ft-card"
         :style="{
             backgroundImage: `url(${backgroundImageUrl})`,
             backgroundPosition: 'center',
@@ -36,7 +35,7 @@ const backgroundImageUrl = computed(function () {
                 },
             }"
         >
-            <q-responsive :ratio="props.aspectRatio">
+            <q-responsive :ratio="16 / 9">
                 <div class="PropertyCard__content column">
                     <q-space />
 
