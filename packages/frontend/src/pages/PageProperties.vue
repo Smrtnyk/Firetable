@@ -22,6 +22,7 @@ const props = defineProps<Props>();
 const router = useRouter();
 const propertiesStore = usePropertiesStore();
 const permissionsStore = usePermissionsStore();
+import FTTitle from "src/components/FTTitle.vue";
 import { useDialog } from "src/composables/useDialog";
 import { createNewProperty } from "src/db";
 import { tryCatchLoadingWrapper } from "src/helpers/ui-helpers";
@@ -93,6 +94,7 @@ async function onVenueCreate(payload: CreatePropertyPayload): Promise<void> {
 
 <template>
     <div class="PageHome">
+        <FTTitle title="Venues" />
         <PropertyCardList
             v-if="properties.length > 0"
             :properties="properties"

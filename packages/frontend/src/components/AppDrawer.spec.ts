@@ -74,7 +74,7 @@ describe("AppDrawer", () => {
             expect(Dark.isActive).toBe(false);
 
             const initialDarkModeInStorage = localStorage.getItem("FTDarkMode");
-            await userEvent.click(screen.getByText("Toggle dark mode"));
+            await userEvent.click(screen.getByLabelText("Toggle dark mode"));
 
             await expect.poll(() => Dark.isActive).toBe(true);
 
@@ -128,11 +128,7 @@ describe("AppDrawer", () => {
         it("changes language when a new language is selected", async () => {
             renderAppDrawer();
 
-            await expect
-                .element(screen.getByText("Logout", { exact: true }), { timeout: 2000 })
-                .toBeVisible();
-
-            await userEvent.click(screen.getByLabelText("Language"));
+            await userEvent.click(screen.getByLabelText("Language switcher"));
             await userEvent.click(screen.getByRole("option", { name: "German" }));
 
             await expect
@@ -149,7 +145,6 @@ describe("AppDrawer", () => {
                 expectedSnapshot: `
                 - Manage Organisations
                 - Issue Reports Overview
-                - Logout
                 `,
                 role: AdminRole.ADMIN,
             },
@@ -167,7 +162,6 @@ describe("AppDrawer", () => {
                 - Manage Properties
                 - Report an Issue
                 - Settings
-                - Logout
                 `,
                 role: Role.PROPERTY_OWNER,
             },
@@ -184,7 +178,6 @@ describe("AppDrawer", () => {
                 - Guestbook
                 - Report an Issue
                 - Settings
-                - Logout
                 `,
                 role: Role.MANAGER,
             },
@@ -194,7 +187,6 @@ describe("AppDrawer", () => {
                 expectedSnapshot: `
                 - Guestbook
                 - Report an Issue
-                - Logout
                 `,
                 role: Role.HOSTESS,
             },
@@ -226,7 +218,6 @@ describe("AppDrawer", () => {
                 description: "Staff with no special permissions",
                 expectedSnapshot: `
                 - Report an Issue
-                - Logout
                 `,
             },
             {
@@ -238,7 +229,6 @@ describe("AppDrawer", () => {
                 expectedSnapshot: `
                 - Manage Inventory
                 - Report an Issue
-                - Logout
                 `,
             },
             {
@@ -252,7 +242,6 @@ describe("AppDrawer", () => {
                 - Manage Floors
                 - Manage Inventory
                 - Report an Issue
-                - Logout
                 `,
             },
             {
@@ -280,7 +269,6 @@ describe("AppDrawer", () => {
                 - Manage Inventory
                 - Guestbook
                 - Report an Issue
-                - Logout
                 `,
             },
         ];

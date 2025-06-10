@@ -38,6 +38,7 @@ function getInitialForm(): CreateDrinkCardPayload {
     }
 
     return {
+        backgroundImage: "",
         description: "",
         elements: [],
         isActive: true,

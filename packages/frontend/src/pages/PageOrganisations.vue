@@ -7,6 +7,7 @@ import AddNewOrganisationForm from "src/components/admin/organisation/AddNewOrga
 import FTBtn from "src/components/FTBtn.vue";
 import FTCenteredText from "src/components/FTCenteredText.vue";
 import FTDialog from "src/components/FTDialog.vue";
+import FTTitle from "src/components/FTTitle.vue";
 import { useDialog } from "src/composables/useDialog";
 import { createNewOrganisation } from "src/db";
 import {
@@ -59,6 +60,8 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 
 <template>
     <div class="PageOrganisations">
+        <FTTitle title="Organisations" />
+
         <div class="row q-col-gutter-md" v-if="organisations.length > 0">
             <div
                 class="col-12 col-sm-6 col-lg-4"
@@ -131,7 +134,7 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 
                         <!-- Action Section -->
                         <div class="OrganisationCard__action">
-                            <span>{{ t("common.viewDetails", "View Details") }}</span>
+                            <span>View Details</span>
                             <i class="fas fa-arrow-right" />
                         </div>
                     </div>
@@ -158,23 +161,24 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 
 <style lang="scss" scoped>
 .OrganisationCard {
-    background: white;
-    border-radius: 16px;
+    background: $surface-elevated;
+    border-radius: $generic-border-radius;
     padding: 24px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: $box-shadow;
+    border: 1px solid $border-light;
     height: 100%;
     display: flex;
     flex-direction: column;
 
     &:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        border-color: rgba(99, 102, 241, 0.2);
+        box-shadow:
+            0 8px 24px rgba(0, 0, 0, 0.12),
+            0 0 0 1px rgba($primary, 0.2);
+        border-color: rgba($primary, 0.2);
 
         .OrganisationCard__action {
-            background: #6366f1;
+            background: $primary;
             color: white;
 
             i {
@@ -199,8 +203,8 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
     &__icon {
         width: 48px;
         height: 48px;
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        border-radius: 12px;
+        background: $gradient-primary;
+        border-radius: $generic-border-radius;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -210,7 +214,7 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 
     &__status {
         &-chip {
-            border-radius: 8px !important;
+            border-radius: $button-border-radius !important;
             font-weight: 600;
         }
     }
@@ -222,7 +226,7 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
             margin: 0;
             font-size: 20px;
             font-weight: 700;
-            color: #111827;
+            color: $text-primary;
             line-height: 1.3;
         }
     }
@@ -240,19 +244,19 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
         align-items: center;
         gap: 12px;
         padding: 12px;
-        background: #f8fafc;
-        border-radius: 10px;
-        border: 1px solid #e2e8f0;
+        background: $surface-secondary;
+        border-radius: $button-border-radius;
+        border: 1px solid $border-light;
 
         &-icon {
             width: 32px;
             height: 32px;
-            background: #e0e7ff;
-            border-radius: 8px;
+            background: rgba($primary, 0.1);
+            border-radius: $button-border-radius;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #6366f1;
+            color: $primary;
             font-size: 14px;
         }
 
@@ -264,7 +268,7 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 
         &-label {
             font-size: 12px;
-            color: #64748b;
+            color: $text-tertiary;
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -272,7 +276,7 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 
         &-value {
             font-size: 16px;
-            color: #1e293b;
+            color: $text-primary;
             font-weight: 700;
             margin-top: 2px;
         }
@@ -283,12 +287,12 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
         align-items: center;
         justify-content: space-between;
         padding: 12px 16px;
-        background: #f1f5f9;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
+        background: $surface-secondary;
+        border: 1px solid $border-light;
+        border-radius: $button-border-radius;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-weight: 600;
-        color: #475569;
+        color: $text-secondary;
         font-size: 14px;
 
         i {
@@ -300,45 +304,49 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 
 // Dark mode support
 .body--dark .OrganisationCard {
-    background: #1e293b;
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+    background: $surface-elevated-dark;
+    border-color: $border-light-dark;
+    box-shadow:
+        0 2px 12px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
 
     &:hover {
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-        border-color: rgba(99, 102, 241, 0.4);
+        box-shadow:
+            0 4px 16px rgba(0, 0, 0, 0.4),
+            0 0 0 1px rgba($primary, 0.4);
+        border-color: rgba($primary, 0.4);
     }
 
     .OrganisationCard__title h3 {
-        color: #f1f5f9;
+        color: $text-primary-dark;
     }
 
     .OrganisationCard__stat {
-        background: #334155;
-        border-color: #475569;
+        background: $surface-container-dark;
+        border-color: $border-light-dark;
 
         &-icon {
-            background: rgba(99, 102, 241, 0.2);
-            color: #a5b4fc;
+            background: rgba($primary, 0.2);
+            color: $accent;
         }
 
         &-label {
-            color: #94a3b8;
+            color: $text-tertiary-dark;
         }
 
         &-value {
-            color: #f1f5f9;
+            color: $text-primary-dark;
         }
     }
 
     .OrganisationCard__action {
-        background: #334155;
-        border-color: #475569;
-        color: #cbd5e1;
+        background: $surface-container-dark;
+        border-color: $border-light-dark;
+        color: $text-secondary-dark;
 
         &:hover {
-            background: #6366f1;
-            border-color: #6366f1;
+            background: $primary;
+            border-color: $primary;
             color: white;
         }
     }

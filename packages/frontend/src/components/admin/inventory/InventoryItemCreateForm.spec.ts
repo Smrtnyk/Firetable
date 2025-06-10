@@ -70,10 +70,15 @@ describe("InventoryItemCreateForm.vue", () => {
 
             const submittedItem = emittedEvents[0][0];
             expect(submittedItem).toStrictEqual({
+                brand: "",
+                customProperties: {},
+                description: "",
                 isActive: true,
                 mainCategory: DrinkMainCategory.SPIRITS,
                 name: "Test Vodka",
                 quantity: 50,
+                region: "",
+                style: null,
                 subCategory: SpiritSubCategory.VODKA,
                 supplier: "",
                 type: InventoryItemType.DRINK,
@@ -84,10 +89,15 @@ describe("InventoryItemCreateForm.vue", () => {
 
     describe("edit", () => {
         const itemToEdit: CreateInventoryItemPayload = {
+            brand: "Red Bull GmbH",
+            customProperties: {},
+            description: "Popular energy drink",
             isActive: true,
             mainCategory: DrinkMainCategory.NON_ALCOHOLIC,
             name: "Red Bull",
             quantity: 10,
+            region: "Austria",
+            style: null,
             subCategory: NonAlcoholicCategory.ENERGY_DRINK,
             supplier: "Red Bull GmbH",
             type: InventoryItemType.DRINK,
@@ -137,10 +147,15 @@ describe("InventoryItemCreateForm.vue", () => {
 
     describe("initialData", () => {
         const initialData: CreateInventoryItemPayload = {
+            brand: "Red Bull GmbH",
+            customProperties: {},
+            description: "Popular energy drink",
             isActive: true,
             mainCategory: DrinkMainCategory.NON_ALCOHOLIC,
             name: "Red Bull",
             quantity: 0,
+            region: "Austria",
+            style: null,
             subCategory: NonAlcoholicCategory.ENERGY_DRINK,
             supplier: "Red Bull GmbH",
             type: InventoryItemType.DRINK,

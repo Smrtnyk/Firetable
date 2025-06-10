@@ -69,12 +69,6 @@ const backgroundImageUrl = computed(function () {
 
                     <!-- Title -->
                     <h3 class="EventCard__title">{{ event.name }}</h3>
-
-                    <!-- Action Button -->
-                    <div class="EventCard__action">
-                        <span>{{ t("EventCard.viewDetails", "View Details") }}</span>
-                        <i class="fas fa-arrow-right" />
-                    </div>
                 </div>
             </div>
         </router-link>
@@ -83,31 +77,19 @@ const backgroundImageUrl = computed(function () {
 
 <style lang="scss" scoped>
 .EventCard {
-    background: white;
-    border-radius: 20px;
+    background: $surface-elevated;
+    border-radius: $generic-border-radius;
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-    box-shadow:
-        0 2px 10px rgba(0, 0, 0, 0.08),
-        0 0 0 1px rgba(0, 0, 0, 0.05);
+    box-shadow: $box-shadow;
 
     &:hover {
-        transform: translateY(-8px) scale(1.02);
         box-shadow:
-            0 20px 40px rgba(0, 0, 0, 0.15),
+            0 10px 20px rgba(0, 0, 0, 0.15),
             0 0 0 1px rgba(0, 0, 0, 0.1);
 
         .EventCard__image {
-            transform: scale(1.1);
-        }
-
-        .EventCard__action {
-            background: #6366f1;
-            color: white;
-
-            i {
-                transform: translateX(4px);
-            }
+            transform: scale(1.05);
         }
     }
 
@@ -144,18 +126,18 @@ const backgroundImageUrl = computed(function () {
         right: 16px;
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(10px);
-        border-radius: 12px;
+        border-radius: $button-border-radius;
         padding: 8px 12px;
         display: flex;
         align-items: center;
         gap: 6px;
         font-weight: 600;
         font-size: 14px;
-        color: #1f2937;
+        color: $text-primary;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
         i {
-            color: #10b981;
+            color: $positive;
             font-size: 12px;
         }
     }
@@ -178,12 +160,12 @@ const backgroundImageUrl = computed(function () {
         display: flex;
         align-items: center;
         gap: 8px;
-        color: #6b7280;
+        color: $text-secondary;
         font-size: 14px;
         font-weight: 500;
 
         i {
-            color: #8b5cf6;
+            color: $accent;
             width: 16px;
             text-align: center;
         }
@@ -192,38 +174,18 @@ const backgroundImageUrl = computed(function () {
     &__title {
         font-size: 20px;
         font-weight: 700;
-        color: #111827;
         line-height: 1.3;
-        margin: 0 0 24px 0;
+        margin: 0;
         flex: 1;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
-
-    &__action {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 20px;
-        border: 2px solid #e5e7eb;
-        border-radius: 12px;
-        background: #f9fafb;
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        font-weight: 600;
-        color: #374151;
-
-        i {
-            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            font-size: 14px;
-        }
-    }
 }
 
-// Dark mode support
 .body--dark .EventCard {
-    background: #1f2937;
+    background: $surface-elevated-dark;
     box-shadow:
         0 2px 10px rgba(0, 0, 0, 0.3),
         0 0 0 1px rgba(255, 255, 255, 0.1);
@@ -235,33 +197,24 @@ const backgroundImageUrl = computed(function () {
     }
 
     .EventCard__price-tag {
-        background: rgba(31, 41, 55, 0.95);
-        color: #f9fafb;
+        background: rgba($surface-elevated-dark, 0.95);
+        color: $text-primary-dark;
+
+        i {
+            color: $positive;
+        }
     }
 
     .EventCard__date,
     .EventCard__time {
-        color: #9ca3af;
-    }
+        color: $text-secondary-dark;
 
-    .EventCard__title {
-        color: #f9fafb;
-    }
-
-    .EventCard__action {
-        background: #374151;
-        border-color: #4b5563;
-        color: #e5e7eb;
-
-        &:hover {
-            background: #6366f1;
-            border-color: #6366f1;
-            color: white;
+        i {
+            color: $accent;
         }
     }
 }
 
-// Responsive adjustments
 @media (max-width: 768px) {
     .EventCard {
         &__image-section {
@@ -273,18 +226,12 @@ const backgroundImageUrl = computed(function () {
         }
 
         &__meta {
-            flex-direction: column;
-            gap: 8px;
+            flex-direction: row;
+            gap: 16px;
         }
 
         &__title {
             font-size: 18px;
-            margin-bottom: 20px;
-        }
-
-        &__action {
-            padding: 10px 16px;
-            font-size: 14px;
         }
     }
 }
@@ -301,7 +248,6 @@ const backgroundImageUrl = computed(function () {
 
         &__title {
             font-size: 16px;
-            margin-bottom: 16px;
         }
     }
 }

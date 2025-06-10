@@ -69,15 +69,18 @@ function handleAddItem(inventoryItem: InventoryItemDoc): void {
     };
 
     const newItem: DrinkCardItem = {
+        // The Default value will be overwritten if an item is a drink
+        alcoholContent: null,
         brand: inventoryItem.brand,
+        customNote: "",
         description: inventoryItem.description,
         displayAlcoholContent:
             isDrinkItem(inventoryItem) && inventoryItem.alcoholContent !== undefined,
         displayOrigin: inventoryItem.region !== undefined,
+
         inventoryItemId: inventoryItem.id,
         // Default display settings
         isHighlighted: false,
-
         isVisible: true,
         mainCategory: inventoryItem.mainCategory,
         // Copy relevant inventory fields
@@ -86,9 +89,9 @@ function handleAddItem(inventoryItem: InventoryItemDoc): void {
         price: 0,
         region: inventoryItem.region,
         servingSize,
+
         specialPrice: createEmptySpecialPrice(),
         style: inventoryItem.style,
-
         subCategory: inventoryItem.subCategory,
         tags: [],
         type: inventoryItem.type,
