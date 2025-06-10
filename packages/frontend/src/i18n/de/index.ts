@@ -302,6 +302,14 @@ const de: TranslationStructure = {
             "Fehler beim Importieren der Artikel. Bitte überprüfen Sie das Dateiformat und versuchen Sie es erneut.",
         importMergeSuccess:
             "Artikel erfolgreich importiert. {count} Artikel hinzugefügt, {updated} aktualisiert",
+        itemMainCategory: {
+            beer: "Bier",
+            "cocktail-components": "Cocktail-Zutaten",
+            "non-alcoholic": "Alkoholfrei",
+            spirits: "Spirituosen",
+            tobacco: "Tabak",
+            wine: "Wein",
+        },
         noItemsMessage: "Es sind keine Artikel im Inventar vorhanden.",
         title: "Inventar",
     },

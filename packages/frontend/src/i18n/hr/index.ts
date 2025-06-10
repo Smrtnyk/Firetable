@@ -299,6 +299,14 @@ const hr: TranslationStructure = {
             "Pogreška pri uvozu artikala. Molimo provjerite format datoteke i pokušajte ponovno.",
         importMergeSuccess:
             "Artikli uspješno uvezeni. {count} artikala dodano, {updated} ažurirano",
+        itemMainCategory: {
+            beer: "Pivo",
+            "cocktail-components": "Komponente koktela",
+            "non-alcoholic": "Bezalkoholno",
+            spirits: "Žestoka pića",
+            tobacco: "Tobak",
+            wine: "Vino",
+        },
         noItemsMessage: "Nema artikala u zalihama.",
         title: "Zalihe",
     },

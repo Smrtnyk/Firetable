@@ -15,17 +15,17 @@
         "seed:admin:only": "npx tsx seeds/scripts/seed.ts --only-admin"
     },
     "dependencies": {
-        "es-toolkit": "1.39.1",
+        "es-toolkit": "1.39.3",
         "firebase-admin": "13.4.0",
         "firebase-functions": "6.3.2"
     },
     "devDependencies": {
         "@faker-js/faker": "9.8.0",
         "@firebase/rules-unit-testing": "4.0.1",
-        "@types/node": "22.15.30",
+        "@types/node": "24.0.0",
         "cac": "6.7.14",
         "tinyrainbow": "2.0.0",
-        "vitest": "3.2.2",
+        "vitest": "3.2.3",
         "knip": "5.60.2",
         "typescript": "5.8.3",
         "tsx": "4.19.4"

@@ -82,6 +82,12 @@ async function deleteItem(item: InventoryItemDoc): Promise<void> {
     }).catch(AppLogger.error.bind(AppLogger));
 }
 
+// i18n-scan: "PageAdminInventory.itemMainCategory.beer"
+// i18n-scan: "PageAdminInventory.itemMainCategory.wine"
+// i18n-scan: "PageAdminInventory.itemMainCategory.spirits"
+// i18n-scan: "PageAdminInventory.itemMainCategory.cocktail-components"
+// i18n-scan: "PageAdminInventory.itemMainCategory.non-alcoholic"
+// i18n-scan: "PageAdminInventory.itemMainCategory.tobacco"
 function getCategoryTitle(category: InventoryItemDoc["mainCategory"]): string {
     return t(`PageAdminInventory.itemMainCategory.${category}`);
 }

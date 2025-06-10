@@ -24,7 +24,7 @@
     },
     "devDependencies": {
         "@types/hammerjs": "2.0.46",
-        "@types/node": "22.15.30",
+        "@types/node": "24.0.0",
         "@vitest/browser": "catalog:",
         "jsondiffpatch": "0.7.3",
         "vitest": "catalog:",

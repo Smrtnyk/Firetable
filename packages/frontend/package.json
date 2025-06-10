@@ -19,8 +19,8 @@
     },
     "devDependencies": {
         "@pinia/testing": "1.0.2",
-        "@playwright/test": "1.52.0",
-        "@quasar/app-vite": "2.2.0",
+        "@playwright/test": "1.53.0",
+        "@quasar/app-vite": "2.2.1",
         "@quasar/vite-plugin": "1.9.0",
         "@types/papaparse": "5.3.16",
         "@types/qrcode": "1.5.5",

@@ -10,6 +10,7 @@ import enGB from "../src/i18n/en-GB";
 const SRC_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../src");
 const FILE_EXTENSIONS = [".vue", ".ts"];
 const I18N_KEY_REGEX = /\bt\(\s*["'`]([^"'`]+)["'`]/g;
+const I18N_COMMENT_REGEX = /i18n-scan:\s*["'`]([^"'`]+)["'`]/g;
 
 type TranslationObject = { [key: string]: string | TranslationObject };
 
@@ -32,6 +33,14 @@ async function findUsedKeysInDir(directory: string): Promise<Map<string, string[
             for (const match of content.matchAll(I18N_KEY_REGEX)) {
                 const key = match[1];
                 if (key.includes("${")) continue;
+                const existingFiles = usedKeys.get(key) || [];
+                if (!existingFiles.includes(fullPath)) {
+                    usedKeys.set(key, [...existingFiles, fullPath]);
+                }
+            }
+
+            for (const match of content.matchAll(I18N_COMMENT_REGEX)) {
+                const key = match[1];
                 const existingFiles = usedKeys.get(key) || [];
                 if (!existingFiles.includes(fullPath)) {
                     usedKeys.set(key, [...existingFiles, fullPath]);
