@@ -255,7 +255,7 @@ onUnmounted(function () {
 
 <template>
     <div v-if="event" class="PageEvent flex column justify-between" ref="pageRef">
-        <div class="PageEvent__header">
+        <div class="PageEvent__header q-mb-md">
             <EventGuestSearch
                 :floors="eventFloors"
                 :show-floor-name-in-option="hasMultipleFloorPlans"
@@ -340,7 +340,6 @@ onUnmounted(function () {
     }
 }
 
-// Mobile responsive
 @media (max-width: 768px) {
     .PageEvent {
         &__header {
