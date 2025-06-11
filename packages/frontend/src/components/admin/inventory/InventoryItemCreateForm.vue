@@ -101,13 +101,19 @@ function getInitialForm(): CreateInventoryItemPayload {
         return { ...props.itemToEdit };
     }
     return {
+        brand: "",
+        customProperties: {},
+        description: "",
         isActive: true,
         mainCategory: DrinkMainCategory.SPIRITS,
         name: "",
         quantity: 0,
+        region: "",
+        style: null,
         subCategory: SpiritSubCategory.VODKA,
         supplier: "",
         type: InventoryItemType.DRINK,
+        volume: null,
         ...props.initialData,
     };
 }

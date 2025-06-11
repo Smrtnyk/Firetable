@@ -10,7 +10,7 @@ export type CreateDrinkCardPayload = CreateCustomDrinkCardPayload | CreatePDFDri
 export type CreatePDFDrinkCardPayload = Omit<PDFDrinkCardDoc, "createdAt" | "id" | "updatedAt">;
 
 export interface CustomDrinkCardDoc extends DrinkCardBase {
-    backgroundImage?: string;
+    backgroundImage: null | string;
     createdAt: Date;
     elements: DrinkCardElement[];
     id: string;
@@ -22,8 +22,8 @@ export interface CustomDrinkCardDoc extends DrinkCardBase {
 }
 
 export interface DrinkBundle extends DrinkCardElement {
-    description?: string;
-    isHighlighted?: boolean;
+    description: string;
+    isHighlighted: boolean;
     isVisible: boolean;
     items: {
         // Reference to existing menu items
@@ -31,7 +31,7 @@ export interface DrinkBundle extends DrinkCardElement {
         quantity: number;
     }[];
     price: number;
-    savings?: {
+    savings: null | {
         amount: number;
         percentage: number;
     };
@@ -54,30 +54,28 @@ export interface DrinkCardHeaderEnd extends DrinkCardElement {
 }
 
 export interface DrinkCardItem {
-    alcoholContent?: InventoryItemDoc extends DrinkItem
-        ? InventoryItemDoc["alcoholContent"]
-        : never;
-    brand?: InventoryItemDoc["brand"];
+    alcoholContent: InventoryItemDoc extends DrinkItem ? InventoryItemDoc["alcoholContent"] : null;
+    brand: InventoryItemDoc["brand"] | null;
     /**
      *  Additional note specific to this menu item
      */
-    customNote?: string;
+    customNote: string;
 
-    description?: InventoryItemDoc["description"];
+    description: InventoryItemDoc["description"];
     /**
      *  Whether to show alcohol content
      */
-    displayAlcoholContent?: boolean;
+    displayAlcoholContent: boolean;
     /**
      * Whether to show region/origin
      */
-    displayOrigin?: boolean;
+    displayOrigin: boolean;
     inventoryItemId: string;
     // Optional display fields
     /**
      * Featuring special items
      */
-    isHighlighted?: boolean;
+    isHighlighted: boolean;
     isVisible: boolean;
     mainCategory: InventoryItemDoc["mainCategory"];
     // Fields copied from inventory
@@ -91,7 +89,7 @@ export interface DrinkCardItem {
      */
     specialPrice: SpecialPrice;
 
-    style?: InventoryItemDoc["style"];
+    style: InventoryItemDoc["style"];
     subCategory: InventoryItemDoc["subCategory"];
     /**
      * Tags for special labels

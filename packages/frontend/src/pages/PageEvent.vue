@@ -287,13 +287,15 @@ onUnmounted(function () {
             />
         </div>
 
-        <EventFloorCanvasList
-            v-if="eventFloors.length > 0"
-            :event-floors="eventFloors"
-            :map-floor-to-canvas="mapFloorToCanvas"
-            :is-active-floor="isActiveFloor"
-            @set-active-floor="setActiveFloor"
-        />
+        <div class="PageEvent__canvas-container">
+            <EventFloorCanvasList
+                v-if="eventFloors.length > 0"
+                :event-floors="eventFloors"
+                :map-floor-to-canvas="mapFloorToCanvas"
+                :is-active-floor="isActiveFloor"
+                @set-active-floor="setActiveFloor"
+            />
+        </div>
 
         <EventQueuedReservations
             v-if="event"
@@ -313,3 +315,14 @@ onUnmounted(function () {
         />
     </div>
 </template>
+
+<style lang="scss" scoped>
+.PageEvent {
+    &__canvas-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex: 1;
+    }
+}
+</style>

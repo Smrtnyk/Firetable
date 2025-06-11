@@ -1,34 +1,86 @@
-// Quasar Stylus Variables
-// --------------------------------------------------
-// To customize the look and feel of this app, you can override
-// the Stylus variables found in Quasar's source Stylus files.
-
-// Check documentation for full list of Quasar variables
-
-// It's highly recommended to change the default colors
-// to match your app's branding.
-// Tip: Use the "Theme Builder" on Quasar's documentation website.
 $primary   : #6247aa;
-$primary-darkened:  #4d3886;
-$secondary : #42a497;
-$tertiary  : #AA475E;
-$quaternary: #47AA93;
+$secondary : #FFAB40;
+$tertiary  : #4ECDC4;
+$quaternary: #FF6F61;
+$accent    : #BB86FC;
 
-$accent    : #9c27b0;
-$positive  : rgb(40,199,111);
-$negative  : rgb(234,84,85);
-$info      : #31CCEC;
-$warning   : rgb(255,159,67);
+$positive  : #81C784;
+$negative  : #CF6679;
+$info      : #64B5F6;
+$warning   : #FFD54F;
 
 $pink      : #f687b3;
-$green     : #68d391;
-$indigo    : #7f9cf5;
-
-$bg-dark   : #222;
+$green     : #81C784;
+$indigo    : #64B5F6;
 
 $border-radius: .5rem;
 
-$gradient-primary: linear-gradient(316deg, $primary 0%, #a594f9 74%);
-$gradient-primary-reversed: linear-gradient(316deg, $primary-darkened 0%, $primary 74%);
+$gradient-primary: linear-gradient(316deg, $primary 0%, #d4b3ff 74%);
+$gradient-primary-reversed: linear-gradient(316deg, #9c5dfc 0%, $primary 74%);
 
 $box-shadow: 0 4px 25px 0 rgba(0,0,0,.1);
+
+// DARK MODE OVERRIDES
+$dark-page: #1F1D2B;
+
+$dark: #252836;
+
+$separator-dark-color: rgba(234, 234, 236, 0.2);
+
+$menu-background: #ffffff;
+
+$table-dark-border-color: rgba(234, 234, 236, 0.1);
+$table-dark-hover-background: rgba(187, 134, 252, 0.1);
+$table-dark-selected-background: rgba(187, 134, 252, 0.15);
+
+$surface-primary: #f8fafc;
+$surface-secondary: #f1f5f9;
+$surface-elevated: #ffffff;
+$surface-container: #e2e8f0;
+
+$text-primary: #1e293b;
+$text-secondary: #475569;
+$text-tertiary: #64748b;
+$text-muted: #94a3b8;
+
+$border-light: #e2e8f0;
+$border-medium: #cbd5e1;
+
+$surface-primary-dark: #1F1D2B;        // Same as background
+$surface-secondary-dark: #242033;      // Slightly lighter than background
+$surface-elevated-dark: #252836;       // Same as surface
+$surface-container-dark: #2d2a3a;      // Slightly lighter than surface
+
+$text-primary-dark: #EAEAEC;           // onSurface/onBackground
+$text-secondary-dark: #c7c3d0;         // Slightly dimmed
+$text-tertiary-dark: #9c94a8;          // More dimmed
+$text-muted-dark: #7a6f85;             // Most dimmed
+
+$border-light-dark: rgba(234, 234, 236, 0.15);
+$border-medium-dark: rgba(234, 234, 236, 0.25);
+
+$icon-primary: #BB86FC;
+$icon-primary-dark: #BB86FC;           // Same in dark mode
+$icon-hover: #9c5dfc;                  // Darker purple for hover
+$icon-hover-dark: #d4b3ff;             // Lighter purple for dark hover
+
+$state-hover-light: rgba(187, 134, 252, 0.1);
+$state-hover-dark: rgba(187, 134, 252, 0.15);
+$state-active-light: rgba(187, 134, 252, 0.15);
+$state-active-dark: rgba(187, 134, 252, 0.25);
+
+$role-bg-light: rgba(255, 255, 255, 0.2);
+$role-bg-dark: rgba(37, 40, 54, 0.8);
+
+$avatar-bg: #BB86FC;
+$avatar-bg-dark: #BB86FC;
+
+$header-bg: #BB86FC;
+$header-bg-dark: #252836;
+
+$page-bg: #f8fafc;
+$page-bg-dark: #1F1D2B;
+
+$button-border-radius: 8px;
+$generic-border-radius: 12px;
+

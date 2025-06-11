@@ -105,22 +105,6 @@ function onStateSelect(newState: ReservationState): void {
     <ReservationLabelChips :reservation="reservation" />
 
     <q-card-section>
-        <ReservationGeneralInfo :timezone="timezone" :reservation="reservation" />
-
-        <q-item
-            clickable
-            @click="emit('goToGuestProfile', guestSummaryData.guestId)"
-            class="column q-pa-none"
-            v-if="guestSummaryData && guestSummaryData.totalReservations > 0"
-            v-close-popup
-        >
-            <q-separator />
-            <div>{{ t("EventShowReservation.guestHistoryLabel") }}:</div>
-            <div>
-                <GuestSummaryChips :summary="guestSummaryData" />
-            </div>
-        </q-item>
-
         <template
             v-if="
                 !isCancelled &&
@@ -128,8 +112,7 @@ function onStateSelect(newState: ReservationState): void {
                 permissionsStore.canConfirmReservation
             "
         >
-            <q-separator />
-            <div class="state-grid q-mt-md q-mb-lg" role="radiogroup">
+            <div class="state-grid q-mb-lg" role="radiogroup">
                 <div
                     v-for="state in Object.values(ReservationState)"
                     :key="state"
@@ -156,6 +139,26 @@ function onStateSelect(newState: ReservationState): void {
             </div>
             <q-separator class="q-mb-md" />
         </template>
+
+        <ReservationGeneralInfo :timezone="timezone" :reservation="reservation" />
+
+        <div class="q-mb-md">
+            <q-separator />
+        </div>
+
+        <q-item
+            clickable
+            @click="emit('goToGuestProfile', guestSummaryData.guestId)"
+            class="column q-pa-none"
+            v-if="guestSummaryData && guestSummaryData.totalReservations > 0"
+            v-close-popup
+        >
+            <q-separator />
+            <div>{{ t("EventShowReservation.guestHistoryLabel") }}:</div>
+            <div>
+                <GuestSummaryChips :summary="guestSummaryData" />
+            </div>
+        </q-item>
 
         <q-item v-if="!isCancelled" class="q-pa-sm-none q-pa-xs-none q-gutter-xs q-ml-none">
             <FTBtn

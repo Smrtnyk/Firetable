@@ -70,7 +70,7 @@ export enum WineSubCategory {
 export type CreateInventoryItemPayload = Omit<InventoryItemDoc, "id">;
 
 export interface DrinkItem extends BaseInventoryItem {
-    alcoholContent?: number;
+    alcoholContent: number;
     mainCategory: DrinkMainCategory;
     subCategory: DrinkSubCategory;
     type: InventoryItemType.DRINK;
@@ -89,20 +89,20 @@ interface BaseInventoryItem {
      * Commercial brand name of the product
      * Example: "Absolut", "Heineken", "Red Bull"
      */
-    brand?: string | undefined;
+    brand: string;
 
     /**
      * Additional properties for special cases
      * Allows for flexible extension without schema changes
      * Example: { "allergens": ["sulfites"], "vintage": "2018" }
      */
-    customProperties?: Record<string, any>;
+    customProperties: Record<string, unknown>;
 
     /**
      * Detailed description of the product
      * Can include tasting notes, serving suggestions, etc.
      */
-    description?: string | undefined;
+    description: string;
 
     /**
      * Unique identifier for the inventory item
@@ -140,20 +140,20 @@ interface BaseInventoryItem {
      * Used for classification and sourcing
      * Example: "Scotland", "France", "Japan"
      */
-    region?: string | undefined;
+    region: null | string;
 
     /**
      * Specific style or variant of the product
      * Provides additional classification detail
      * Example: "Irish Whiskey", "London Dry Gin", "Cola"
      */
-    style?: string | undefined;
+    style: null | string;
 
     /**
      * Name or identifier of the supplier
      * Used for reordering and supplier management
      */
-    supplier?: string;
+    supplier: string;
 
     /**
      * The primary classification of the item
@@ -165,7 +165,7 @@ interface BaseInventoryItem {
      * Volume of the container in milliliters
      * Example: 750 for a standard wine bottle
      */
-    volume?: number | undefined;
+    volume: null | number;
 }
 
 type DrinkSubCategory = {

@@ -936,6 +936,7 @@ function updateTableLabel(newLabel: unknown): void {
 }
 
 .mobile-warning {
+    margin: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
