@@ -9,15 +9,6 @@ import { refreshApp } from "src/helpers/utils";
 import { AppLogger } from "src/logger/FTLogger";
 import { getCurrentUser } from "vuefire";
 
-interface NavigationError extends Error {
-    original?: unknown;
-    type: NavigationErrorType;
-}
-
-type NavigationErrorType = "TIMEOUT" | "UNKNOWN";
-
-const NAVIGATION_TIMEOUT = 10_000;
-
 export type AuthGuard = (to: RouteLocationNormalized) => Promise<boolean | RouteLocationRaw>;
 
 /**
@@ -64,12 +55,17 @@ export function createAuthGuard(
             return false;
         }
 
-        const token = await user.getIdTokenResult();
-        const role = token?.claims.role as string;
+        try {
+            const token = await user.getIdTokenResult();
+            const role = token?.claims.role as string;
 
-        return isFunction(allowedRoles)
-            ? Boolean(allowedRoles(permissionsStore))
-            : (allowedRoles as string[]).includes(role);
+            return isFunction(allowedRoles)
+                ? Boolean(allowedRoles(permissionsStore))
+                : (allowedRoles as string[]).includes(role);
+        } catch (error) {
+            AppLogger.error("[Auth Guard] Token error:", error);
+            return false;
+        }
     }
 
     return async function authGuard(
@@ -81,84 +77,42 @@ export function createAuthGuard(
         });
 
         try {
-            const timeoutPromise = new Promise<never>(function (_resolve, reject) {
-                setTimeout(function () {
-                    reject(new Error("Navigation timeout"));
-                }, NAVIGATION_TIMEOUT);
-            });
+            const { isReady, user } = await checkAndInitAuth();
+            const requiresAuth = to.meta.requiresAuth;
 
-            let navigationResult: boolean | RouteLocationRaw = false;
-
-            await Promise.race([
-                (async function () {
-                    const { isReady, user } = await checkAndInitAuth();
-                    const requiresAuth = to.meta.requiresAuth;
-
-                    if (import.meta.env.DEV) {
-                        AppLogger.info("[Auth Guard]", {
-                            allowedRoles: to.meta.allowedRoles,
-                            isReady,
-                            path: to.path,
-                            requiresAuth,
-                        });
-                    }
-
-                    if (requiresAuth && !isReady) {
-                        navigationResult = { name: "auth" };
-                        return;
-                    }
-
-                    if (to.path === "/auth") {
-                        navigationResult = isReady ? { name: "home" } : true;
-                        return;
-                    }
-
-                    if (!isReady) {
-                        navigationResult = true;
-                        return;
-                    }
-
-                    const hasPermissions = await checkRoutePermissions(to, user);
-                    if (!hasPermissions) {
-                        navigationResult = { name: "home" };
-                        return;
-                    }
-
-                    navigationResult = true;
-                })(),
-                timeoutPromise,
-            ]);
-
-            return navigationResult;
-        } catch (error) {
-            const navigationError = createNavigationError(error);
-            AppLogger.error("[Auth Guard] Error:", navigationError);
-
-            if (navigationError.type === "TIMEOUT") {
-                showErrorMessage("Navigation timeout. Please try again.", refreshApp);
-            } else {
-                showErrorMessage(navigationError.message, refreshApp);
+            if (import.meta.env.DEV) {
+                AppLogger.info("[Auth Guard]", {
+                    allowedRoles: to.meta.allowedRoles,
+                    isReady,
+                    path: to.path,
+                    requiresAuth,
+                });
             }
 
+            // Handle auth route specially
+            if (to.path === "/auth") {
+                return isReady ? { name: "home" } : true;
+            }
+
+            // Handle protected routes
+            if (requiresAuth && !isReady) {
+                return { name: "auth" };
+            }
+
+            // Skip permission checks for non-protected routes
+            if (!requiresAuth) {
+                return true;
+            }
+
+            // Check permissions for protected routes
+            const hasPermissions = await checkRoutePermissions(to, user);
+            return hasPermissions ? true : { name: "home" };
+        } catch (error) {
+            AppLogger.error("[Auth Guard] Navigation error:", error);
+            showErrorMessage("Navigation failed. Please try again.", refreshApp);
             return false;
         } finally {
             Loading.hide();
         }
     };
-}
-
-function createNavigationError(error: unknown): NavigationError {
-    const navigationError: NavigationError = {
-        message: "Navigation failed",
-        name: "NavigationError",
-        type: "UNKNOWN",
-    };
-
-    if (error instanceof Error && error.message.includes("timeout")) {
-        navigationError.type = "TIMEOUT";
-        navigationError.message = "Navigation timeout";
-    }
-
-    navigationError.original = error;
-    return navigationError;
 }

@@ -3,12 +3,11 @@ import type { RouteLocationNormalizedGeneric, RouteMeta } from "vue-router";
 
 import { AdminRole, Role } from "@firetable/types";
 import { createTestingPinia } from "@pinia/testing";
-import { delay } from "es-toolkit";
 import { setActivePinia } from "pinia";
 import { Loading } from "quasar";
 import { AppLogger } from "src/logger/FTLogger";
 import { AuthState, useAuthStore } from "src/stores/auth-store";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createApp } from "vue";
 import { getCurrentUser } from "vuefire";
 
@@ -65,7 +64,6 @@ describe("Auth Guard", () => {
     let guard: AuthGuard;
 
     beforeEach(() => {
-        vi.useFakeTimers();
         const app = createApp({});
         const pinia = createTestingPinia({
             createSpy: vi.fn,
@@ -76,10 +74,6 @@ describe("Auth Guard", () => {
         mockedAuthStore = mockedStore(useAuthStore) as any;
         mockPermissionsStore = {} as unknown as ReturnType<typeof usePermissionsStore>;
         guard = createAuthGuard(mockedAuthStore, mockPermissionsStore);
-    });
-
-    afterEach(() => {
-        vi.useRealTimers();
     });
 
     describe("Authentication", () => {
@@ -207,12 +201,7 @@ describe("Auth Guard", () => {
 
             const res = await guard(to);
 
-            expect(AppLogger.error).toHaveBeenCalledWith(
-                "[Auth Guard] Error:",
-                expect.objectContaining({
-                    message: expect.stringContaining("Navigation failed"),
-                }),
-            );
+            expect(AppLogger.error).toHaveBeenCalledWith("[Auth Guard] Navigation error:", error);
             expect(res).toBe(false);
         });
 
@@ -246,21 +235,20 @@ describe("Auth Guard", () => {
             expect(await guard(to)).toStrictEqual({ name: "home" });
         });
 
-        it("handles timeouts", async () => {
-            const to = createMockRoute("/test");
+        it("handles auth errors gracefully", async () => {
+            const to = createMockRoute("/test", { requiresAuth: true });
 
-            vi.mocked(getCurrentUser).mockImplementationOnce(() => delay(11_000) as any);
+            vi.mocked(getCurrentUser).mockRejectedValueOnce(new Error("Firebase auth error"));
 
-            const guardPromise = guard(to);
-            vi.advanceTimersByTime(11_000);
-            await guardPromise;
+            const res = await guard(to);
 
             expect(AppLogger.error).toHaveBeenCalledWith(
-                "[Auth Guard] Error:",
+                "[Auth Guard] Navigation error:",
                 expect.objectContaining({
-                    message: expect.stringContaining("timeout"),
+                    message: "Firebase auth error",
                 }),
             );
+            expect(res).toBe(false);
         });
     });
 
@@ -276,32 +264,12 @@ describe("Auth Guard", () => {
             });
             expect(Loading.hide).toHaveBeenCalled();
         });
-
-        it("handles successful navigation before timeout", async () => {
-            const to = createMockRoute("/test");
-
-            vi.mocked(getCurrentUser).mockImplementationOnce(
-                () =>
-                    new Promise((resolve) => {
-                        setTimeout(() => resolve(null), 1000);
-                    }),
-            );
-
-            const guardPromise = guard(to);
-            vi.advanceTimersByTime(1000);
-            const res = await guardPromise;
-
-            expect(AppLogger.error).not.toHaveBeenCalled();
-            expect(res).toBe(true);
-        });
     });
 
     describe("Concurrency", () => {
         it("handles multiple navigation attempts", async () => {
             const firstNav = guard(createMockRoute("/first"));
             const secondNav = guard(createMockRoute("/second"));
-
-            vi.advanceTimersByTime(1000);
 
             const res = await Promise.all([firstNav, secondNav]);
 
