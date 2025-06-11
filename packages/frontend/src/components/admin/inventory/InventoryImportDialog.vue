@@ -2,8 +2,8 @@
     <div class="InventoryImportDialog">
         <q-card-section>
             <FTTabs v-model="activeTab" dense :disable="loading">
-                <q-tab name="file" label="Import file" />
-                <q-tab name="paste" label="Paste CSV as text" />
+                <q-tab name="file" :label="t('InventoryImportDialog.tabs.importFile')" />
+                <q-tab name="paste" :label="t('InventoryImportDialog.tabs.pasteCsvAsText')" />
             </FTTabs>
 
             <q-separator />
@@ -20,8 +20,8 @@
                         @click="fileInput?.click()"
                     >
                         <q-icon name="fa fa-file-import" size="48px" color="primary" />
-                        <div class="text-h6 q-mt-md">Drop your CSV file here</div>
-                        <div class="text-caption q-mt-sm">Or click to upload</div>
+                        <div class="text-h6 q-mt-md">{{ t('InventoryImportDialog.fileUpload.dropCsvMessage') }}</div>
+                        <div class="text-caption q-mt-sm">{{ t('InventoryImportDialog.fileUpload.clickToUploadMessage') }}</div>
                         <input
                             type="file"
                             ref="fileInput"
@@ -39,7 +39,7 @@
                         type="textarea"
                         outlined
                         class="w-full"
-                        placeholder="Paste your CSV text here"
+                        :placeholder="t('InventoryImportDialog.pasteCsv.placeholder')"
                         :disable="loading"
                         :rows="10"
                     />

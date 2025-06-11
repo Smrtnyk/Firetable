@@ -24,7 +24,7 @@ const issueDescription = ref(props.issueToEdit?.description ?? "");
 const selectedCategory = ref<IssueCategory>(props.issueToEdit?.category ?? IssueCategory.BUG);
 const issueForm = useTemplateRef<QForm>("issueForm");
 
-const descriptionRules = [minLength("Issue description needs to have at least 10 characters!", 10)];
+const descriptionRules = [minLength(t('IssueCreateForm.validation.descriptionMinLength'), 10)];
 
 const categoryOptions = [
     {

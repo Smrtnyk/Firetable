@@ -31,6 +31,26 @@ const hr: TranslationStructure = {
     AdminEventEditInfo: {
         saveButtonLabel: "Spremi",
     },
+    AdminEventRTInfo: {
+        titles: {
+            capacityOverview: "Pregled kapaciteta",
+            guestStatistics: "Statistika gostiju",
+        },
+        labels: {
+            tables: "stolova",
+            pending: "na čekanju",
+            totalGuests: "Ukupno gostiju",
+            withContactsSuffix: "s kontaktima",
+            vipGuests: "VIP gosti",
+            returningGuests: "Gosti koji se vraćaju",
+            avgConsumption: "Prosj. potrošnja",
+        },
+    },
+    AdminPropertyEventsList: {
+        buttons: {
+            loadMore: "Učitaj više",
+        },
+    },
     AppDrawer: {
         languages: {
             croatian: "Hrvatski",
@@ -70,6 +90,22 @@ const hr: TranslationStructure = {
     },
     AppTopMenu: {
         menuAriaLabel: "Izbornik",
+    },
+    config: {
+        floorElements: {
+            rectangle: "Pravokutnik",
+            circle: "Krug",
+            squareTable: "Kvadratni stol",
+            roundTable: "Okrugli stol",
+            wall: "Zid",
+            sofa: "Sofa",
+            djBooth: "DJ pult",
+            stage: "Pozornica",
+            door: "Vrata",
+            bar: "Šank",
+            cloakroom: "Garderoba",
+            text: "Tekst",
+        },
     },
     DrinkBundleDialog: {
         bundleItemsLabel: "Stavke Paketa ({count})",
@@ -178,6 +214,19 @@ const hr: TranslationStructure = {
         unlinkTablesLabel: "Odvoji stolove",
         waitingForResponse: "Čekanje na odgovor",
     },
+    EventViewControls: {
+        sections: {
+            floors: "Katovi",
+            actions: "Akcije",
+        },
+        menuItems: {
+            queuedReservations: "Rezervacije na čekanju",
+            guestList: "Popis gostiju",
+            eventInfo: "Informacije o događaju",
+            adminView: "Admin prikaz",
+            exportReservations: "Izvezi rezervacije",
+        },
+    },
     FTBottomDialog: {
         closeBottomDialogAriaLabel: "Zatvori donji dijalog",
     },
@@ -234,6 +283,33 @@ const hr: TranslationStructure = {
         arrived: "Stigao",
         reservations: "Rezervacije",
     },
+    helpers: {
+        formRules: {
+            greaterThanZero: "Broj mora biti veći od 0!",
+            noEmptyString: "Molimo unesite nešto.",
+            noWhiteSpaces: "Praznine nisu dopuštene!",
+            requireNumber: "Morate unijeti broj!",
+            validOptionalURL: "Nije važeći URL.",
+        },
+        ui: {
+            deleteConfirmPlaceholder: "Molimo upišite \"{confirmText}\" za potvrdu",
+            unexpectedError: "Došlo je do neočekivane pogreške.",
+            errorDialogTitle: "Greška",
+        },
+    },
+    InventoryImportDialog: {
+        tabs: {
+            importFile: "Uvezi datoteku",
+            pasteCsvAsText: "Zalijepi CSV kao tekst",
+        },
+        fileUpload: {
+            dropCsvMessage: "Ispusti CSV datoteku ovdje",
+            clickToUploadMessage: "Ili klikni za prijenos",
+        },
+        pasteCsv: {
+            placeholder: "Zalijepi svoj CSV tekst ovdje",
+        },
+    },
     InventoryItemCreateForm: {
         alcoholContentRange: "Sadržaj alkohola mora biti između 0 i 100",
         mainCategoryRequired: "Glavna kategorija je obavezna",
@@ -247,6 +323,11 @@ const hr: TranslationStructure = {
         subCategory: "Podkategorija",
         supplier: "Dobavljač",
         volume: "Volumen",
+    },
+    IssueCreateForm: {
+        validation: {
+            descriptionMinLength: "Opis problema mora imati najmanje 10 znakova!",
+        },
     },
     NetworkOverlay: {
         noInternetConnectionText: "Nema internetske veze",
@@ -262,6 +343,7 @@ const hr: TranslationStructure = {
             plannedVsWalkInTitle: "Planirano vs. Bez najave",
             reservationsByDayOfWeekTitle: "Rezervacije po danu u tjednu",
             totalPlannedReservationsTitle: "Ukupno planiranih rezervacija",
+            consumptionLabel: "Potrošnja",
         },
         chipLabels: {
             avgGuestsPlanned: "Prosj. gostiju po planiranoj rezervaciji:",
@@ -587,3 +669,5 @@ const hr: TranslationStructure = {
 };
 
 export default hr;
+
+[end of packages/frontend/src/i18n/hr/index.ts]

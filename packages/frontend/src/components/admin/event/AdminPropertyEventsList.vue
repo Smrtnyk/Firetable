@@ -155,7 +155,7 @@ function handleLoad(): void {
 
             <!-- Load More Button -->
             <div class="row justify-center q-my-md">
-                <q-btn v-if="!done" label="Load More" @click="handleLoad" />
+                <q-btn v-if="!done" :label="t('AdminPropertyEventsList.buttons.loadMore')" @click="handleLoad" />
             </div>
         </template>
     </div>

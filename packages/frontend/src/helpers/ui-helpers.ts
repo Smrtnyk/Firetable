@@ -2,6 +2,7 @@ import type { VoidFunction } from "@firetable/types";
 
 import { isString, noop } from "es-toolkit";
 import { Dialog, Loading, Notify } from "quasar";
+import { i18n } from "src/boot/i18n";
 
 type TryCatchLoadingWrapperOptions<T> = {
     args?: unknown[];
@@ -67,7 +68,7 @@ export function showDeleteConfirm(
                 isValid: (val: string) => val === confirmText,
                 model: "",
                 outlined: true,
-                placeholder: `Please type "${confirmText}" to confirm`,
+                placeholder: i18n.global.t('helpers.ui.deleteConfirmPlaceholder', { confirmText }),
                 type: "text",
             },
             title,
@@ -78,7 +79,7 @@ export function showDeleteConfirm(
 }
 
 export function showErrorMessage(e: unknown, onCloseCallback?: VoidFunction): void {
-    let message = "An unexpected error occurred.";
+    let message = i18n.global.t('helpers.ui.unexpectedError');
     if (isString(e)) {
         message = e;
     } else if (e instanceof Error) {
@@ -88,7 +89,7 @@ export function showErrorMessage(e: unknown, onCloseCallback?: VoidFunction): vo
     const dialog = Dialog.create({
         class: ["error-dialog", "ft-card"],
         message,
-        title: "Error",
+        title: i18n.global.t('helpers.ui.errorDialogTitle'),
     });
 
     if (onCloseCallback) {

@@ -29,6 +29,26 @@ const enGB = {
     AdminEventEditInfo: {
         saveButtonLabel: "Save",
     },
+    AdminEventRTInfo: {
+        titles: {
+            capacityOverview: "Capacity Overview",
+            guestStatistics: "Guest Statistics",
+        },
+        labels: {
+            tables: "tables",
+            pending: "pending",
+            totalGuests: "Total Guests",
+            withContactsSuffix: "with contacts",
+            vipGuests: "VIP Guests",
+            returningGuests: "Returning Guests",
+            avgConsumption: "Avg. Consumption",
+        },
+    },
+    AdminPropertyEventsList: {
+        buttons: {
+            loadMore: "Load More",
+        },
+    },
     AppDrawer: {
         languages: {
             croatian: "Croatian",
@@ -68,6 +88,22 @@ const enGB = {
     },
     AppTopMenu: {
         menuAriaLabel: "Menu",
+    },
+    config: {
+        floorElements: {
+            rectangle: "Rectangle",
+            circle: "Circle",
+            squareTable: "Square table",
+            roundTable: "Round table",
+            wall: "Wall",
+            sofa: "Sofa",
+            djBooth: "DJ Booth",
+            stage: "Stage",
+            door: "Door",
+            bar: "Bar",
+            cloakroom: "Cloakroom",
+            text: "Text",
+        },
     },
     DrinkBundleDialog: {
         bundleItemsLabel: "Bundle Items ({count})",
@@ -176,6 +212,20 @@ const enGB = {
         unlinkTablesLabel: "Unlink tables",
         waitingForResponse: "Waiting for response",
     },
+    EventViewControls: {
+        sections: {
+            floors: "Floors",
+            actions: "Actions",
+        },
+        // floorSelector object removed as currentFloorSuffix was its only property
+        menuItems: {
+            queuedReservations: "Queued Reservations",
+            guestList: "Guest List",
+            eventInfo: "Event Info",
+            adminView: "Admin View",
+            exportReservations: "Export Reservations",
+        },
+    },
     FTBottomDialog: {
         closeBottomDialogAriaLabel: "Close bottom dialog",
     },
@@ -232,6 +282,33 @@ const enGB = {
         arrived: "Arrived",
         reservations: "Reservations",
     },
+    helpers: {
+        formRules: {
+            greaterThanZero: "Number must be greater than 0!",
+            noEmptyString: "Please type something",
+            noWhiteSpaces: "No whitespaces are allowed!",
+            requireNumber: "You must type in a number!",
+            validOptionalURL: "Not a valid url",
+        },
+        ui: {
+            deleteConfirmPlaceholder: "Please type \"{confirmText}\" to confirm",
+            unexpectedError: "An unexpected error occurred.",
+            errorDialogTitle: "Error",
+        },
+    },
+    InventoryImportDialog: {
+        tabs: {
+            importFile: "Import file",
+            pasteCsvAsText: "Paste CSV as text",
+        },
+        fileUpload: {
+            dropCsvMessage: "Drop your CSV file here",
+            clickToUploadMessage: "Or click to upload",
+        },
+        pasteCsv: {
+            placeholder: "Paste your CSV text here",
+        },
+    },
     InventoryItemCreateForm: {
         alcoholContentRange: "Alcohol content must be between 0 and 100",
         mainCategoryRequired: "Main category is required",
@@ -245,6 +322,11 @@ const enGB = {
         subCategory: "Sub Category",
         supplier: "Supplier",
         volume: "Volume",
+    },
+    IssueCreateForm: {
+        validation: {
+            descriptionMinLength: "Issue description needs to have at least 10 characters!",
+        },
     },
     NetworkOverlay: {
         noInternetConnectionText: "No Internet Connection",
@@ -260,6 +342,7 @@ const enGB = {
             plannedVsWalkInTitle: "Planned vs. Walk-In",
             reservationsByDayOfWeekTitle: "Reservations by Day of Week",
             totalPlannedReservationsTitle: "Total Planned Reservations",
+            consumptionLabel: "Consumption",
         },
         chipLabels: {
             avgGuestsPlanned: "Avg Guests per planned reservation:",

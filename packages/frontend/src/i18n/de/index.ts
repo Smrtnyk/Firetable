@@ -33,6 +33,26 @@ const de: TranslationStructure = {
     AdminEventEditInfo: {
         saveButtonLabel: "Speichern",
     },
+    AdminEventRTInfo: {
+        titles: {
+            capacityOverview: "Kapazitätsübersicht",
+            guestStatistics: "Gästestatistik",
+        },
+        labels: {
+            tables: "Tische",
+            pending: "ausstehend",
+            totalGuests: "Gesamtzahl Gäste",
+            withContactsSuffix: "mit Kontakten",
+            vipGuests: "VIP-Gäste",
+            returningGuests: "Wiederkehrende Gäste",
+            avgConsumption: "Durchschn. Verbrauch",
+        },
+    },
+    AdminPropertyEventsList: {
+        buttons: {
+            loadMore: "Mehr laden",
+        },
+    },
     AppDrawer: {
         languages: {
             croatian: "Kroatisch",
@@ -72,6 +92,22 @@ const de: TranslationStructure = {
     },
     AppTopMenu: {
         menuAriaLabel: "Menü",
+    },
+    config: {
+        floorElements: {
+            rectangle: "Rechteck",
+            circle: "Kreis",
+            squareTable: "Quadratischer Tisch",
+            roundTable: "Runder Tisch",
+            wall: "Wand",
+            sofa: "Sofa",
+            djBooth: "DJ-Pult",
+            stage: "Bühne",
+            door: "Tür",
+            bar: "Bar",
+            cloakroom: "Garderobe",
+            text: "Text",
+        },
     },
     DrinkBundleDialog: {
         bundleItemsLabel: "Paketartikel ({count})",
@@ -180,6 +216,19 @@ const de: TranslationStructure = {
         unlinkTablesLabel: "Tischverbindung aufheben",
         waitingForResponse: "Warte auf Rückmeldung",
     },
+    EventViewControls: {
+        sections: {
+            floors: "Etagen",
+            actions: "Aktionen",
+        },
+        menuItems: {
+            queuedReservations: "Reservierungswarteschlange",
+            guestList: "Gästeliste",
+            eventInfo: "Veranstaltungsinfo",
+            adminView: "Admin-Ansicht",
+            exportReservations: "Reservierungen exportieren",
+        },
+    },
     FTBottomDialog: {
         closeBottomDialogAriaLabel: "Unteren Dialog schließen",
     },
@@ -236,6 +285,33 @@ const de: TranslationStructure = {
         arrived: "Angekommen",
         reservations: "Reservierungen",
     },
+    helpers: {
+        formRules: {
+            greaterThanZero: "Zahl muss größer als 0 sein!",
+            noEmptyString: "Bitte geben Sie etwas ein.",
+            noWhiteSpaces: "Leerzeichen sind nicht erlaubt!",
+            requireNumber: "Sie müssen eine Zahl eingeben!",
+            validOptionalURL: "Keine gültige URL.",
+        },
+        ui: {
+            deleteConfirmPlaceholder: "Bitte geben Sie \"{confirmText}\" zur Bestätigung ein",
+            unexpectedError: "Ein unerwarteter Fehler ist aufgetreten.",
+            errorDialogTitle: "Fehler",
+        },
+    },
+    InventoryImportDialog: {
+        tabs: {
+            importFile: "Datei importieren",
+            pasteCsvAsText: "CSV als Text einfügen",
+        },
+        fileUpload: {
+            dropCsvMessage: "CSV-Datei hier ablegen",
+            clickToUploadMessage: "Oder klicken Sie zum Hochladen",
+        },
+        pasteCsv: {
+            placeholder: "Fügen Sie Ihren CSV-Text hier ein",
+        },
+    },
     InventoryItemCreateForm: {
         alcoholContentRange: "Alkoholgehalt muss zwischen 0 und 100 liegen",
         mainCategoryRequired: "Hauptkategorie ist erforderlich",
@@ -249,6 +325,11 @@ const de: TranslationStructure = {
         subCategory: "Unterkategorie",
         supplier: "Lieferant",
         volume: "Volumen",
+    },
+    IssueCreateForm: {
+        validation: {
+            descriptionMinLength: "Die Problembeschreibung muss mindestens 10 Zeichen lang sein!",
+        },
     },
     NetworkOverlay: {
         noInternetConnectionText: "Keine Internetverbindung",
@@ -264,6 +345,7 @@ const de: TranslationStructure = {
             plannedVsWalkInTitle: "Geplant vs. Laufkundschaft",
             reservationsByDayOfWeekTitle: "Reservierungen nach Wochentag",
             totalPlannedReservationsTitle: "Gesamte geplante Reservierungen",
+            consumptionLabel: "Verbrauch",
         },
         chipLabels: {
             avgGuestsPlanned: "Durchschn. Gäste pro geplanter Reservierung:",
