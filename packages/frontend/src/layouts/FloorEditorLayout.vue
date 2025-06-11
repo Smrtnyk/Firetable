@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppDrawer from "src/components/AppDrawer.vue";
 import AppTopMenu from "src/components/AppTopMenu.vue";
+import RouteLoadingBar from "src/components/RouteLoadingBar.vue";
 import { ref } from "vue";
 import { useRoute } from "vue-router";
 
@@ -10,6 +11,7 @@ const isDrawerVisible = ref(false);
 
 <template>
     <q-layout view="hHh lpR fFf">
+        <RouteLoadingBar />
         <AppDrawer v-model="isDrawerVisible" />
         <AppTopMenu @toggle-drawer="isDrawerVisible = !isDrawerVisible" />
         <q-page-container>

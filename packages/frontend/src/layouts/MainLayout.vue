@@ -2,6 +2,7 @@
 import AppDrawer from "src/components/AppDrawer.vue";
 import AppTopMenu from "src/components/AppTopMenu.vue";
 import NetworkOverlay from "src/components/NetworkOverlay.vue";
+import RouteLoadingBar from "src/components/RouteLoadingBar.vue";
 import { useAuthStore } from "src/stores/auth-store";
 import { computed, ref } from "vue";
 import { useRoute } from "vue-router";
@@ -15,6 +16,7 @@ const isDrawerVisible = ref(false);
 
 <template>
     <q-layout v-if="isLoggedIn" view="hHh lpR fFf">
+        <RouteLoadingBar />
         <NetworkOverlay />
         <AppDrawer v-model="isDrawerVisible" />
         <AppTopMenu @toggle-drawer="isDrawerVisible = !isDrawerVisible" />
@@ -32,4 +34,5 @@ const isDrawerVisible = ref(false);
             </q-page>
         </q-page-container>
     </q-layout>
+    <router-view v-else />
 </template>
