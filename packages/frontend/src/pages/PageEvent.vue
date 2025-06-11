@@ -255,20 +255,19 @@ onUnmounted(function () {
 
 <template>
     <div v-if="event" class="PageEvent flex column justify-between" ref="pageRef">
-        <div>
+        <div class="PageEvent__header">
             <EventGuestSearch
                 :floors="eventFloors"
                 :show-floor-name-in-option="hasMultipleFloorPlans"
                 :all-reserved-tables="plannedReservations"
                 @found="animateTables"
                 @clear="stopAllTableAnimations"
-                class="q-mb-sm"
+                class="PageEvent__search"
             />
 
             <EventViewControls
                 :active-floor="activeFloor"
                 :floors="floorInstances"
-                :has-multiple-floor-plans="hasMultipleFloorPlans"
                 :can-see-admin-event="permissionStore.canCreateEvents"
                 :can-export-reservations="canExportReservations"
                 :is-active-floor="isActiveFloor"
@@ -284,6 +283,7 @@ onUnmounted(function () {
                 @show-event-info="showEventInfo"
                 @set-active-floor="setActiveFloor"
                 @export-reservations="onExportReservations"
+                class="PageEvent__controls"
             />
         </div>
 
@@ -318,11 +318,35 @@ onUnmounted(function () {
 
 <style lang="scss" scoped>
 .PageEvent {
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    &__search {
+        flex: 1;
+    }
+
+    &__controls {
+        flex-shrink: 0;
+    }
+
     &__canvas-container {
         display: flex;
         justify-content: center;
         align-items: center;
         flex: 1;
+    }
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+    .PageEvent {
+        &__header {
+            gap: 6px;
+            margin-bottom: 12px;
+        }
     }
 }
 </style>

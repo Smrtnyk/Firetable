@@ -30,7 +30,6 @@ describe("EventViewControls.vue", () => {
             canSeeAdminEvent: true,
             floors,
             guestListCount: 0,
-            hasMultipleFloorPlans: true,
             isActiveFloor,
             queuedReservationsCount: 0,
             ...props,
@@ -38,7 +37,7 @@ describe("EventViewControls.vue", () => {
     }
 
     async function showMenu(): Promise<void> {
-        const btnDropdown = page.getByLabelText("Toggle event controls menu");
+        const btnDropdown = page.getByLabelText("Event controls menu");
         await userEvent.click(btnDropdown);
     }
 
@@ -46,74 +45,77 @@ describe("EventViewControls.vue", () => {
         activeFloor = floors[0];
     });
 
-    it("renders prev and next floor btns", async () => {
-        const screen = render();
+    it("renders floor selection in menu when multiple floors exist", async () => {
+        render();
         await showMenu();
 
-        const prevFloorBtn = screen.getByLabelText("Show previous floor");
-        const nextFloorBtn = screen.getByLabelText("Show next floor");
+        // Check for radiogroup
+        const radioGroup = page.getByRole("radiogroup", { name: "Select floor" });
+        await expect.element(radioGroup).toBeVisible();
 
-        await expect.element(prevFloorBtn).toBeVisible();
-        await expect.element(nextFloorBtn).toBeVisible();
+        // Check for radio buttons
+        const firstFloorRadio = page.getByRole("radio", { name: /first floor.*current floor/i });
+        const secondFloorRadio = page.getByRole("radio", { name: "Second Floor" });
+
+        await expect.element(firstFloorRadio).toBeVisible();
+        await expect.element(secondFloorRadio).toBeVisible();
     });
 
-    it("sets prev floor btn as disabled when multi floors", async () => {
-        const screen = render();
+    it("shows active floor with check icon", async () => {
+        render();
         await showMenu();
 
-        const prevFloorBtn = screen.getByLabelText("Show previous floor");
-        await expect.element(prevFloorBtn).toBeDisabled();
+        // Check that the active floor has aria-checked="true"
+        const activeFloorRadio = page.getByRole("radio", { name: /first floor.*current floor/i });
+        await expect.element(activeFloorRadio).toBeVisible();
+        await expect.element(activeFloorRadio).toHaveAttribute("aria-checked", "true");
 
-        const nextFloorBtn = screen.getByLabelText("Show next floor");
-        await expect.element(nextFloorBtn).not.toBeDisabled();
+        // Check that inactive floor has aria-checked="false"
+        const inactiveFloorRadio = page.getByRole("radio", { name: "Second Floor" });
+        await expect.element(inactiveFloorRadio).toHaveAttribute("aria-checked", "false");
     });
 
-    it("sets next floor btn as disabled when multi floors", async () => {
-        activeFloor = floors[1];
-        const screen = render();
+    it("shows inactive floors with regular circle icon", async () => {
+        render();
         await showMenu();
 
-        const prevFloorBtn = screen.getByLabelText("Show previous floor");
-        await expect.element(prevFloorBtn).not.toBeDisabled();
-
-        const nextFloorBtn = screen.getByLabelText("Show next floor");
-        await expect.element(nextFloorBtn).toBeDisabled();
+        const inactiveFloorRadio = page.getByRole("radio", { name: "Second Floor" });
+        await expect.element(inactiveFloorRadio).toBeVisible();
+        await expect.element(inactiveFloorRadio).toHaveAttribute("aria-checked", "false");
     });
 
-    it("does not render switch floor plans when floors are of length 1", async () => {
-        const screen = render({
+    it("does not render floors section when only one floor exists", async () => {
+        render({
             floors: [floors[0]],
         });
         await showMenu();
 
-        const prevFloorBtn = screen.getByLabelText("Show previous floor");
-        const nextFloorBtn = screen.getByLabelText("Show next floor");
-
-        await expect.element(prevFloorBtn).not.toBeInTheDocument();
-        await expect.element(nextFloorBtn).not.toBeInTheDocument();
+        const floorsHeader = page.getByText("Floors");
+        await expect.element(floorsHeader).not.toBeInTheDocument();
     });
 
-    it("renders 'Show Details' btn when 'canSeeAdminEvent' is true", async () => {
-        const screen = render({ canSeeAdminEvent: true });
+    it("renders 'Admin View' option when 'canSeeAdminEvent' is true", async () => {
+        render({ canSeeAdminEvent: true });
         await showMenu();
 
-        const navigateToAdminBtn = screen.getByLabelText("Navigate to admin event");
-        await expect.element(navigateToAdminBtn).toBeVisible();
+        const adminViewItem = page.getByLabelText("Navigate to admin view");
+        await expect.element(adminViewItem).toBeVisible();
     });
 
-    it("does not render 'Show Details' option when 'canSeeAdminEvent' is false", async () => {
-        const screen = render({ canSeeAdminEvent: false });
+    it("does not render 'Admin View' option when 'canSeeAdminEvent' is false", async () => {
+        render({ canSeeAdminEvent: false });
         await showMenu();
 
-        await expect.element(screen.getByText("Show Details")).not.toBeInTheDocument();
+        const adminViewItem = page.getByLabelText("Navigate to admin view");
+        await expect.element(adminViewItem).not.toBeInTheDocument();
     });
 
-    it("emits 'set-active-floor' with correct floor data when next floor is selected", async () => {
+    it("emits 'set-active-floor' with correct floor data when floor is selected", async () => {
         const screen = render();
         await showMenu();
 
-        const nextFloorBtn = screen.getByLabelText("Show next floor");
-        await userEvent.click(nextFloorBtn);
+        const secondFloorRadio = page.getByRole("radio", { name: "Second Floor" });
+        await userEvent.click(secondFloorRadio);
 
         const emitted = last(
             screen.emitted<EventViewControlsProps["activeFloor"][]>()["set-active-floor"],
@@ -121,119 +123,127 @@ describe("EventViewControls.vue", () => {
         expect(emitted![0]).toStrictEqual(floors[1]);
     });
 
-    it("emits 'toggle-queued-reservations-drawer-visibility' when 'Table Waiting list' is clicked", async () => {
-        const screen = render({
-            canSeeAdminEvent: false,
-        });
+    it("emits 'toggle-queued-reservations-drawer-visibility' when 'Queued Reservations' is clicked", async () => {
+        const screen = render();
         await showMenu();
 
-        const waitingListItem = screen.getByLabelText(
-            "Toggle queued reservations drawer visibility",
-        );
-        await userEvent.click(waitingListItem);
+        const queuedReservationsItem = page.getByLabelText("Toggle queued reservations drawer");
+        await userEvent.click(queuedReservationsItem);
 
         expect(screen.emitted()["toggle-queued-reservations-drawer-visibility"]).toHaveLength(1);
     });
 
-    it("emits 'toggle-event-guest-list-drawer-visibility' when 'Guestlist' is clicked", async () => {
+    it("emits 'toggle-event-guest-list-drawer-visibility' when 'Guest List' is clicked", async () => {
         const screen = render();
         await showMenu();
 
-        const guestListItem = screen.getByLabelText("Toggle event guest list drawer visibility");
+        const guestListItem = page.getByLabelText("Toggle guest list drawer");
         await userEvent.click(guestListItem);
 
         expect(screen.emitted()["toggle-event-guest-list-drawer-visibility"]).toHaveLength(1);
     });
 
     it("emits 'show-event-info' when 'Event Info' is clicked", async () => {
-        const screen = render({
-            canSeeAdminEvent: false,
-        });
+        const screen = render();
         await showMenu();
 
-        const eventInfoItem = screen.getByLabelText("Show event info");
+        const eventInfoItem = page.getByLabelText("Show event info");
         await userEvent.click(eventInfoItem);
 
         expect(screen.emitted()["show-event-info"]).toHaveLength(1);
     });
 
-    it("emits 'navigate-to-admin-event' when 'Show Details' is clicked", async () => {
+    it("emits 'navigate-to-admin-event' when 'Admin View' is clicked", async () => {
         const screen = render({
             canSeeAdminEvent: true,
         });
         await showMenu();
 
-        const navigateToAdminBtn = screen.getByLabelText("Navigate to admin event");
-        await userEvent.click(navigateToAdminBtn);
+        const adminViewItem = page.getByLabelText("Navigate to admin view");
+        await userEvent.click(adminViewItem);
 
         expect(screen.emitted()["navigate-to-admin-event"]).toHaveLength(1);
     });
 
-    it("emits export-reservations event when export button is clicked", async () => {
+    it("emits export-reservations event when 'Export Reservations' is clicked", async () => {
         const screen = render({
             canExportReservations: true,
-            guestListCount: 0,
-            queuedReservationsCount: 0,
         });
+        await showMenu();
 
-        const exportButton = screen.getByLabelText("Export reservations");
+        const exportItem = page.getByLabelText("Export reservations");
+        await userEvent.click(exportItem);
 
-        await userEvent.click(exportButton);
         expect(screen.emitted("export-reservations")).toBeTruthy();
         expect(screen.emitted("export-reservations")?.length).toBe(1);
     });
 
-    it("doesn't render export button when canExportReservations is false", async () => {
-        const screen = render({
+    it("doesn't render 'Export Reservations' when canExportReservations is false", async () => {
+        render({
             canExportReservations: false,
         });
+        await showMenu();
 
-        const exportButton = screen.getByLabelText("Export reservations");
-        await expect.element(exportButton).not.toBeInTheDocument();
+        const exportItem = page.getByLabelText("Export reservations");
+        await expect.element(exportItem).not.toBeInTheDocument();
     });
 
     describe("Badges", () => {
-        it("displays correct count in queued reservations badge", async () => {
-            const screen = render({
+        it("displays correct count in queued reservations badge in menu", async () => {
+            render({
                 queuedReservationsCount: 5,
             });
+            await showMenu();
 
-            const badge = screen
-                .getByLabelText("Toggle queued reservations drawer visibility")
-                .getByRole("status");
-
-            await expect.element(badge!).toBeVisible();
-            await expect.element(badge!).toHaveTextContent("5");
+            const badge = page.getByLabelText("5 queued reservations");
+            await expect.element(badge).toBeVisible();
+            await expect.element(badge).toHaveTextContent("5");
         });
 
-        it("displays correct count in guest list badge", async () => {
-            const screen = render({
+        it("displays correct count in guest list badge in menu", async () => {
+            render({
                 guestListCount: 10,
             });
+            await showMenu();
 
-            const badge = screen
-                .getByLabelText("Toggle event guest list drawer visibility")
-                .getByRole("status");
-
-            await expect.element(badge!).toBeVisible();
-            await expect.element(badge!).toHaveTextContent("10");
+            const badge = page.getByLabelText("10 guests");
+            await expect.element(badge).toBeVisible();
+            await expect.element(badge).toHaveTextContent("10");
         });
 
-        it("shows badges only when counts are greater than 0", async () => {
-            const screen = render({
+        it("shows floating badge on menu button when notifications exist", async () => {
+            render({
+                guestListCount: 7,
+                queuedReservationsCount: 3,
+            });
+
+            const floatingBadge = page.getByLabelText("10 notifications");
+            await expect.element(floatingBadge).toBeVisible();
+            await expect.element(floatingBadge).toHaveTextContent("10");
+        });
+
+        it("shows only menu item badges when counts are greater than 0", async () => {
+            render({
+                guestListCount: 0,
+                queuedReservationsCount: 0,
+            });
+            await showMenu();
+
+            const queuedBadge = page.getByLabelText("0 queued reservations");
+            const guestListBadge = page.getByLabelText("0 guests");
+
+            await expect.element(queuedBadge).not.toBeInTheDocument();
+            await expect.element(guestListBadge).not.toBeInTheDocument();
+        });
+
+        it("does not show floating badge when no notifications exist", async () => {
+            render({
                 guestListCount: 0,
                 queuedReservationsCount: 0,
             });
 
-            const queuedBadge = screen
-                .getByLabelText("Toggle queued reservations drawer visibility")
-                .getByRole("status");
-            const guestListBadge = screen
-                .getByLabelText("Toggle event guest list drawer visibility")
-                .getByRole("status");
-
-            await expect.element(queuedBadge).not.toBeInTheDocument();
-            await expect.element(guestListBadge).not.toBeInTheDocument();
+            const floatingBadge = page.getByLabelText("0 notifications");
+            await expect.element(floatingBadge).not.toBeInTheDocument();
         });
     });
 });
