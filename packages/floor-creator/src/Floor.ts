@@ -109,8 +109,8 @@ export abstract class Floor {
         this.scale = calculateCanvasScale(
             container.clientWidth,
             container.clientHeight,
-            this.floorDoc.width,
-            this.floorDoc.height,
+            this.width,
+            this.height,
         );
         this.setScaling();
         this.zoomManager.setScale(this.scale);
