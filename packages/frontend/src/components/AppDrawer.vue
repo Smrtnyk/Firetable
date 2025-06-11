@@ -145,6 +145,8 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
         digitalDrinkCardsLink.value,
         inventoryLink.value,
         manageAnalyticsLink.value,
+        propertySettingsLink.value,
+
         {
             icon: "fa fa-users",
             isVisible: role === Role.PROPERTY_OWNER || role === Role.MANAGER,
@@ -169,7 +171,6 @@ const links = computed<(GuardedLink | LinkWithChildren)[]>(function () {
             label: t("AppDrawer.links.reportIssue"),
             route: { name: "reportIssue", params: { organisationId } },
         },
-        propertySettingsLink.value,
     ];
 
     return allLinks.filter(function (link): link is NonNullable<GuardedLink | LinkWithChildren> {
@@ -501,10 +502,12 @@ function setDarkMode(newValue: boolean): void {
             margin: 0 12px 4px;
             border-radius: 12px;
             transition: all 0.2s ease;
+            color: $text-secondary;
 
             &:hover {
                 background: $state-hover-light;
                 transform: translateX(4px);
+                color: $text-primary;
             }
         }
 
@@ -512,12 +515,48 @@ function setDarkMode(newValue: boolean): void {
             .q-item {
                 margin: 0 12px 4px;
                 border-radius: 12px;
+                color: $text-secondary;
+
+                &:hover {
+                    background: $state-hover-light;
+                    transform: translateX(4px);
+                    color: $text-primary;
+                }
             }
         }
 
         &--expandable {
             :deep(.q-expansion-item__toggle-icon) {
-                color: $icon-primary;
+                color: $text-secondary;
+                font-size: 16px;
+                transition: color 0.2s ease;
+            }
+
+            :deep(.q-item__section--avatar) {
+                .q-icon {
+                    color: $text-secondary;
+                    font-size: 16px;
+                    transition: color 0.2s ease;
+                }
+            }
+
+            :deep(.q-item__label) {
+                color: $text-secondary;
+                font-weight: 500;
+            }
+
+            :deep(.q-item:hover) {
+                .q-item__label {
+                    color: $text-primary;
+                }
+
+                .q-item__section--avatar .q-icon {
+                    color: $accent;
+                }
+
+                .q-expansion-item__toggle-icon {
+                    color: $accent;
+                }
             }
         }
     }
@@ -526,9 +565,22 @@ function setDarkMode(newValue: boolean): void {
         :deep(.q-item) {
             margin-left: 24px;
             background: rgba($surface-secondary, 0.8);
+            color: $text-secondary;
 
             &:hover {
                 background: $state-hover-light;
+                color: $text-primary;
+                transform: translateX(4px);
+            }
+
+            .q-item__section--avatar .q-icon {
+                color: $text-tertiary;
+                font-size: 14px;
+                transition: color 0.2s ease;
+            }
+
+            &:hover .q-item__section--avatar .q-icon {
+                color: $accent;
             }
         }
     }
@@ -571,7 +623,7 @@ function setDarkMode(newValue: boolean): void {
 
         i {
             width: 16px;
-            color: $icon-primary;
+            color: $text-tertiary;
             font-size: 14px;
         }
     }
@@ -633,14 +685,65 @@ function setDarkMode(newValue: boolean): void {
                 color: $text-primary-dark;
             }
         }
+
+        :deep(.q-expansion-item__container) {
+            .q-item {
+                color: $text-secondary-dark;
+
+                &:hover {
+                    background: $state-hover-dark;
+                    color: $text-primary-dark;
+                }
+            }
+        }
+
+        &--expandable {
+            :deep(.q-expansion-item__toggle-icon) {
+                color: $text-secondary-dark;
+            }
+
+            :deep(.q-item__section--avatar) {
+                .q-icon {
+                    color: $text-secondary-dark;
+                }
+            }
+
+            :deep(.q-item__label) {
+                color: $text-secondary-dark;
+            }
+
+            :deep(.q-item:hover) {
+                .q-item__label {
+                    color: $text-primary-dark;
+                }
+
+                .q-item__section--avatar .q-icon {
+                    color: $accent;
+                }
+
+                .q-expansion-item__toggle-icon {
+                    color: $accent;
+                }
+            }
+        }
     }
 
     &__nav-child {
         :deep(.q-item) {
             background: $role-bg-dark;
+            color: $text-secondary-dark;
 
             &:hover {
                 background: $state-hover-dark;
+                color: $text-primary-dark;
+            }
+
+            .q-item__section--avatar .q-icon {
+                color: $icon-secondary-dark;
+            }
+
+            &:hover .q-item__section--avatar .q-icon {
+                color: $icon-primary-dark;
             }
         }
     }
@@ -662,7 +765,7 @@ function setDarkMode(newValue: boolean): void {
         color: $text-secondary-dark;
 
         i {
-            color: $icon-primary-dark;
+            color: $text-tertiary-dark;
         }
     }
 

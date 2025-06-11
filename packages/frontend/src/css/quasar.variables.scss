@@ -59,10 +59,16 @@ $text-muted-dark: #7a6f85;             // Most dimmed
 $border-light-dark: rgba(234, 234, 236, 0.15);
 $border-medium-dark: rgba(234, 234, 236, 0.25);
 
-$icon-primary: #BB86FC;
-$icon-primary-dark: #BB86FC;           // Same in dark mode
-$icon-hover: #9c5dfc;                  // Darker purple for hover
-$icon-hover-dark: #d4b3ff;             // Lighter purple for dark hover
+$icon-primary: $text-secondary;
+$icon-secondary: rgba($text-secondary, 0.7);
+$icon-tertiary: rgba($text-tertiary, 0.8);
+$icon-hover: $accent;
+
+// Dark mode icon colors
+$icon-primary-dark: $text-secondary-dark;
+$icon-secondary-dark: rgba($text-secondary-dark, 0.7);
+$icon-tertiary-dark: rgba($text-tertiary-dark, 0.8);
+$icon-hover-dark: $accent;
 
 $state-hover-light: rgba(187, 134, 252, 0.1);
 $state-hover-dark: rgba(187, 134, 252, 0.15);
