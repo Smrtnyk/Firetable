@@ -124,4 +124,44 @@ describe("EventGuestSearch.vue", () => {
         const janeOption = screen.getByText("Jane Smith (Table 2) on Second Floor");
         await expect.element(janeOption).toBeVisible();
     });
+
+    it("keeps dropdown open and allows unchecking 'Hide arrived' when all guests are filtered out", async () => {
+        // Create a scenario where only arrived guests match the search
+        const onlyArrivedReservations = [
+            {
+                arrived: true,
+                floorId: "floor1",
+                guestName: "John Doe",
+                isVIP: false,
+                tableLabel: "Table 1",
+            },
+        ];
+
+        const screen = renderComponent(EventGuestSearch, {
+            allReservedTables: onlyArrivedReservations,
+            floors,
+            showFloorNameInOption,
+        });
+
+        const input = screen.getByRole("combobox");
+        await userEvent.fill(input, "John");
+        await userEvent.click(input);
+
+        // Find and check the 'Hide arrived' checkbox
+        const hideArrivedCheckbox = screen.getByRole("checkbox", { name: "Hide arrived" });
+        await expect.element(hideArrivedCheckbox).toBeVisible();
+        await userEvent.click(hideArrivedCheckbox);
+
+        // Verify that the checkbox is still visible and can be unchecked
+        await expect.element(hideArrivedCheckbox).toBeVisible();
+        await expect.element(hideArrivedCheckbox).toBeChecked();
+
+        // Uncheck the checkbox
+        await userEvent.click(hideArrivedCheckbox);
+        await expect.element(hideArrivedCheckbox).not.toBeChecked();
+
+        // Verify that John Doe appears again
+        const johnOption = screen.getByText("John Doe (Table 1) on First Floor");
+        await expect.element(johnOption).toBeVisible();
+    });
 });

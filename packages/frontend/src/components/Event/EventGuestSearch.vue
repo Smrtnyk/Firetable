@@ -46,9 +46,25 @@ function filterFn(val: string, update: any): void {
             // Exclude arrived reservations if hideArrived is true
             return !(hideArrived.value && reservation.arrived);
         });
-        options.value = filteredTables.map(mapReservationToOption).filter(function (option) {
+
+        const mappedOptions = filteredTables.map(mapReservationToOption).filter(function (option) {
             return option.value.guestName.toLowerCase().includes(loweredVal);
         });
+
+        // NOTE: a quasar workaround to keep the before-options slot rendered
+        // If no options after filtering but hideArrived is true, add a dummy option to keep dropdown open
+        if (mappedOptions.length === 0 && hideArrived.value) {
+            options.value = [
+                {
+                    // @ts-expect-error -- a workaround to keep the before-options slot rendered
+                    isDummy: true,
+                    label: "",
+                    value: null as any,
+                },
+            ];
+        } else {
+            options.value = mappedOptions;
+        }
     });
 }
 
@@ -159,10 +175,12 @@ function setModel(val: string): void {
                         />
                     </q-item-section>
                 </q-item>
+                <q-separator />
             </template>
 
             <template #option="scope">
-                <q-item v-bind="scope.itemProps">
+                <!-- Don't render dummy option that is a workaround -->
+                <q-item v-if="!scope.opt.isDummy" v-bind="scope.itemProps">
                     <q-item-section>
                         <q-item-label>
                             {{ scope.opt.label }}
