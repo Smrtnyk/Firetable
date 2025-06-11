@@ -31,6 +31,26 @@ const hr: TranslationStructure = {
     AdminEventEditInfo: {
         saveButtonLabel: "Spremi",
     },
+    AdminEventRTInfo: {
+        labels: {
+            avgConsumption: "Prosj. potrošnja",
+            pending: "na čekanju",
+            returningGuests: "Gosti koji se vraćaju",
+            tables: "stolova",
+            totalGuests: "Ukupno gostiju",
+            vipGuests: "VIP gosti",
+            withContactsSuffix: "s kontaktima",
+        },
+        titles: {
+            capacityOverview: "Pregled kapaciteta",
+            guestStatistics: "Statistika gostiju",
+        },
+    },
+    AdminPropertyEventsList: {
+        buttons: {
+            loadMore: "Učitaj više",
+        },
+    },
     AppDrawer: {
         languages: {
             croatian: "Hrvatski",
@@ -70,6 +90,22 @@ const hr: TranslationStructure = {
     },
     AppTopMenu: {
         menuAriaLabel: "Izbornik",
+    },
+    config: {
+        floorElements: {
+            bar: "Šank",
+            circle: "Krug",
+            cloakroom: "Garderoba",
+            djBooth: "DJ pult",
+            door: "Vrata",
+            rectangle: "Pravokutnik",
+            roundTable: "Okrugli stol",
+            sofa: "Sofa",
+            squareTable: "Kvadratni stol",
+            stage: "Pozornica",
+            text: "Tekst",
+            wall: "Zid",
+        },
     },
     DrinkBundleDialog: {
         bundleItemsLabel: "Stavke Paketa ({count})",
@@ -178,6 +214,19 @@ const hr: TranslationStructure = {
         unlinkTablesLabel: "Odvoji stolove",
         waitingForResponse: "Čekanje na odgovor",
     },
+    EventViewControls: {
+        menuItems: {
+            adminView: "Admin prikaz",
+            eventInfo: "Informacije o događaju",
+            exportReservations: "Izvezi rezervacije",
+            guestList: "Popis gostiju",
+            queuedReservations: "Rezervacije na čekanju",
+        },
+        sections: {
+            actions: "Akcije",
+            floors: "Katovi",
+        },
+    },
     FTBottomDialog: {
         closeBottomDialogAriaLabel: "Zatvori donji dijalog",
     },
@@ -234,6 +283,33 @@ const hr: TranslationStructure = {
         arrived: "Stigao",
         reservations: "Rezervacije",
     },
+    helpers: {
+        formRules: {
+            greaterThanZero: "Broj mora biti veći od 0!",
+            noEmptyString: "Molimo unesite nešto.",
+            noWhiteSpaces: "Praznine nisu dopuštene!",
+            requireNumber: "Morate unijeti broj!",
+            validOptionalURL: "Nije važeći URL.",
+        },
+        ui: {
+            deleteConfirmPlaceholder: 'Molimo upišite "{confirmText}" za potvrdu',
+            errorDialogTitle: "Greška",
+            unexpectedError: "Došlo je do neočekivane pogreške.",
+        },
+    },
+    InventoryImportDialog: {
+        fileUpload: {
+            clickToUploadMessage: "Ili klikni za prijenos",
+            dropCsvMessage: "Ispusti CSV datoteku ovdje",
+        },
+        pasteCsv: {
+            placeholder: "Zalijepi svoj CSV tekst ovdje",
+        },
+        tabs: {
+            importFile: "Uvezi datoteku",
+            pasteCsvAsText: "Zalijepi CSV kao tekst",
+        },
+    },
     InventoryItemCreateForm: {
         alcoholContentRange: "Sadržaj alkohola mora biti između 0 i 100",
         mainCategoryRequired: "Glavna kategorija je obavezna",
@@ -248,6 +324,11 @@ const hr: TranslationStructure = {
         supplier: "Dobavljač",
         volume: "Volumen",
     },
+    IssueCreateForm: {
+        validation: {
+            descriptionMinLength: "Opis problema mora imati najmanje 10 znakova!",
+        },
+    },
     NetworkOverlay: {
         noInternetConnectionText: "Nema internetske veze",
         reloadButtonLabel: "Ponovno učitaj",
@@ -257,6 +338,7 @@ const hr: TranslationStructure = {
         charts: {
             arrivedVsNoShowTitle: "Stigli vs. Nisu se pojavili",
             consumptionDataTitle: "Podaci o potrošnji",
+            consumptionLabel: "Potrošnja",
             guestDistributionTitle: "Raspodjela gostiju",
             peakReservationHoursTitle: "Vršni sati rezervacija",
             plannedVsWalkInTitle: "Planirano vs. Bez najave",

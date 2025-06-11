@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 export interface EventViewControlsProps {
     activeFloor: undefined | { id: string; name: string };
@@ -38,6 +39,8 @@ const totalNotifications = computed(() => queuedReservationsCount + guestListCou
 function setActiveFloor(floor: { id: string; name: string }): void {
     emit("set-active-floor", floor);
 }
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -66,7 +69,7 @@ function setActiveFloor(floor: { id: string; name: string }): void {
                     <template v-if="hasMultipleFloors">
                         <q-item-label header class="EventViewControls__section-header">
                             <q-icon name="fa fa-layer-group" class="q-mr-xs" />
-                            Floors
+                            {{ t("EventViewControls.sections.floors") }}
                         </q-item-label>
 
                         <!-- Radio group for floors -->
@@ -116,7 +119,7 @@ function setActiveFloor(floor: { id: string; name: string }): void {
                     <!-- Actions Section -->
                     <q-item-label header class="EventViewControls__section-header">
                         <q-icon name="fa fa-cog" class="q-mr-xs" />
-                        Actions
+                        {{ t("EventViewControls.sections.actions") }}
                     </q-item-label>
 
                     <!-- Queued Reservations -->
@@ -137,7 +140,7 @@ function setActiveFloor(floor: { id: string; name: string }): void {
                         </q-item-section>
                         <q-item-section>
                             <q-item-label class="EventViewControls__menu-label">
-                                Queued Reservations
+                                {{ t("EventViewControls.menuItems.queuedReservations") }}
                             </q-item-label>
                         </q-item-section>
                         <q-item-section side v-if="queuedReservationsCount > 0">
@@ -167,7 +170,7 @@ function setActiveFloor(floor: { id: string; name: string }): void {
                         </q-item-section>
                         <q-item-section>
                             <q-item-label class="EventViewControls__menu-label">
-                                Guest List
+                                {{ t("EventViewControls.menuItems.guestList") }}
                             </q-item-label>
                         </q-item-section>
                         <q-item-section side v-if="guestListCount > 0">
@@ -199,7 +202,7 @@ function setActiveFloor(floor: { id: string; name: string }): void {
                         </q-item-section>
                         <q-item-section>
                             <q-item-label class="EventViewControls__menu-label">
-                                Event Info
+                                {{ t("EventViewControls.menuItems.eventInfo") }}
                             </q-item-label>
                         </q-item-section>
                     </q-item>
@@ -223,7 +226,7 @@ function setActiveFloor(floor: { id: string; name: string }): void {
                         </q-item-section>
                         <q-item-section>
                             <q-item-label class="EventViewControls__menu-label">
-                                Admin View
+                                {{ t("EventViewControls.menuItems.adminView") }}
                             </q-item-label>
                         </q-item-section>
                     </q-item>
@@ -247,7 +250,7 @@ function setActiveFloor(floor: { id: string; name: string }): void {
                         </q-item-section>
                         <q-item-section>
                             <q-item-label class="EventViewControls__menu-label">
-                                Export Reservations
+                                {{ t("EventViewControls.menuItems.exportReservations") }}
                             </q-item-label>
                         </q-item-section>
                     </q-item>

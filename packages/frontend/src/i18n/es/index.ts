@@ -32,6 +32,26 @@ const es: TranslationStructure = {
     AdminEventEditInfo: {
         saveButtonLabel: "Guardar",
     },
+    AdminEventRTInfo: {
+        labels: {
+            avgConsumption: "Consumo Prom.",
+            pending: "pendientes",
+            returningGuests: "Invitados Recurrentes",
+            tables: "mesas",
+            totalGuests: "Total de Invitados",
+            vipGuests: "Invitados VIP",
+            withContactsSuffix: "con contactos",
+        },
+        titles: {
+            capacityOverview: "Resumen de Capacidad",
+            guestStatistics: "Estadísticas de Invitados",
+        },
+    },
+    AdminPropertyEventsList: {
+        buttons: {
+            loadMore: "Cargar más",
+        },
+    },
     AppDrawer: {
         languages: {
             croatian: "Croata",
@@ -71,6 +91,22 @@ const es: TranslationStructure = {
     },
     AppTopMenu: {
         menuAriaLabel: "Menú",
+    },
+    config: {
+        floorElements: {
+            bar: "Barra",
+            circle: "Círculo",
+            cloakroom: "Guardarropa",
+            djBooth: "Cabina de DJ",
+            door: "Puerta",
+            rectangle: "Rectángulo",
+            roundTable: "Mesa redonda",
+            sofa: "Sofá",
+            squareTable: "Mesa cuadrada",
+            stage: "Escenario",
+            text: "Texto",
+            wall: "Pared",
+        },
     },
     DrinkBundleDialog: {
         bundleItemsLabel: "Artículos del Paquete ({count})",
@@ -180,6 +216,19 @@ const es: TranslationStructure = {
         unlinkTablesLabel: "Desvincular mesas",
         waitingForResponse: "Esperando respuesta",
     },
+    EventViewControls: {
+        menuItems: {
+            adminView: "Vista de Administrador",
+            eventInfo: "Información del Evento",
+            exportReservations: "Exportar Reservas",
+            guestList: "Lista de Invitados",
+            queuedReservations: "Reservas en Cola",
+        },
+        sections: {
+            actions: "Acciones",
+            floors: "Pisos",
+        },
+    },
     FTBottomDialog: {
         closeBottomDialogAriaLabel: "Cerrar diálogo inferior",
     },
@@ -236,12 +285,39 @@ const es: TranslationStructure = {
         arrived: "Llegado",
         reservations: "Reservaciones",
     },
+    helpers: {
+        formRules: {
+            greaterThanZero: "¡El número debe ser mayor que 0!",
+            noEmptyString: "Por favor, escribe algo.",
+            noWhiteSpaces: "¡No se permiten espacios en blanco!",
+            requireNumber: "¡Debes ingresar un número!",
+            validOptionalURL: "No es una URL válida.",
+        },
+        ui: {
+            deleteConfirmPlaceholder: 'Por favor, escribe "{confirmText}" para confirmar',
+            errorDialogTitle: "Error",
+            unexpectedError: "Ocurrió un error inesperado.",
+        },
+    },
+    InventoryImportDialog: {
+        fileUpload: {
+            clickToUploadMessage: "O haz clic para subir",
+            dropCsvMessage: "Suelta tu archivo CSV aquí",
+        },
+        pasteCsv: {
+            placeholder: "Pega tu texto CSV aquí",
+        },
+        tabs: {
+            importFile: "Importar archivo",
+            pasteCsvAsText: "Pegar CSV como texto",
+        },
+    },
     InventoryItemCreateForm: {
-        alcoholContentRange: "Alcohol content must be between 0 and 100",
-        mainCategoryRequired: "Main category is required",
-        quantityNonNegative: "Quantity must be non-negative",
-        subCategoryRequired: "Sub category is required",
-        volumePositive: "Volume must be positive",
+        alcoholContentRange: "El contenido de alcohol debe estar entre 0 y 100",
+        mainCategoryRequired: "La categoría principal es obligatoria",
+        quantityNonNegative: "La cantidad no debe ser negativa",
+        subCategoryRequired: "La subcategoría es obligatoria",
+        volumePositive: "El volumen debe ser positivo",
     },
     InventoryTable: {
         mainCategory: "Categoría principal",
@@ -249,6 +325,11 @@ const es: TranslationStructure = {
         subCategory: "Subcategoría",
         supplier: "Proveedor",
         volume: "Volumen",
+    },
+    IssueCreateForm: {
+        validation: {
+            descriptionMinLength: "¡La descripción del problema debe tener al menos 10 caracteres!",
+        },
     },
     NetworkOverlay: {
         noInternetConnectionText: "Sin conexión a Internet",
@@ -259,6 +340,7 @@ const es: TranslationStructure = {
         charts: {
             arrivedVsNoShowTitle: "Llegadas vs. No Presentados",
             consumptionDataTitle: "Datos de Consumo",
+            consumptionLabel: "Consumo",
             guestDistributionTitle: "Distribución de Huéspedes",
             peakReservationHoursTitle: "Horas Pico de Reservas",
             plannedVsWalkInTitle: "Planificadas vs. Sin Cita Previa",
@@ -304,7 +386,7 @@ const es: TranslationStructure = {
         eventCreatedNotificationMessage: "¡Evento creado!",
         noEventsMessage: "No hay eventos creados",
         pastEventsLabel: "Eventos anteriores",
-        title: "Events",
+        title: "Eventos",
     },
     PageAdminFloors: {
         deleteFloorMessage: "¿Eliminar piso?",
@@ -569,10 +651,10 @@ const es: TranslationStructure = {
         tableAlreadyLinkedErrorMsg: "Esta mesa ya está vinculada a la reservación",
         transferReservationConfirmMessage:
             "Esto transferirá la reservación de la mesa {table1Label} a la mesa {table2Label}",
-        transferReservationConfirmTitle: "Está seguro de que quieres transferir esta reservación?",
+        transferReservationConfirmTitle: "Esta seguro de que quieres transferir esta reservación?",
         transferringReservationOperationMsg: "Transfiriendo reservación de la mesa {tableLabel}",
         transferToSameTableErrorMsg: "No se puede transferir la reservación a la misma mesa!",
-        unlinkConfirmMessage: "Está seguro de que desea desvincular estas mesas: {table}?",
+        unlinkConfirmMessage: "Esta seguro de que desea desvincular estas mesas: {table}?",
         unlinkConfirmTitle: "Desvincular mesas",
     },
     validation: {

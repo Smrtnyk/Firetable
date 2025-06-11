@@ -68,7 +68,7 @@ const chartInfos = computed(function () {
         },
         {
             data: consumptionAnalysisCombined.value,
-            labels: ["Consumption"] as string[],
+            labels: [t("PageAdminAnalytics.charts.consumptionLabel")] as string[],
             title: t("PageAdminAnalytics.charts.consumptionDataTitle"),
             type: "bar",
         },

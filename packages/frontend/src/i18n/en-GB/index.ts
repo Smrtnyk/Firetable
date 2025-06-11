@@ -29,6 +29,26 @@ const enGB = {
     AdminEventEditInfo: {
         saveButtonLabel: "Save",
     },
+    AdminEventRTInfo: {
+        labels: {
+            avgConsumption: "Avg. Consumption",
+            pending: "pending",
+            returningGuests: "Returning Guests",
+            tables: "tables",
+            totalGuests: "Total Guests",
+            vipGuests: "VIP Guests",
+            withContactsSuffix: "with contacts",
+        },
+        titles: {
+            capacityOverview: "Capacity Overview",
+            guestStatistics: "Guest Statistics",
+        },
+    },
+    AdminPropertyEventsList: {
+        buttons: {
+            loadMore: "Load More",
+        },
+    },
     AppDrawer: {
         languages: {
             croatian: "Croatian",
@@ -68,6 +88,22 @@ const enGB = {
     },
     AppTopMenu: {
         menuAriaLabel: "Menu",
+    },
+    config: {
+        floorElements: {
+            bar: "Bar",
+            circle: "Circle",
+            cloakroom: "Cloakroom",
+            djBooth: "DJ Booth",
+            door: "Door",
+            rectangle: "Rectangle",
+            roundTable: "Round table",
+            sofa: "Sofa",
+            squareTable: "Square table",
+            stage: "Stage",
+            text: "Text",
+            wall: "Wall",
+        },
     },
     DrinkBundleDialog: {
         bundleItemsLabel: "Bundle Items ({count})",
@@ -176,6 +212,20 @@ const enGB = {
         unlinkTablesLabel: "Unlink tables",
         waitingForResponse: "Waiting for response",
     },
+    EventViewControls: {
+        // floorSelector object removed as currentFloorSuffix was its only property
+        menuItems: {
+            adminView: "Admin View",
+            eventInfo: "Event Info",
+            exportReservations: "Export Reservations",
+            guestList: "Guest List",
+            queuedReservations: "Queued Reservations",
+        },
+        sections: {
+            actions: "Actions",
+            floors: "Floors",
+        },
+    },
     FTBottomDialog: {
         closeBottomDialogAriaLabel: "Close bottom dialog",
     },
@@ -232,6 +282,33 @@ const enGB = {
         arrived: "Arrived",
         reservations: "Reservations",
     },
+    helpers: {
+        formRules: {
+            greaterThanZero: "Number must be greater than 0!",
+            noEmptyString: "Please type something",
+            noWhiteSpaces: "No whitespaces are allowed!",
+            requireNumber: "You must type in a number!",
+            validOptionalURL: "Not a valid url",
+        },
+        ui: {
+            deleteConfirmPlaceholder: 'Please type "{confirmText}" to confirm',
+            errorDialogTitle: "Error",
+            unexpectedError: "An unexpected error occurred.",
+        },
+    },
+    InventoryImportDialog: {
+        fileUpload: {
+            clickToUploadMessage: "Or click to upload",
+            dropCsvMessage: "Drop your CSV file here",
+        },
+        pasteCsv: {
+            placeholder: "Paste your CSV text here",
+        },
+        tabs: {
+            importFile: "Import file",
+            pasteCsvAsText: "Paste CSV as text",
+        },
+    },
     InventoryItemCreateForm: {
         alcoholContentRange: "Alcohol content must be between 0 and 100",
         mainCategoryRequired: "Main category is required",
@@ -246,6 +323,11 @@ const enGB = {
         supplier: "Supplier",
         volume: "Volume",
     },
+    IssueCreateForm: {
+        validation: {
+            descriptionMinLength: "Issue description needs to have at least 10 characters!",
+        },
+    },
     NetworkOverlay: {
         noInternetConnectionText: "No Internet Connection",
         reloadButtonLabel: "Reload",
@@ -255,6 +337,7 @@ const enGB = {
         charts: {
             arrivedVsNoShowTitle: "Arrived vs. No-Show",
             consumptionDataTitle: "Consumption Data",
+            consumptionLabel: "Consumption",
             guestDistributionTitle: "Guest Distribution",
             peakReservationHoursTitle: "Peak Reservation Hours",
             plannedVsWalkInTitle: "Planned vs. Walk-In",

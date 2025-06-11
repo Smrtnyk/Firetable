@@ -4,6 +4,7 @@ import type { FloorDoc, ReservationDoc } from "@firetable/types";
 import { getTablesFromFloorDoc } from "@firetable/floor-creator";
 import { property } from "es-toolkit/compat";
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 export interface AdminEventRTInfoProps {
     activeReservations: ReservationDoc[];
@@ -91,6 +92,8 @@ const contactRate = computed(function () {
         100
     ).toFixed(1);
 });
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -101,7 +104,9 @@ const contactRate = computed(function () {
             <div class="col-12 col-md-6">
                 <q-card class="bg-primary text-white ft-card">
                     <q-card-section>
-                        <div class="text-h6">Capacity Overview</div>
+                        <div class="text-h6">
+                            {{ t("AdminEventRTInfo.titles.capacityOverview") }}
+                        </div>
                         <div class="row items-center q-gutter-x-md">
                             <div class="text-h3" aria-label="occupancy rate">
                                 {{ occupancyRate }}%
@@ -109,10 +114,12 @@ const contactRate = computed(function () {
                             <div class="column">
                                 <div aria-label="tables occupied">
                                     {{ reservationsStatus.currentlyOccupied }} /
-                                    {{ reservationsStatus.total }} tables
+                                    {{ reservationsStatus.total }}
+                                    {{ t("AdminEventRTInfo.labels.tables") }}
                                 </div>
                                 <div aria-label="pending reservations">
-                                    {{ reservationsStatus.pending }} pending
+                                    {{ reservationsStatus.pending }}
+                                    {{ t("AdminEventRTInfo.labels.pending") }}
                                 </div>
                             </div>
                         </div>
@@ -124,15 +131,18 @@ const contactRate = computed(function () {
             <div class="col-12 col-md-6">
                 <q-card class="bg-secondary text-white ft-card">
                     <q-card-section>
-                        <div class="text-h6">Guest Statistics</div>
+                        <div class="text-h6">
+                            {{ t("AdminEventRTInfo.titles.guestStatistics") }}
+                        </div>
                         <div class="row items-center q-gutter-x-md">
                             <div class="text-h3" aria-label="total guests">
                                 {{ reservationsStatus.totalGuests }}
                             </div>
                             <div class="column">
-                                <div>Total Guests</div>
+                                <div>{{ t("AdminEventRTInfo.labels.totalGuests") }}</div>
                                 <div aria-label="guest contact rate">
-                                    {{ contactRate }}% with contacts
+                                    {{ contactRate }}%
+                                    {{ t("AdminEventRTInfo.labels.withContactsSuffix") }}
                                 </div>
                             </div>
                         </div>
@@ -144,7 +154,9 @@ const contactRate = computed(function () {
             <div class="col-12 col-md-4">
                 <q-card class="ft-card">
                     <q-card-section>
-                        <div class="text-subtitle2">VIP Guests</div>
+                        <div class="text-subtitle2">
+                            {{ t("AdminEventRTInfo.labels.vipGuests") }}
+                        </div>
                         <div class="text-h5" aria-label="vip guest count">
                             {{ reservationsStatus.vipGuests }}
                         </div>
@@ -155,7 +167,9 @@ const contactRate = computed(function () {
             <div class="col-12 col-md-4">
                 <q-card class="ft-card">
                     <q-card-section>
-                        <div class="text-subtitle2">Returning Guests</div>
+                        <div class="text-subtitle2">
+                            {{ t("AdminEventRTInfo.labels.returningGuests") }}
+                        </div>
                         <div class="text-h5" aria-label="returning guest count">
                             {{ reservationsStatus.returningGuests }}
                         </div>
@@ -166,7 +180,9 @@ const contactRate = computed(function () {
             <div class="col-12 col-md-4">
                 <q-card class="ft-card">
                     <q-card-section>
-                        <div class="text-subtitle2">Avg. Consumption</div>
+                        <div class="text-subtitle2">
+                            {{ t("AdminEventRTInfo.labels.avgConsumption") }}
+                        </div>
                         <div class="text-h5" aria-label="average consumption">
                             {{ reservationsStatus.averageConsumption.toFixed(2) }}
                         </div>

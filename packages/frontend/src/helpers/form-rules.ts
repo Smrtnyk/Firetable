@@ -1,9 +1,10 @@
 import { isString } from "es-toolkit";
 import { isNumber } from "es-toolkit/compat";
 import { isNil } from "es-toolkit/predicate";
+import { i18n } from "src/boot/i18n";
 
 export function greaterThanZero(
-    msg = "Number must be greater than 0!",
+    msg = i18n.global.t("helpers.formRules.greaterThanZero"),
 ): (val: unknown) => boolean | string {
     return function (val: unknown): boolean | string {
         return (!Number.isNaN(Number(val)) && Number(val) > 0) || msg;
@@ -34,7 +35,9 @@ export function minLength(msg: string, minLen = 5): (val: string) => boolean | s
     };
 }
 
-export function noEmptyString(msg = "Please type something"): (val: string) => boolean | string {
+export function noEmptyString(
+    msg = i18n.global.t("helpers.formRules.noEmptyString"),
+): (val: string) => boolean | string {
     return function (val: string): boolean | string {
         return (val && val.length > 0) || msg;
     };
@@ -57,7 +60,7 @@ export function noNegativeNumber(msg: string): (val: unknown) => boolean | strin
 }
 
 export function noWhiteSpaces(val: string): boolean | string {
-    return !/\s/g.test(val) || "No whitespaces are allowed!";
+    return !/\s/g.test(val) || i18n.global.t("helpers.formRules.noWhiteSpaces");
 }
 
 export function numberInRange(
@@ -100,14 +103,16 @@ export function optionalNumberInRange(
 }
 
 export function requireNumber(
-    msg = "You must type in a number!",
+    msg = i18n.global.t("helpers.formRules.requireNumber"),
 ): (val: unknown) => boolean | string {
     return function (val: unknown): boolean | string {
         return !Number.isNaN(Number(val)) || msg;
     };
 }
 
-export function validOptionalURL(msg = "Not a valid url"): (val: string) => boolean | string {
+export function validOptionalURL(
+    msg = i18n.global.t("helpers.formRules.validOptionalURL"),
+): (val: string) => boolean | string {
     return function (val: string): boolean | string {
         if (val === "") {
             return true;

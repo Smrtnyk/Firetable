@@ -1,3 +1,4 @@
+import { i18n, loadLanguage } from "src/boot/i18n";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -10,6 +11,10 @@ import {
     noWhiteSpaces,
     optionalNumberInRange,
 } from "./form-rules";
+
+const languageStrings = await loadLanguage("en-GB");
+i18n.global.locale.value = "en-GB";
+i18n.global.setLocaleMessage("en-GB", languageStrings.default);
 
 describe("form-rules.ts", () => {
     describe("noEmptyString", () => {
