@@ -7,6 +7,9 @@ const hr: TranslationStructure = {
     },
     AddNewGuestForm: {
         guestNameInputLabel: "Ime gosta *",
+        validation: {
+            nameMinLength: "Ime gosta mora imati najmanje 3 znaka",
+        },
     },
     AddNewOrganisationForm: {
         maxPropertiesLabel: "Dodajte maksimalan broj dopuštenih nekretnina...",
@@ -24,6 +27,9 @@ const hr: TranslationStructure = {
         propertyNameLabel: "Naziv objekta",
         propertyNameLengthValidationMessage: "Naziv nekretnine mora imati najmanje 3 znaka!",
         uploadFileButtonLabel: "Učitaj datoteku",
+    },
+    AdminEventEditInfo: {
+        saveButtonLabel: "Spremi",
     },
     AppDrawer: {
         languages: {
@@ -48,6 +54,16 @@ const hr: TranslationStructure = {
             settings: "Postavke",
         },
         logoutAriaLabel: "Odjavi se",
+        roles: {
+            administrator: "Administrator",
+            manager: "Menadžer",
+            propertyOwner: "Vlasnik objekta",
+            staff: "Osoblje",
+        },
+        sectionTitles: {
+            navigation: "Navigacija",
+            settings: "Postavke",
+        },
         toggles: {
             darkMode: "Prebaci na tamni način",
         },
@@ -237,6 +253,25 @@ const hr: TranslationStructure = {
         reloadButtonLabel: "Ponovno učitaj",
         waitOrReloadText: "Pričekajte ili pokušajte ponovno učitati stranicu",
     },
+    PageAdminAnalytics: {
+        charts: {
+            arrivedVsNoShowTitle: "Stigli vs. Nisu se pojavili",
+            consumptionDataTitle: "Podaci o potrošnji",
+            guestDistributionTitle: "Raspodjela gostiju",
+            peakReservationHoursTitle: "Vršni sati rezervacija",
+            plannedVsWalkInTitle: "Planirano vs. Bez najave",
+            reservationsByDayOfWeekTitle: "Rezervacije po danu u tjednu",
+            totalPlannedReservationsTitle: "Ukupno planiranih rezervacija",
+        },
+        chipLabels: {
+            avgGuestsPlanned: "Prosj. gostiju po planiranoj rezervaciji:",
+            avgGuestsWalkIn: "Prosj. gostiju po rezervaciji bez najave:",
+        },
+        tabs: {
+            all: "SVE",
+        },
+        title: "Analitika",
+    },
     PageAdminEvent: {
         arrivedReservationsTabLabel: "Stigli ({count})",
         cancelledReservationsTabLabel: "Otkazano ({count})",
@@ -418,6 +453,10 @@ const hr: TranslationStructure = {
         deleteQueuedReservationConfirmMsg: "Jeste li sigurni da želite izbrisati ovu rezervaciju?",
         exportReservationsConfirmMsg: "Ovo će izvesti rezervacije u CSV datoteku",
     },
+    PageEvents: {
+        noEventsMessage: "Nema nadolazećih događaja",
+        title: "Nadolazeći događaji",
+    },
     PageIssueReport: {
         categories: {
             bug: "Greška",
@@ -447,11 +486,25 @@ const hr: TranslationStructure = {
         propertiesLimit: "Ograničenje nekretnina",
     },
     PageProfile: {
+        buttons: {
+            cancel: "Odustani",
+        },
+        fields: {
+            changePassword: {
+                description: "Ažurirajte svoju lozinku kako biste osigurali svoj račun",
+                title: "Promijeni lozinku",
+            },
+        },
         nameLabel: "Ime: {name}",
         passwordInputDisabledTitle: "Omogući unos",
         passwordInputEnabledTitle: "Onemogući unos",
         passwordInputPlaceholder: "Unesite novu lozinku",
         roleLabel: "Uloga: {role}",
+        sections: {
+            profileInformation: "Informacije o profilu",
+            security: "Sigurnost",
+        },
+        subtitle: "Upravljajte postavkama svog računa i preferencijama",
         title: "Profil od {name}",
         updatePasswordButtonLabel: "Ažuriraj lozinku",
     },
@@ -461,6 +514,9 @@ const hr: TranslationStructure = {
     },
     PlannedReservationForm: {
         reservedByStaffRadioBtnLabel: "Osoblje",
+    },
+    PropertyCard: {
+        viewEventsAction: "Prikaži događaje",
     },
     TelNumberInput: {
         clearButtonLabel: "Očisti",

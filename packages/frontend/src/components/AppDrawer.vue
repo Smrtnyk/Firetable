@@ -189,13 +189,13 @@ const roleDisplayName = computed(function () {
     const role = nonNullableUser.value.role;
     switch (role) {
         case AdminRole.ADMIN:
-            return "Administrator";
+            return t("AppDrawer.roles.administrator");
         case Role.MANAGER:
-            return "Manager";
+            return t("AppDrawer.roles.manager");
         case Role.PROPERTY_OWNER:
-            return "Property Owner";
+            return t("AppDrawer.roles.propertyOwner");
         case Role.STAFF:
-            return "Staff";
+            return t("AppDrawer.roles.staff");
         default:
             return role;
     }
@@ -307,7 +307,7 @@ function setDarkMode(newValue: boolean): void {
 
         <!-- Navigation Section -->
         <div class="AppDrawer__nav">
-            <div class="AppDrawer__nav-title">Navigation</div>
+            <div class="AppDrawer__nav-title">{{ t("AppDrawer.sectionTitles.navigation") }}</div>
 
             <q-list class="AppDrawer__nav-list">
                 <template v-for="(link, index) in links" :key="index">
@@ -334,7 +334,7 @@ function setDarkMode(newValue: boolean): void {
 
         <!-- Settings Section -->
         <div class="AppDrawer__settings">
-            <div class="AppDrawer__settings-title">Settings</div>
+            <div class="AppDrawer__settings-title">{{ t("AppDrawer.sectionTitles.settings") }}</div>
 
             <!-- Language Selector -->
             <div class="AppDrawer__setting-item">

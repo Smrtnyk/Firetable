@@ -18,7 +18,7 @@ interface Props {
     propertyId: string;
 }
 
-const { locale } = useI18n();
+const { locale, t } = useI18n();
 const props = defineProps<Props>();
 const propertiesStore = usePropertiesStore();
 const today = new Date();
@@ -63,25 +63,25 @@ const chartInfos = computed(function () {
         {
             data: peakReservationHours.value,
             labels: peakHoursLabels.value,
-            title: "Peak Reservation Hours",
+            title: t("PageAdminAnalytics.charts.peakReservationHoursTitle"),
             type: "bar",
         },
         {
             data: consumptionAnalysisCombined.value,
             labels: ["Consumption"] as string[],
-            title: "Consumption Data",
+            title: t("PageAdminAnalytics.charts.consumptionDataTitle"),
             type: "bar",
         },
         {
             data: guestDistributionAnalysis.value,
             labels: guestDistributionLabels.value,
-            title: "Guest Distribution",
+            title: t("PageAdminAnalytics.charts.guestDistributionTitle"),
             type: "bar",
         },
         {
             data: reservationsByDayOfWeek.value,
             labels: DAYS_OF_WEEK.value,
-            title: "Reservations by Day of Week",
+            title: t("PageAdminAnalytics.charts.reservationsByDayOfWeekTitle"),
             type: "bar",
         },
     ] as const;
@@ -90,7 +90,7 @@ const chartInfos = computed(function () {
 
 <template>
     <div class="PageAdminAnalytics">
-        <FTTitle title="Analytics" />
+        <FTTitle :title="t('PageAdminAnalytics.title')" />
 
         <FTTimeframeSelector v-model="selected" />
 
@@ -98,18 +98,18 @@ const chartInfos = computed(function () {
             <FTCard class="q-mb-md">
                 <BarChart
                     :chart-data="plannedReservationsByProperty"
-                    chart-title="Total Planned Reservations"
+                    :chart-title="t('PageAdminAnalytics.charts.totalPlannedReservationsTitle')"
                 />
             </FTCard>
             <div class="row q-col-gutter-sm q-col-gutter-md-md">
                 <div class="col-12">
                     <q-chip color="primary">
-                        Avg Guests per planned reservation:
+                        {{ t("PageAdminAnalytics.chipLabels.avgGuestsPlanned") }}
                         {{ avgGuestsPerReservation.averagePlannedGuests.toFixed(2) }}
                     </q-chip>
 
                     <q-chip color="primary">
-                        Avg Guests per walk-in reservation:
+                        {{ t("PageAdminAnalytics.chipLabels.avgGuestsWalkIn") }}
                         {{ avgGuestsPerReservation.averageWalkInGuests.toFixed(2) }}
                     </q-chip>
                 </div>
@@ -117,14 +117,14 @@ const chartInfos = computed(function () {
                 <FTCard class="col-sm-12 col-md-6">
                     <PieChart
                         :chart-data="plannedArrivedVsNoShow"
-                        chart-title="Arrived vs. No-Show"
+                        :chart-title="t('PageAdminAnalytics.charts.arrivedVsNoShowTitle')"
                     />
                 </FTCard>
 
                 <FTCard class="col-sm-12 col-md-6">
                     <PieChart
                         :chart-data="plannedVsWalkInReservations"
-                        chart-title="Planned vs. Walk-In"
+                        :chart-title="t('PageAdminAnalytics.charts.plannedVsWalkInTitle')"
                     />
                 </FTCard>
 
@@ -134,7 +134,7 @@ const chartInfos = computed(function () {
                             v-for="day in [...Object.keys(plannedReservationsByDay), 'ALL']"
                             :key="day"
                             :name="day"
-                            :label="day"
+                            :label="day === 'ALL' ? t('PageAdminAnalytics.tabs.all') : day"
                         />
                     </FTTabs>
 

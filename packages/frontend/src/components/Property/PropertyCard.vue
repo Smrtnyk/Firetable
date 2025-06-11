@@ -2,12 +2,14 @@
 import type { PropertyDoc } from "@firetable/types";
 
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 interface Props {
     property: PropertyDoc;
 }
 
 const props = defineProps<Props>();
+const { t } = useI18n();
 
 const backgroundImageUrl = computed(function () {
     return props.property.img || `/images/default-property-img.jpg`;
@@ -41,7 +43,7 @@ const backgroundImageUrl = computed(function () {
                         <h2 class="PropertyCard__title">{{ props.property.name }}</h2>
 
                         <div class="PropertyCard__action">
-                            <span>View Events</span>
+                            <span>{{ t("PropertyCard.viewEventsAction") }}</span>
                             <i class="fas fa-arrow-right" />
                         </div>
                     </div>

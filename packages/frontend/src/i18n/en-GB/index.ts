@@ -5,6 +5,9 @@ const enGB = {
     },
     AddNewGuestForm: {
         guestNameInputLabel: "Guest name *",
+        validation: {
+            nameMinLength: "Guest name must be at least 3 characters long",
+        },
     },
     AddNewOrganisationForm: {
         maxPropertiesLabel: "Add maximum number of allowed properties...",
@@ -22,6 +25,9 @@ const enGB = {
         propertyNameLabel: "Property name",
         propertyNameLengthValidationMessage: "Property name needs to have at least 3 characters!",
         uploadFileButtonLabel: "Upload File",
+    },
+    AdminEventEditInfo: {
+        saveButtonLabel: "Save",
     },
     AppDrawer: {
         languages: {
@@ -46,6 +52,16 @@ const enGB = {
             settings: "Settings",
         },
         logoutAriaLabel: "Logout",
+        roles: {
+            administrator: "Administrator",
+            manager: "Manager",
+            propertyOwner: "Property Owner",
+            staff: "Staff",
+        },
+        sectionTitles: {
+            navigation: "Navigation",
+            settings: "Settings",
+        },
         toggles: {
             darkMode: "Toggle dark mode",
         },
@@ -235,6 +251,25 @@ const enGB = {
         reloadButtonLabel: "Reload",
         waitOrReloadText: "Wait or try to reload the page",
     },
+    PageAdminAnalytics: {
+        charts: {
+            arrivedVsNoShowTitle: "Arrived vs. No-Show",
+            consumptionDataTitle: "Consumption Data",
+            guestDistributionTitle: "Guest Distribution",
+            peakReservationHoursTitle: "Peak Reservation Hours",
+            plannedVsWalkInTitle: "Planned vs. Walk-In",
+            reservationsByDayOfWeekTitle: "Reservations by Day of Week",
+            totalPlannedReservationsTitle: "Total Planned Reservations",
+        },
+        chipLabels: {
+            avgGuestsPlanned: "Avg Guests per planned reservation:",
+            avgGuestsWalkIn: "Avg Guests per walk-in reservation:",
+        },
+        tabs: {
+            all: "ALL",
+        },
+        title: "Analytics",
+    },
     PageAdminEvent: {
         arrivedReservationsTabLabel: "Arrived ({count})",
         cancelledReservationsTabLabel: "Cancelled ({count})",
@@ -416,6 +451,10 @@ const enGB = {
         deleteQueuedReservationConfirmMsg: "Are you sure you want to delete this reservation?",
         exportReservationsConfirmMsg: "This will export reservations to a CSV file",
     },
+    PageEvents: {
+        noEventsMessage: "There are no upcoming events",
+        title: "Upcoming Events",
+    },
     PageIssueReport: {
         categories: {
             bug: "Bug",
@@ -445,11 +484,25 @@ const enGB = {
         propertiesLimit: "Properties Limit",
     },
     PageProfile: {
+        buttons: {
+            cancel: "Cancel",
+        },
+        fields: {
+            changePassword: {
+                description: "Update your password to keep your account secure",
+                title: "Change Password",
+            },
+        },
         nameLabel: "Name: {name}",
         passwordInputDisabledTitle: "Enable input",
         passwordInputEnabledTitle: "Disable input",
         passwordInputPlaceholder: "Enter new password",
         roleLabel: "Role: {role}",
+        sections: {
+            profileInformation: "Profile Information",
+            security: "Security",
+        },
+        subtitle: "Manage your account settings and preferences",
         title: "Profile of {name}",
         updatePasswordButtonLabel: "Update Password",
     },
@@ -459,6 +512,9 @@ const enGB = {
     },
     PlannedReservationForm: {
         reservedByStaffRadioBtnLabel: "Staff",
+    },
+    PropertyCard: {
+        viewEventsAction: "View Events",
     },
     TelNumberInput: {
         clearButtonLabel: "Clear",

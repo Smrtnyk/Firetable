@@ -7,6 +7,9 @@ const de: TranslationStructure = {
     },
     AddNewGuestForm: {
         guestNameInputLabel: "Gastname *",
+        validation: {
+            nameMinLength: "Der Gastname muss mindestens 3 Zeichen lang sein",
+        },
     },
     AddNewOrganisationForm: {
         maxPropertiesLabel: "Maximale Anzahl erlaubter Immobilien hinzufügen...",
@@ -26,6 +29,9 @@ const de: TranslationStructure = {
         propertyNameLabel: "Name der Liegenschaft",
         propertyNameLengthValidationMessage: "Der Immobilienname muss mindestens 3 Zeichen haben!",
         uploadFileButtonLabel: "Datei hochladen",
+    },
+    AdminEventEditInfo: {
+        saveButtonLabel: "Speichern",
     },
     AppDrawer: {
         languages: {
@@ -50,6 +56,16 @@ const de: TranslationStructure = {
             settings: "Einstellungen",
         },
         logoutAriaLabel: "Abmelden",
+        roles: {
+            administrator: "Administrator",
+            manager: "Manager",
+            propertyOwner: "Eigentümer der Immobilie",
+            staff: "Personal",
+        },
+        sectionTitles: {
+            navigation: "Navigation",
+            settings: "Einstellungen",
+        },
         toggles: {
             darkMode: "Dunkelmodus umschalten",
         },
@@ -239,6 +255,25 @@ const de: TranslationStructure = {
         reloadButtonLabel: "Neu laden",
         waitOrReloadText: "Warten Sie oder versuchen Sie, die Seite neu zu laden",
     },
+    PageAdminAnalytics: {
+        charts: {
+            arrivedVsNoShowTitle: "Anwesend vs. Nichterscheinen",
+            consumptionDataTitle: "Verbrauchsdaten",
+            guestDistributionTitle: "Gästeverteilung",
+            peakReservationHoursTitle: "Hauptreservierungszeiten",
+            plannedVsWalkInTitle: "Geplant vs. Laufkundschaft",
+            reservationsByDayOfWeekTitle: "Reservierungen nach Wochentag",
+            totalPlannedReservationsTitle: "Gesamte geplante Reservierungen",
+        },
+        chipLabels: {
+            avgGuestsPlanned: "Durchschn. Gäste pro geplanter Reservierung:",
+            avgGuestsWalkIn: "Durchschn. Gäste pro Laufkundschaft-Reservierung:",
+        },
+        tabs: {
+            all: "ALLE",
+        },
+        title: "Analysen",
+    },
     PageAdminEvent: {
         arrivedReservationsTabLabel: "Angekommen ({count})",
         cancelledReservationsTabLabel: "Storniert ({count})",
@@ -426,6 +461,10 @@ const de: TranslationStructure = {
         deleteQueuedReservationConfirmMsg: "Reservierung aus der Warteschlange löschen?",
         exportReservationsConfirmMsg: "Reservierungen exportieren?",
     },
+    PageEvents: {
+        noEventsMessage: "Es gibt keine kommenden Veranstaltungen",
+        title: "Kommende Veranstaltungen",
+    },
     PageIssueReport: {
         categories: {
             bug: "Fehler",
@@ -455,11 +494,25 @@ const de: TranslationStructure = {
         propertiesLimit: "Immobilienlimit",
     },
     PageProfile: {
+        buttons: {
+            cancel: "Abbrechen",
+        },
+        fields: {
+            changePassword: {
+                description: "Aktualisieren Sie Ihr Passwort, um Ihr Konto zu schützen",
+                title: "Passwort ändern",
+            },
+        },
         nameLabel: "Name: {name}",
         passwordInputDisabledTitle: "Eingabe aktivieren",
         passwordInputEnabledTitle: "Eingabe deaktivieren",
         passwordInputPlaceholder: "Neues Passwort eingeben",
         roleLabel: "Rolle: {role}",
+        sections: {
+            profileInformation: "Profilinformationen",
+            security: "Sicherheit",
+        },
+        subtitle: "Verwalten Sie Ihre Kontoeinstellungen und Präferenzen",
         title: "Profil von {name}",
         updatePasswordButtonLabel: "Passwort aktualisieren",
     },
@@ -469,6 +522,9 @@ const de: TranslationStructure = {
     },
     PlannedReservationForm: {
         reservedByStaffRadioBtnLabel: "Personal",
+    },
+    PropertyCard: {
+        viewEventsAction: "Veranstaltungen anzeigen",
     },
     TelNumberInput: {
         clearButtonLabel: "Löschen",

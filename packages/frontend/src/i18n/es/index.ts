@@ -7,6 +7,9 @@ const es: TranslationStructure = {
     },
     AddNewGuestForm: {
         guestNameInputLabel: "Nombre de invitado *",
+        validation: {
+            nameMinLength: "El nombre del huésped debe tener al menos 3 caracteres",
+        },
     },
     AddNewOrganisationForm: {
         maxPropertiesLabel: "Agregar número máximo de propiedades permitidas...",
@@ -25,6 +28,9 @@ const es: TranslationStructure = {
         propertyNameLengthValidationMessage:
             "¡El nombre de la propiedad debe tener al menos 3 caracteres!",
         uploadFileButtonLabel: "Subir archivo",
+    },
+    AdminEventEditInfo: {
+        saveButtonLabel: "Guardar",
     },
     AppDrawer: {
         languages: {
@@ -49,6 +55,16 @@ const es: TranslationStructure = {
             settings: "Configuración",
         },
         logoutAriaLabel: "Cerrar sesión",
+        roles: {
+            administrator: "Administrador",
+            manager: "Gerente",
+            propertyOwner: "Propietario del inmueble",
+            staff: "Personal",
+        },
+        sectionTitles: {
+            navigation: "Navegación",
+            settings: "Configuración",
+        },
         toggles: {
             darkMode: "Modo oscuro",
         },
@@ -239,6 +255,25 @@ const es: TranslationStructure = {
         reloadButtonLabel: "Recargar",
         waitOrReloadText: "Espere o intente recargar la página",
     },
+    PageAdminAnalytics: {
+        charts: {
+            arrivedVsNoShowTitle: "Llegadas vs. No Presentados",
+            consumptionDataTitle: "Datos de Consumo",
+            guestDistributionTitle: "Distribución de Huéspedes",
+            peakReservationHoursTitle: "Horas Pico de Reservas",
+            plannedVsWalkInTitle: "Planificadas vs. Sin Cita Previa",
+            reservationsByDayOfWeekTitle: "Reservas por Día de la Semana",
+            totalPlannedReservationsTitle: "Total de Reservas Planificadas",
+        },
+        chipLabels: {
+            avgGuestsPlanned: "Prom. de Huéspedes por reserva planificada:",
+            avgGuestsWalkIn: "Prom. de Huéspedes por reserva sin cita previa:",
+        },
+        tabs: {
+            all: "TODOS",
+        },
+        title: "Analíticas",
+    },
     PageAdminEvent: {
         arrivedReservationsTabLabel: "Llegados ({count})",
         cancelledReservationsTabLabel: "Cancelados ({count})",
@@ -423,6 +458,10 @@ const es: TranslationStructure = {
         deleteQueuedReservationConfirmMsg: "¿Está seguro que desea eliminar esta reservación?",
         exportReservationsConfirmMsg: "Esto exportará todas las reservaciones a un archivo CSV",
     },
+    PageEvents: {
+        noEventsMessage: "No hay próximos eventos",
+        title: "Próximos Eventos",
+    },
     PageIssueReport: {
         categories: {
             bug: "Bug",
@@ -452,11 +491,26 @@ const es: TranslationStructure = {
         propertiesLimit: "Límite de propiedades",
     },
     PageProfile: {
+        buttons: {
+            cancel: "Cancelar",
+        },
+        fields: {
+            changePassword: {
+                description: "Actualiza tu contraseña para mantener tu cuenta segura",
+                title: "Cambiar Contraseña",
+            },
+        },
         nameLabel: "Nombre: {name}",
         passwordInputDisabledTitle: "Habilitar entrada",
         passwordInputEnabledTitle: "Deshabilitar entrada",
         passwordInputPlaceholder: "Ingrese una nueva contraseña",
         roleLabel: "Rol: {role}",
+        sections: {
+            profileInformation: "Información del Perfil",
+            security: "Seguridad",
+        },
+
+        subtitle: "Gestiona la configuración y preferencias de tu cuenta",
         title: "Perfil de {name}",
         updatePasswordButtonLabel: "Actualizar Contraseña",
     },
@@ -466,6 +520,9 @@ const es: TranslationStructure = {
     },
     PlannedReservationForm: {
         reservedByStaffRadioBtnLabel: "Staff",
+    },
+    PropertyCard: {
+        viewEventsAction: "Ver Eventos",
     },
     TelNumberInput: {
         clearButtonLabel: "Borrar",

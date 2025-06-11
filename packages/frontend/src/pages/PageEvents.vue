@@ -129,7 +129,7 @@ function showEventForm(event?: EventDoc): void {
 
 <template>
     <div class="PageHome">
-        <FTTitle title="Upcoming Events">
+        <FTTitle :title="t('PageEvents.title')">
             <template #right v-if="canCreateEvents">
                 <FTBtn
                     class="button-gradient"
@@ -147,7 +147,7 @@ function showEventForm(event?: EventDoc): void {
             :property-time-zone="propertySettings.timezone"
         />
         <FTCenteredText v-if="!isLoading && events.length === 0">
-            There are no upcoming events
+            {{ t("PageEvents.noEventsMessage") }}
         </FTCenteredText>
     </div>
 </template>

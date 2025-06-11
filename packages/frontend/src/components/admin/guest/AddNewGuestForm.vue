@@ -28,7 +28,7 @@ const guestName = ref("");
 const guestContact = ref("");
 const guestTags = ref<string[]>([]);
 const createGuestForm = useTemplateRef<QForm>("createGuestForm");
-const guestNameRules = [minLength("Guest name must be at least 3 characters long", 3)];
+const guestNameRules = [minLength(t("AddNewGuestForm.validation.nameMinLength"), 3)];
 
 if (mode === "edit" && initialData) {
     guestName.value = initialData.name;

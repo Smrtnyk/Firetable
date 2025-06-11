@@ -58,14 +58,16 @@ async function changePassword(): Promise<void> {
                 <h1 class="PageProfile__title">
                     {{ t("PageProfile.title", { name: user.name }) }}
                 </h1>
-                <p class="PageProfile__subtitle">Manage your account settings and preferences</p>
+                <p class="PageProfile__subtitle">{{ t("PageProfile.subtitle") }}</p>
             </div>
 
             <!-- Profile Section -->
             <div class="PageProfile__section">
                 <div class="PageProfile__section-header">
                     <i class="fas fa-user PageProfile__section-icon" />
-                    <h2 class="PageProfile__section-title">Profile Information</h2>
+                    <h2 class="PageProfile__section-title">
+                        {{ t("PageProfile.sections.profileInformation") }}
+                    </h2>
                 </div>
 
                 <div class="PageProfile__card">
@@ -97,15 +99,19 @@ async function changePassword(): Promise<void> {
             <div class="PageProfile__section">
                 <div class="PageProfile__section-header">
                     <i class="fas fa-lock PageProfile__section-icon" />
-                    <h2 class="PageProfile__section-title">Security</h2>
+                    <h2 class="PageProfile__section-title">
+                        {{ t("PageProfile.sections.security") }}
+                    </h2>
                 </div>
 
                 <div class="PageProfile__card">
                     <div class="PageProfile__password-section">
                         <div class="PageProfile__field-header">
-                            <h4 class="PageProfile__field-title">Change Password</h4>
+                            <h4 class="PageProfile__field-title">
+                                {{ t("PageProfile.fields.changePassword.title") }}
+                            </h4>
                             <p class="PageProfile__field-description">
-                                Update your password to keep your account secure
+                                {{ t("PageProfile.fields.changePassword.description") }}
                             </p>
                         </div>
 
@@ -150,7 +156,7 @@ async function changePassword(): Promise<void> {
                             />
                             <q-btn
                                 @click="toggleInput"
-                                label="Cancel"
+                                :label="t('PageProfile.buttons.cancel')"
                                 flat
                                 color="grey-7"
                                 class="q-ml-sm"
