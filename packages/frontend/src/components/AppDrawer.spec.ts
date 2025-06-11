@@ -157,11 +157,11 @@ describe("AppDrawer", () => {
                 - Manage Drink Cards
                 - Manage Inventory
                 - Manage Analytics
+                - Settings
                 - Manage Users
                 - Guestbook
                 - Manage Properties
                 - Report an Issue
-                - Settings
                 `,
                 role: Role.PROPERTY_OWNER,
             },
@@ -174,10 +174,10 @@ describe("AppDrawer", () => {
                 - Manage Drink Cards
                 - Manage Inventory
                 - Manage Analytics
+                - Settings
                 - Manage Users
                 - Guestbook
                 - Report an Issue
-                - Settings
                 `,
                 role: Role.MANAGER,
             },
