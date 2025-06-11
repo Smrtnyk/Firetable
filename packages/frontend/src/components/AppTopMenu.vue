@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { refreshApp } from "src/helpers/utils";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
@@ -25,7 +24,6 @@ const menuLinks = [
             active-color="white"
             :breakpoint="0"
         >
-            <q-btn icon="fa fa-redo" rounded @click="refreshApp" flat />
             <q-space />
             <q-route-tab
                 v-for="menu in menuLinks"
@@ -33,10 +31,16 @@ const menuLinks = [
                 :to="{ name: menu.routeName }"
                 exact
                 :icon="menu.icon"
+                class="AppTopMenu__tab"
             />
             <q-space />
-            <q-btn flat :aria-label="t('AppTopMenu.menuAriaLabel')" @click="emit('toggle-drawer')">
-                <q-icon size="2rem" name="fa fa-bars" />
+            <q-btn
+                flat
+                :aria-label="t('AppTopMenu.menuAriaLabel')"
+                @click="emit('toggle-drawer')"
+                class="AppTopMenu__menu-btn"
+            >
+                <q-icon size="1.25rem" name="fa fa-bars" />
             </q-btn>
         </q-tabs>
     </q-header>
@@ -47,11 +51,54 @@ const menuLinks = [
     background-color: transparent;
 
     &__tabs {
-        padding-left: 1rem;
-        padding-right: 1rem;
+        padding: 0 1rem;
+        min-height: 48px;
+        height: 48px;
 
         .q-tabs__content {
             justify-content: space-evenly;
+            height: 100%;
+        }
+    }
+
+    &__tab {
+        min-height: 48px;
+        padding: 8px 16px;
+
+        .q-tab__icon {
+            font-size: 1.1rem;
+        }
+    }
+
+    &__menu-btn {
+        padding: 8px 12px;
+        min-height: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .AppTopMenu {
+        &__tabs {
+            min-height: 44px;
+            height: 44px;
+            padding: 0 0.5rem;
+        }
+
+        &__tab {
+            min-height: 44px;
+            padding: 6px 12px;
+
+            .q-tab__icon {
+                font-size: 1rem;
+            }
+        }
+
+        &__menu-btn {
+            padding: 6px 10px;
+
+            .q-icon {
+                font-size: 1.1rem !important;
+            }
         }
     }
 }

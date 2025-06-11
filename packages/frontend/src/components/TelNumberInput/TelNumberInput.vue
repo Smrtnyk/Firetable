@@ -1,58 +1,78 @@
 <template>
-    <div>
-        <div class="row items-start q-gutter-sm justify-between">
-            <q-select
-                class="col-4"
-                outlined
-                v-model="selectedCountry"
-                :options="countryOptions"
-                option-label="name"
-                :label="t('TelNumberInput.countryCodeLabel')"
-                :use-input="!selectedCountry"
-                @filter="onFilterCountries"
-                clearable
-                clear-icon="fa fa-close"
-                :clear-icon-label="t('TelNumberInput.clearButtonLabel')"
-                :rules="[validateCountrySelection]"
-            >
-                <template #option="scope">
-                    <q-item v-bind="scope.itemProps">
-                        <q-item-section avatar>
-                            <img
-                                :src="scope.opt.flag"
-                                alt=""
-                                class="q-mr-sm"
-                                style="width: 20px; height: 14px"
-                            />
-                        </q-item-section>
-                        <q-item-section side>
-                            {{ scope.opt.name }} (+{{ scope.opt.dialCode }})
-                        </q-item-section>
-                    </q-item>
-                </template>
+    <div class="TelNumberInput">
+        <div class="TelNumberInput__container">
+            <!-- Country Code Select -->
+            <div class="TelNumberInput__country-select">
+                <q-select
+                    v-model="selectedCountry"
+                    hide-bottom-space
+                    :options="countryOptions"
+                    option-label="name"
+                    :label="t('TelNumberInput.countryCodeLabel')"
+                    :use-input="!selectedCountry"
+                    @filter="onFilterCountries"
+                    clearable
+                    clear-icon="fas fa-times"
+                    :clear-icon-label="t('TelNumberInput.clearButtonLabel')"
+                    :rules="[validateCountrySelection]"
+                    outlined
+                    dense
+                    class="TelNumberInput__country-field"
+                >
+                    <template #option="scope">
+                        <q-item v-bind="scope.itemProps" class="TelNumberInput__country-option">
+                            <q-item-section avatar>
+                                <img :src="scope.opt.flag" alt="" class="TelNumberInput__flag" />
+                            </q-item-section>
+                            <q-item-section>
+                                <div class="TelNumberInput__country-info">
+                                    <span class="TelNumberInput__country-name">{{
+                                        scope.opt.name
+                                    }}</span>
+                                    <span class="TelNumberInput__dial-code"
+                                        >+{{ scope.opt.dialCode }}</span
+                                    >
+                                </div>
+                            </q-item-section>
+                        </q-item>
+                    </template>
 
-                <template #selected-item="{ opt }">
-                    <div class="row no-wrap items-center full-width">
-                        <img
-                            :src="opt.flag"
-                            alt=""
-                            class="q-mr-sm"
-                            style="width: 20px; height: 14px"
-                        />
-                        <div>+{{ opt.dialCode }}</div>
-                    </div>
-                </template>
-            </q-select>
+                    <template #selected-item="{ opt }">
+                        <div class="TelNumberInput__selected">
+                            <img :src="opt.flag" alt="" class="TelNumberInput__flag" />
+                            <span class="TelNumberInput__selected-code">+{{ opt.dialCode }}</span>
+                        </div>
+                    </template>
 
-            <q-input
-                class="col"
-                v-model="phoneNumber"
-                :label="t('TelNumberInput.phoneNumberLabel')"
-                type="tel"
-                outlined
-                :rules="[validatePhoneNumber]"
-                @blur="onPhoneNumberBlur"
-            />
+                    <template #prepend>
+                        <i class="fas fa-globe TelNumberInput__icon" />
+                    </template>
+                </q-select>
+            </div>
+
+            <!-- Phone Number Input -->
+            <div class="TelNumberInput__phone-input">
+                <q-input
+                    v-model="phoneNumber"
+                    :label="t('TelNumberInput.phoneNumberLabel')"
+                    type="tel"
+                    outlined
+                    dense
+                    :rules="[validatePhoneNumber]"
+                    @blur="onPhoneNumberBlur"
+                    class="TelNumberInput__phone-field"
+                >
+                    <template #prepend>
+                        <i class="fas fa-phone TelNumberInput__icon" />
+                    </template>
+                </q-input>
+            </div>
+        </div>
+
+        <!-- Helper Text -->
+        <div class="TelNumberInput__helper" v-if="fullNumber">
+            <i class="fas fa-check-circle TelNumberInput__helper-icon" />
+            <span class="TelNumberInput__helper-text">{{ fullNumber }}</span>
         </div>
     </div>
 </template>
@@ -92,7 +112,6 @@ const countryOptions = ref<Country[]>(europeanCountries);
 watch(
     () => modelValue,
     function (newVal) {
-        // Only update inputs if modelValue has changed and is different from current inputs
         if (newVal && newVal !== fullNumber.value) {
             const parsedNumber = parsePhoneNumberFromString(newVal);
             if (parsedNumber) {
@@ -105,7 +124,6 @@ watch(
                 }
             }
         }
-        // Do not reset inputs when newVal is empty (invalid input)
     },
     { immediate: true },
 );
@@ -180,7 +198,6 @@ function validatePhoneNumber(): boolean | string {
         }
     } else {
         if (!country && !number) {
-            // Field is optional
             return true;
         }
         if ((country && !number) || (!country && number)) {
@@ -202,3 +219,255 @@ function validatePhoneNumber(): boolean | string {
 
 watch([selectedCountry, phoneNumber], emitPhoneNumber);
 </script>
+
+<style lang="scss" scoped>
+.TelNumberInput {
+    &__container {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    &__country-select {
+        flex: 0 0 200px; // Fixed width for country select
+    }
+
+    &__phone-input {
+        flex: 1; // Take remaining space
+    }
+
+    &__country-field,
+    &__phone-field {
+        :deep(.q-field__control) {
+            border-radius: $button-border-radius;
+            border-color: $border-light;
+            transition: all 0.2s ease;
+
+            &:hover {
+                border-color: $primary;
+            }
+        }
+
+        :deep(.q-field--focused .q-field__control) {
+            border-color: $primary;
+            box-shadow: 0 0 0 3px rgba($primary, 0.1);
+        }
+
+        :deep(.q-field__label) {
+            color: $text-secondary;
+            font-weight: 500;
+        }
+    }
+
+    &__icon {
+        color: $text-tertiary;
+        font-size: 14px;
+    }
+
+    &__country-option {
+        padding: 8px 16px;
+
+        &:hover {
+            background: rgba($primary, 0.05);
+        }
+    }
+
+    &__flag {
+        width: 20px;
+        height: 14px;
+        border-radius: 2px;
+        object-fit: cover;
+    }
+
+    &__country-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    &__country-name {
+        font-weight: 500;
+        color: $text-primary;
+    }
+
+    &__dial-code {
+        color: $text-secondary;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    &__selected {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+    }
+
+    &__selected-code {
+        font-weight: 600;
+        color: $text-primary;
+        font-size: 14px;
+    }
+
+    &__helper {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 8px;
+        padding: 8px 12px;
+        background: rgba($accent, 0.1); // Changed from $success to $accent
+        border-radius: $button-border-radius;
+        border-left: 3px solid $accent; // Changed from $success to $accent
+    }
+
+    &__helper-icon {
+        color: $accent; // Changed from $success to $accent
+        font-size: 12px;
+    }
+
+    &__helper-text {
+        color: $accent; // Changed from $success to $accent
+        font-weight: 600;
+        font-size: 14px;
+        font-family: "JetBrains Mono", monospace;
+    }
+}
+
+// Dark mode support
+.body--dark .TelNumberInput {
+    &__country-field,
+    &__phone-field {
+        :deep(.q-field__control) {
+            border-color: $border-light-dark;
+            background: $surface-elevated-dark;
+
+            &:hover {
+                border-color: $primary;
+            }
+        }
+
+        :deep(.q-field__label) {
+            color: $text-secondary-dark;
+        }
+    }
+
+    &__icon {
+        color: $text-tertiary-dark;
+    }
+
+    &__country-option {
+        &:hover {
+            background: rgba($primary, 0.1);
+        }
+    }
+
+    &__country-name {
+        color: $text-primary-dark;
+    }
+
+    &__dial-code {
+        color: $text-secondary-dark;
+    }
+
+    &__selected-code {
+        color: $text-primary-dark;
+    }
+
+    &__helper {
+        background: rgba($accent, 0.15);
+    }
+
+    &__helper-text {
+        color: $accent;
+    }
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+    .TelNumberInput {
+        &__container {
+            flex-direction: column;
+            gap: 12px; // Reduced gap
+        }
+
+        &__country-select,
+        &__phone-input {
+            flex: 1;
+            width: 100%; // Ensure full width
+        }
+
+        &__country-field,
+        &__phone-field {
+            :deep(.q-field__control) {
+                min-height: 48px; // Better touch target
+            }
+        }
+
+        &__helper {
+            margin-top: 12px;
+            padding: 10px 12px;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .TelNumberInput {
+        &__container {
+            gap: 10px;
+        }
+
+        &__country-field,
+        &__phone-field {
+            :deep(.q-field__control) {
+                min-height: 44px; // Slightly smaller for very small screens
+            }
+
+            :deep(.q-field__label) {
+                font-size: 14px;
+            }
+        }
+
+        &__country-info {
+            flex-direction: row; // Keep horizontal on mobile
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        &__country-name {
+            font-size: 14px;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        &__dial-code {
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        &__selected {
+            gap: 6px;
+        }
+
+        &__selected-code {
+            font-size: 13px;
+        }
+
+        &__helper {
+            padding: 8px 10px;
+            margin-top: 10px;
+        }
+
+        &__helper-text {
+            font-size: 12px;
+        }
+
+        &__icon {
+            font-size: 13px;
+        }
+    }
+}
+</style>
