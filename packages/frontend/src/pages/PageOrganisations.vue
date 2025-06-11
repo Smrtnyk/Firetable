@@ -131,12 +131,6 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Action Section -->
-                        <div class="OrganisationCard__action">
-                            <span>View Details</span>
-                            <i class="fas fa-arrow-right" />
-                        </div>
                     </div>
                 </router-link>
             </div>
@@ -176,15 +170,6 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
             0 8px 24px rgba(0, 0, 0, 0.12),
             0 0 0 1px rgba($primary, 0.2);
         border-color: rgba($primary, 0.2);
-
-        .OrganisationCard__action {
-            background: $primary;
-            color: white;
-
-            i {
-                transform: translateX(4px);
-            }
-        }
     }
 
     &__link {
@@ -235,7 +220,6 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
         display: flex;
         flex-direction: column;
         gap: 16px;
-        margin-bottom: 24px;
         flex: 1;
     }
 
@@ -281,25 +265,6 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
             margin-top: 2px;
         }
     }
-
-    &__action {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 16px;
-        background: $surface-secondary;
-        border: 1px solid $border-light;
-        border-radius: $button-border-radius;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        font-weight: 600;
-        color: $text-secondary;
-        font-size: 14px;
-
-        i {
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 12px;
-        }
-    }
 }
 
 // Dark mode support
@@ -338,18 +303,6 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
             color: $text-primary-dark;
         }
     }
-
-    .OrganisationCard__action {
-        background: $surface-container-dark;
-        border-color: $border-light-dark;
-        color: $text-secondary-dark;
-
-        &:hover {
-            background: $primary;
-            border-color: $primary;
-            color: white;
-        }
-    }
 }
 
 // Responsive adjustments
@@ -363,7 +316,6 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 
         &__stats {
             gap: 12px;
-            margin-bottom: 20px;
         }
 
         &__stat {
@@ -388,10 +340,6 @@ async function onOrganisationCreate(organisationPayload: CreateOrganisationPaylo
 
         &__title h3 {
             font-size: 16px;
-        }
-
-        &__stats {
-            margin-bottom: 16px;
         }
     }
 }
