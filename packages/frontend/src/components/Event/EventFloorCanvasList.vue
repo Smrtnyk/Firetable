@@ -18,8 +18,8 @@ const { eventFloors, isActiveFloor, mapFloorToCanvas } = defineProps<EventFloorC
             class="ft-tab-pane"
             :class="{ 'active show': isActiveFloor(floor.id) }"
         >
-            <div class="ft-no-border-radius">
-                <canvas :id="floor.id" :ref="mapFloorToCanvas(floor)"></canvas>
+            <div class="ft-no-border-radius ft-card">
+                <canvas :id="floor.id" :ref="mapFloorToCanvas(floor)" class="ft-card"></canvas>
             </div>
         </div>
     </div>
