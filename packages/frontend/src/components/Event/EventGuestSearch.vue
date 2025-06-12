@@ -153,6 +153,7 @@ function setModel(val: string): void {
             clearable
             clear-icon="fa fa-close"
             dense
+            hide-dropdown-icon
             outlined
             :debounce="300"
             @input-value="setModel"
@@ -161,7 +162,7 @@ function setModel(val: string): void {
             :options="options"
         >
             <template #prepend>
-                <q-icon name="fa fa-search" />
+                <q-icon name="fa fa-search" size="xs" />
             </template>
 
             <template #before-options>
