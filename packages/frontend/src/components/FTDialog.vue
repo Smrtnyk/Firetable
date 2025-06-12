@@ -7,11 +7,13 @@
             }"
         >
             <q-banner inline-actions>
-                <template #action>
+                <template #avatar>
                     <q-btn
+                        class="q-mt-xs"
                         round
                         flat
-                        icon="fa fa-close"
+                        size="sm"
+                        icon="fa fa-arrow-left"
                         @click="onDialogHide"
                         :aria-label="t('FTDialog.closeDialogAriaLabel')"
                     />
